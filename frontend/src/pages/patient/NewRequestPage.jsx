@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useCurrentLocation } from "../../hooks/useCurrentLocation";
 
 export default function NewRequestPage() {
   const navigate = useNavigate();
+  const { location: geoLoc } = useCurrentLocation();
   const [selectedSymptoms, setSelectedSymptoms] = useState([]);
   const [customDetail, setCustomDetail] = useState("");
   const [location, setLocation] = useState("");
@@ -91,7 +93,9 @@ export default function NewRequestPage() {
         body: JSON.stringify({
           symptoms: symptomsList,
           location: location.trim(),
-          requirement: requirement
+          requirement: requirement,
+          latitude: geoLoc?.lat || null,
+          longitude: geoLoc?.lng || null
         })
       });
 

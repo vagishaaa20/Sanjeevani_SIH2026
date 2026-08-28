@@ -96,6 +96,16 @@ const DOC_STATUS_BADGE = {
   REJECTED: { label: "Rejected", color: "red" },
 };
 
+const DOCTOR_DOCS = [
+  { type: "MEDICAL_REGISTRATION_CERTIFICATE", label: "Medical Registration Certificate", required: true },
+  { type: "MBBS_OR_PRIMARY_QUALIFICATION", label: "MBBS / Primary Medical Qualification", required: true },
+  { type: "INTERNSHIP_COMPLETION_CERTIFICATE", label: "Internship Completion Certificate", required: true },
+  { type: "GOVERNMENT_IDENTITY", label: "Government / Photo Identity Proof", required: true },
+  { type: "PROFESSIONAL_PHOTOGRAPH", label: "Professional Photograph", required: true },
+  { type: "PG_QUALIFICATION_CERTIFICATE", label: "PG Qualification Certificate", required: false },
+  { type: "ADDITIONAL_QUALIFICATION_PROOF", label: "Additional Qualification Proof", required: false },
+];
+
 export default function DoctorDashboard() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
@@ -116,17 +126,28 @@ export default function DoctorDashboard() {
   const [acceptedRequests, setAcceptedRequests] = useState([]);
   const [requestsLoading, setRequestsLoading] = useState(true);
   const [acceptingId, setAcceptingId] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [radiusKm, setRadiusKm] = useState(25);
+  const [selectedCategory, setSelectedCategory] = useState("ALL");
+  const [keywordSearch, setKeywordSearch] = useState("");
 
   // New clinic form state
   const [showClinicForm, setShowClinicForm] = useState(false);
   const [clinicForm, setClinicForm] = useState({ name: "", address: "", fee: "", days: [], start: "09:00", end: "17:00" });
 
-  const loadRequests = useCallback(async () => {
+  const loadRequests = useCallback(async (cityVal, radVal, catVal, keywordVal, docLat, docLng) => {
     const token = localStorage.getItem("accessToken");
     if (!token) return;
     try {
+      let url = "/api/requests/nearby?";
+      if (cityVal) url += `city=${encodeURIComponent(cityVal)}&`;
+      if (radVal) url += `radiusKm=${radVal}&`;
+      if (catVal && catVal !== "ALL") url += `category=${catVal}&`;
+      if (keywordVal) url += `search=${encodeURIComponent(keywordVal)}&`;
+      // Pass doctor's own coordinates as the Haversine origin
+      if (docLat && docLng) url += `lat=${docLat}&lng=${docLng}&`;
       const [nearbyRes, acceptedRes] = await Promise.all([
-        fetch("/api/requests/nearby", { headers: { Authorization: `Bearer ${token}` } }),
+        fetch(url, { headers: { Authorization: `Bearer ${token}` } }),
         fetch("/api/requests/accepted", { headers: { Authorization: `Bearer ${token}` } })
       ]);
       const nearbyData = await nearbyRes.json();
@@ -156,7 +177,14 @@ export default function DoctorDashboard() {
         setErrorMsg(data.error || "Failed to accept request.");
       } else {
         setSuccessMsg("Patient request accepted successfully! Added to your queue.");
-        await loadRequests();
+        await loadRequests(
+          searchQuery,
+          radiusKm,
+          selectedCategory,
+          keywordSearch,
+          profile?.latitude || null,
+          profile?.longitude || null
+        );
       }
     } catch {
       setErrorMsg("Network error accepting request.");
@@ -175,12 +203,21 @@ export default function DoctorDashboard() {
       ]);
       if (pRes.profile) {
         setProfile(pRes.profile);
+        setSearchQuery(pRes.profile.city || "");
         const avail = pRes.profile.availability || {};
         setBookingDisabled(avail.bookingDisabled || false);
         setTeleFee(avail.teleconsultationFee || pRes.profile.consultationFee || "");
 
         if (pRes.profile.verificationStatus === "VERIFIED") {
-          await loadRequests();
+          // Pass doctor's own lat/lng so the backend Haversine has an origin point
+          await loadRequests(
+            pRes.profile.city || "",
+            25,
+            "ALL",
+            "",
+            pRes.profile.latitude || null,
+            pRes.profile.longitude || null
+          );
         }
       }
       setDocs(dRes.documents || []);
@@ -530,16 +567,97 @@ export default function DoctorDashboard() {
               <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
                 {/* Nearby Patient Requests */}
                 <div style={styles.card}>
-                  <div style={styles.cardTitle}>
-                    <span>Nearby Patient Requests ({profile?.city})</span>
-                    <span style={styles.badge(nearbyRequests.length > 0 ? "yellow" : "green")}>
-                      {nearbyRequests.length} Pending
-                    </span>
+                  <div style={{ ...styles.cardTitle, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px", marginBottom: "16px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                      <span>Patient Requests Queue</span>
+                      <span style={styles.badge(nearbyRequests.length > 0 ? "yellow" : "green")}>
+                        {nearbyRequests.length} Pending
+                      </span>
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                      <input
+                        type="text"
+                        placeholder="Keyword search..."
+                        value={keywordSearch}
+                        onChange={(e) => setKeywordSearch(e.target.value)}
+                        style={{
+                          padding: "6px 12px",
+                          borderRadius: "6px",
+                          border: "1px solid #cbd5e1",
+                          fontSize: "0.875rem",
+                          outline: "none",
+                          width: "120px",
+                        }}
+                      />
+                      <select
+                        value={selectedCategory}
+                        onChange={(e) => setSelectedCategory(e.target.value)}
+                        style={{
+                          padding: "6px 12px",
+                          borderRadius: "6px",
+                          border: "1px solid #cbd5e1",
+                          fontSize: "0.875rem",
+                          outline: "none",
+                        }}
+                      >
+                        <option value="ALL">All Urgencies</option>
+                        <option value="EMERGENCY_ESCALATION">Emergency Escalation</option>
+                        <option value="PHYSICAL_VISIT">Physical Visit</option>
+                        <option value="TELECONSULTATION">Teleconsultation</option>
+                      </select>
+                      <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.825rem", color: "#475569" }}>
+                        <span>Radius: {radiusKm} km</span>
+                        <input
+                          type="range"
+                          min="5"
+                          max="100"
+                          step="5"
+                          value={radiusKm}
+                          onChange={(e) => setRadiusKm(parseInt(e.target.value))}
+                          style={{ accentColor: "#3b82f6", cursor: "pointer", width: "80px" }}
+                        />
+                      </div>
+                      <input
+                        type="text"
+                        placeholder="City/region..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        style={{
+                          padding: "6px 12px",
+                          borderRadius: "6px",
+                          border: "1px solid #cbd5e1",
+                          fontSize: "0.875rem",
+                          outline: "none",
+                          width: "100px",
+                        }}
+                      />
+                      <button
+                        style={{
+                          padding: "6px 12px",
+                          background: "#3b82f6",
+                          color: "#fff",
+                          border: "none",
+                          borderRadius: "8px",
+                          fontSize: "0.875rem",
+                          cursor: "pointer",
+                          fontWeight: "600",
+                        }}
+                        onClick={() => {
+                          setRequestsLoading(true);
+                          loadRequests(
+                            searchQuery, radiusKm, selectedCategory, keywordSearch,
+                            profile?.latitude || null, profile?.longitude || null
+                          );
+                        }}
+                      >
+                        Search
+                      </button>
+                    </div>
                   </div>
                   {requestsLoading ? (
                     <div style={styles.emptyState}>Loading clinical requests...</div>
                   ) : nearbyRequests.length === 0 ? (
-                    <div style={styles.emptyState}>No pending patient requests in {profile?.city} at the moment.</div>
+                    <div style={styles.emptyState}>No pending patient requests in "{searchQuery || profile?.city || 'this region'}" at the moment.</div>
                   ) : (
                     <table style={styles.table}>
                       <thead>
@@ -558,6 +676,11 @@ export default function DoctorDashboard() {
                               <div style={{ fontSize: "0.75rem", color: "#64748b" }}>
                                 {req.patientUser?.patientProfile?.sex}, {req.patientUser?.patientProfile?.dateOfBirth ? (new Date().getFullYear() - new Date(req.patientUser.patientProfile.dateOfBirth).getFullYear()) + " y/o" : ""}
                               </div>
+                              {req.distanceKm !== undefined && (
+                                <div style={{ fontSize: "0.725rem", color: "#10b981", fontWeight: "700", marginTop: "2px" }}>
+                                  📍 {req.distanceKm} km away
+                                </div>
+                              )}
                             </td>
                             <td style={styles.td}>
                               <div style={{ fontWeight: "500", color: "#334155" }}>{req.symptoms}</div>
