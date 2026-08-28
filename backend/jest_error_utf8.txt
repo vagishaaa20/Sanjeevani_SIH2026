@@ -1,0 +1,20 @@
+﻿  console.log
+    Γùç injected env (11) from .env // tip: Γùê encrypted .env [www.dotenvx.com]
+
+      at _log (node_modules/dotenv/lib/main.js:131:11)
+
+  console.log
+    Γùç injected env (11) from .env // tip: Γîÿ enable debugging { debug: true }
+
+      at _log (node_modules/dotenv/lib/main.js:131:11)
+
+  console.log
+    Γùç injected env (0) from .env // tip: Γùê secrets for agents [www.dotenvx.com]
+
+      at _log (node_modules/dotenv/lib/main.js:131:11)
+
+  console.log
+    Γùç injected env (0) from .env // tip: Γîü auth for agents [www.vestauth.com]
+
+      at _log (node_modules/dotenv/lib/main.js:131:11)
+

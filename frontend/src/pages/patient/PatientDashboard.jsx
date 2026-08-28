@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 const styles = {
   page: { background: "#f8fafc", minHeight: "100vh", fontFamily: "system-ui, -apple-system, sans-serif" },
-  
+
   // Header
   nav: {
     background: "#fff", borderBottom: "1px solid #e2e8f0", height: "64px",
@@ -28,7 +28,7 @@ const styles = {
   hero: { background: "linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)", padding: "60px 24px 80px", color: "#fff", textAlign: "center" },
   heroTitle: { fontSize: "2.25rem", fontWeight: "800", marginBottom: "8px" },
   heroSubtitle: { fontSize: "1.1rem", color: "#93c5fd", marginBottom: "32px" },
-  
+
   // Practo Dual Search Bar
   searchContainer: {
     display: "flex", maxWidth: "720px", margin: "0 auto 24px", background: "#fff",
@@ -42,7 +42,7 @@ const styles = {
   searchQuery: { flex: 1, padding: "16px", display: "flex", alignItems: "center", gap: "8px" },
   queryInput: { width: "100%", border: "none", outline: "none", fontSize: "0.95rem", color: "#334155" },
   searchBtn: { background: "#0ea5e9", color: "#fff", border: "none", padding: "0 24px", cursor: "pointer", fontWeight: "700" },
-  
+
   popularSearches: { display: "flex", justifyContent: "center", gap: "10px", flexWrap: "wrap", fontSize: "0.8125rem" },
   popularTag: { color: "#93c5fd", cursor: "pointer", textDecoration: "underline" },
 
@@ -64,7 +64,7 @@ const styles = {
   // Sections
   section: { marginBottom: "40px" },
   sectionTitle: { fontSize: "1.25rem", fontWeight: "800", color: "#0f172a", marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "center" },
-  
+
   // Lab Tests Cards
   labsGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "16px" },
   labCard: {
@@ -133,7 +133,7 @@ const DIAGNOSTIC_TESTS = [
 
 export default function PatientDashboard() {
   const navigate = useNavigate();
-  
+
   // Authentication & Profile States
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
@@ -151,9 +151,58 @@ export default function PatientDashboard() {
   const [profileForm, setProfileForm] = useState({
     medicalConditions: "", allergies: "", currentMedications: "", pastMedicalHistory: "", familyMedicalHistory: "", lifestyle: ""
   });
-  
+
   // UI Messages
   const [bookingSuccess, setBookingSuccess] = useState("");
+
+  // Triage Request States
+  const [requests, setRequests] = useState([]);
+  const [reqSymptoms, setReqSymptoms] = useState("");
+  const [reqLocation, setReqLocation] = useState("");
+  const [reqRequirement, setReqRequirement] = useState("");
+  const [submittingReq, setSubmittingReq] = useState(false);
+  const [reqError, setReqError] = useState("");
+  const [reqSuccess, setReqSuccess] = useState("");
+
+  const loadRequests = useCallback(async () => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) return;
+    try {
+      const res = await fetch("/api/requests/my", { headers: { Authorization: `Bearer ${token}` } });
+      const data = await res.json();
+      setRequests(data.requests || []);
+    } catch (e) {
+      console.error(e);
+    }
+  }, []);
+
+  const handleSubmitRequest = async (e) => {
+    e.preventDefault();
+    setSubmittingReq(true);
+    setReqError("");
+    setReqSuccess("");
+    const token = localStorage.getItem("accessToken");
+    try {
+      const res = await fetch("/api/requests", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ symptoms: reqSymptoms, location: reqLocation, requirement: reqRequirement }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setReqError(data.error || "Failed to submit request.");
+      } else {
+        setReqSuccess(`Request submitted successfully! Triage result: ${data.request.triageCategory}`);
+        setReqSymptoms("");
+        setReqRequirement("");
+        await loadRequests();
+      }
+    } catch {
+      setReqError("Network error submitting request.");
+    } finally {
+      setSubmittingReq(false);
+    }
+  };
 
   const loadProfileData = useCallback(async () => {
     const token = localStorage.getItem("accessToken");
@@ -163,8 +212,11 @@ export default function PatientDashboard() {
       const data = await res.json();
       if (data.profile) {
         setProfile(data.profile);
-        if (data.profile.region) setSearchCity(data.profile.region);
-        
+        if (data.profile.region) {
+          setSearchCity(data.profile.region);
+          setReqLocation(data.profile.region);
+        }
+
         // Prep form values
         setProfileForm({
           medicalConditions: data.profile.medicalConditions?.join(", ") || "",
@@ -206,8 +258,8 @@ export default function PatientDashboard() {
     if (u.role !== "patient") { navigate("/login"); return; }
     setUser(u);
 
-    Promise.all([loadProfileData(), queryDoctors()]).finally(() => setLoading(false));
-  }, [navigate, loadProfileData, queryDoctors]);
+    Promise.all([loadProfileData(), queryDoctors(), loadRequests()]).finally(() => setLoading(false));
+  }, [navigate, loadProfileData, queryDoctors, loadRequests]);
 
   const logout = () => { localStorage.clear(); navigate("/login"); };
 
@@ -223,7 +275,7 @@ export default function PatientDashboard() {
         pastMedicalHistory: profileForm.pastMedicalHistory || undefined,
         familyMedicalHistory: profileForm.familyMedicalHistory || undefined,
       };
-      
+
       try {
         if (profileForm.lifestyle) {
           payload.lifestyle = JSON.parse(profileForm.lifestyle);
@@ -276,6 +328,9 @@ export default function PatientDashboard() {
           <div style={styles.navLinks}>
             <button style={styles.navLink(currentTab === "find-doctors")} onClick={() => setCurrentTab("find-doctors")}>
               Find Doctors
+            </button>
+            <button style={styles.navLink(currentTab === "triage-request")} onClick={() => setCurrentTab("triage-request")}>
+              AI Triage & Requests
             </button>
             <button style={styles.navLink(currentTab === "lab-tests")} onClick={() => setCurrentTab("lab-tests")}>
               Book Lab Tests
@@ -336,7 +391,7 @@ export default function PatientDashboard() {
 
       {/* Main Container */}
       <div style={styles.body}>
-        
+
         {/* Success Notifications */}
         {bookingSuccess && <div style={styles.successBadge}>{bookingSuccess}</div>}
 
@@ -368,7 +423,7 @@ export default function PatientDashboard() {
               <span style={styles.serviceDesc}>Home sample collection with certified laboratory diagnosis</span>
             </div>
           </div>
-          <div style={styles.serviceCard} onClick={() => alert("AI Triage system will analyze clinical input in production.")}>
+          <div style={styles.serviceCard} onClick={() => setCurrentTab("triage-request")}>
             <span style={styles.serviceIcon}>🤖</span>
             <div style={styles.serviceContent}>
               <span style={styles.serviceTitle}>AI Triage Guidance</span>
@@ -399,7 +454,7 @@ export default function PatientDashboard() {
             ) : doctorsList.length === 0 ? (
               <div style={styles.card}>
                 <div style={styles.emptyState}>
-                  No verified doctors matching "{searchQuery || 'all'}" found in {searchCity}. 
+                  No verified doctors matching "{searchQuery || 'all'}" found in {searchCity}.
                   <br />Note: Admin must verify registered doctor accounts before they appear here.
                 </div>
               </div>
@@ -408,7 +463,7 @@ export default function PatientDashboard() {
                 {doctorsList.map((doc) => {
                   const hasTeleFee = doc.availability && doc.availability.teleconsultationFee;
                   const isBookingBlocked = doc.availability && doc.availability.bookingDisabled;
-                  
+
                   return (
                     <div key={doc.userId} style={styles.docItem}>
                       <div style={styles.docAvatar}>👨‍⚕️</div>
@@ -447,11 +502,127 @@ export default function PatientDashboard() {
           </div>
         )}
 
+        {/* TAB: Triage Request */}
+        {currentTab === "triage-request" && (
+          <div style={styles.section}>
+            <div style={styles.sectionTitle}>AI-Assisted Symptom Triage & Request Submission</div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
+              {/* Submission Form */}
+              <div style={styles.card}>
+                <h3 style={{ fontSize: "1.1rem", fontWeight: "700", marginBottom: "16px", color: "#0f172a" }}>Submit A Health Request</h3>
+
+                {reqError && <div style={{ ...styles.error, marginBottom: "16px" }}>{reqError}</div>}
+                {reqSuccess && <div style={{ ...styles.successBadge, marginBottom: "16px" }}>{reqSuccess}</div>}
+
+                <form onSubmit={handleSubmitRequest}>
+                  <div style={styles.formGroup}>
+                    <label style={styles.label}>Symptom Description *</label>
+                    <textarea
+                      style={{ ...styles.input, height: "100px", fontFamily: "inherit", resize: "none", padding: "10px" }}
+                      placeholder="Describe your symptoms in detail (e.g., persistent dry cough for 3 days, mild fever 101F, chest heaviness...)"
+                      value={reqSymptoms}
+                      onChange={(e) => setReqSymptoms(e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  <div style={styles.formGroup}>
+                    <label style={styles.label}>Your Location / City *</label>
+                    <input
+                      style={styles.input}
+                      type="text"
+                      placeholder="e.g. Delhi"
+                      value={reqLocation}
+                      onChange={(e) => setReqLocation(e.target.value)}
+                      required
+                    />
+                    <span style={{ fontSize: "0.75rem", color: "#64748b" }}>Matched with verified doctors in this city</span>
+                  </div>
+
+                  <div style={styles.formGroup}>
+                    <label style={styles.label}>Requirement / Requested Support *</label>
+                    <input
+                      style={styles.input}
+                      type="text"
+                      placeholder="e.g. Need general physician consult, urgent prescription refill"
+                      value={reqRequirement}
+                      onChange={(e) => setReqRequirement(e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  <button
+                    style={{ ...styles.bookBtn, width: "100%", padding: "12px", marginTop: "10px" }}
+                    type="submit"
+                    disabled={submittingReq}
+                  >
+                    {submittingReq ? "Submitting to AI Triage..." : "Submit to AI Triage & Doctors"}
+                  </button>
+                </form>
+              </div>
+
+              {/* History & Status */}
+              <div>
+                <h3 style={{ fontSize: "1.1rem", fontWeight: "700", marginBottom: "16px", color: "#0f172a" }}>Your Clinical Requests</h3>
+                {requests.length === 0 ? (
+                  <div style={{ ...styles.card, textAlign: "center", padding: "40px 20px" }}>
+                    <span style={{ fontSize: "2rem", display: "block", marginBottom: "8px" }}>📋</span>
+                    <span style={{ color: "#64748b" }}>No requests submitted yet. Use the form to submit your first triage request.</span>
+                  </div>
+                ) : (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "16px", maxHeight: "500px", overflowY: "auto" }}>
+                    {requests.map((req) => (
+                      <div key={req.id} style={{ ...styles.card, margin: 0, borderLeft: req.triageCategory === 'EMERGENCY_ESCALATION' ? '4px solid #ef4444' : req.triageCategory === 'PHYSICAL_VISIT' ? '4px solid #f59e0b' : '4px solid #10b981' }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "8px" }}>
+                          <span style={{
+                            fontSize: "0.75rem", fontWeight: "800", padding: "2px 8px", borderRadius: "100px",
+                            background: req.triageCategory === 'EMERGENCY_ESCALATION' ? '#fee2e2' : req.triageCategory === 'PHYSICAL_VISIT' ? '#fef9c3' : '#dcfce7',
+                            color: req.triageCategory === 'EMERGENCY_ESCALATION' ? '#b91c1c' : req.triageCategory === 'PHYSICAL_VISIT' ? '#854d0e' : '#15803d'
+                          }}>
+                            {req.triageCategory?.replace(/_/g, " ")}
+                          </span>
+                          <span style={{
+                            fontSize: "0.75rem", fontWeight: "800", padding: "2px 8px", borderRadius: "100px",
+                            background: req.status === 'ACCEPTED' ? '#dbeafe' : req.status === 'PENDING' ? '#f3f4f6' : '#dcfce7',
+                            color: req.status === 'ACCEPTED' ? '#1e40af' : req.status === 'PENDING' ? '#6b7280' : '#15803d'
+                          }}>
+                            {req.status}
+                          </span>
+                        </div>
+                        <p style={{ fontSize: "0.875rem", color: "#334155", margin: "4px 0" }}><strong>Symptoms:</strong> {req.symptoms}</p>
+                        <p style={{ fontSize: "0.875rem", color: "#334155", margin: "4px 0" }}><strong>Requirement:</strong> {req.requirement}</p>
+                        <p style={{ fontSize: "0.8125rem", color: "#64748b", margin: "4px 0" }}><strong>Location:</strong> {req.location}</p>
+
+                        {req.triageReasoning && (
+                          <div style={{ marginTop: "8px", padding: "8px", background: "#f8fafc", borderRadius: "6px", fontSize: "0.75rem", color: "#475569" }}>
+                            <strong>AI Triage Reasoning:</strong> {req.triageReasoning}
+                          </div>
+                        )}
+
+                        {req.status === "ACCEPTED" && req.doctorUser && (
+                          <div style={{ marginTop: "10px", borderTop: "1px solid #e2e8f0", paddingTop: "8px", display: "flex", alignItems: "center", gap: "8px" }}>
+                            <span style={{ fontSize: "1.1rem" }}>👨‍⚕️</span>
+                            <div style={{ fontSize: "0.8125rem" }}>
+                              <div style={{ fontWeight: "700", color: "#0f172a" }}>Dr. {req.doctorUser.doctorProfile?.fullName || "Verified Doctor"}</div>
+                              <div style={{ color: "#64748b" }}>{req.doctorUser.doctorProfile?.specialization} · Phone: {req.doctorUser.phone || "N/A"}</div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* TAB 2: Book Lab Tests */}
         {currentTab === "lab-tests" && (
           <div style={styles.section}>
             <div style={styles.sectionTitle}>Book Diagnostic Tests Online</div>
-            
+
             <div style={{ ...styles.card, background: "#f8fafc", marginBottom: "24px" }}>
               <div style={{ fontSize: "0.95rem", fontWeight: "700", marginBottom: "4px" }}>🏠 Free Home Sample Collection</div>
               <p style={{ fontSize: "0.8125rem", color: "#64748b", margin: 0 }}>

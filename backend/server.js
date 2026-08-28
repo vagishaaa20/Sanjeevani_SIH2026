@@ -4,7 +4,8 @@ const sequelize = require('./src/config/db');
 require('./src/models');
 
 async function startServer() {
-  await sequelize.authenticateDatabase();
+  await sequelize.authenticate();
+  console.log('PostgreSQL connection established.');
   await sequelize.sync();
   app.listen(env.port, () => console.log(`Sanjeevani API listening at http://localhost:${env.port}`));
 }

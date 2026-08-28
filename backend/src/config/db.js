@@ -1,29 +1,26 @@
 const { Sequelize } = require('sequelize');
-const env = require('./env');
+require('dotenv').config();
 
-const sequelize = new Sequelize(env.db.name, env.db.user, env.db.password, {
-  host: env.db.host,
-  port: env.db.port,
-  dialect: 'postgres',
-  logging: env.nodeEnv === 'development' ? (msg) => console.log('[SQL]', msg) : false,
-  dialectOptions: {
-    ssl: {
-      require: true,
-      rejectUnauthorized: false, // required for Supabase / hosted PG providers
-    },
-  },
-});
+const isProduction = process.env.NODE_ENV === 'production';
 
-async function authenticateDatabase() {
-  try {
-    await sequelize.authenticate();
-    console.log('PostgreSQL connection established.');
-  } catch (error) {
-    const details = error.message || (error.original && error.original.message) || String(error);
-    console.error(`Unable to connect to PostgreSQL at ${env.db.host}:${env.db.port}/${env.db.name}: ${details}`);
-    throw error;
+const sequelize = new Sequelize(
+  process.env.DB_NAME || 'sanjeevani',
+  process.env.DB_USER || 'postgres',
+  process.env.DB_PASSWORD || process.env.DB_PSWD || 'admin123',
+  {
+    host: process.env.DB_HOST || 'localhost',
+    port: Number(process.env.DB_PORT) || 5432,
+    dialect: 'postgres',
+    logging: false,
+    dialectOptions: isProduction
+      ? {
+          ssl: {
+            require: true,
+            rejectUnauthorized: false,
+          },
+        }
+      : {}, // 👈 Disables SSL for local development
   }
-}
+);
 
 module.exports = sequelize;
-module.exports.authenticateDatabase = authenticateDatabase;
