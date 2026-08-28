@@ -143,7 +143,7 @@ async function listMyRequests(req, res) {
 
 // ── POST /api/requests ────────────────────────────────────────────────────────
 async function createRequest(req, res) {
-    const { symptoms, location, requirement } = req.body;
+    const { symptoms, location, requirement, latitude, longitude } = req.body;
 
     if (!symptoms || !location || !requirement) {
         return res.status(400).json({ error: 'Symptoms, Location, and Requirement are required fields.' });
@@ -160,6 +160,8 @@ async function createRequest(req, res) {
             triageCategory: triage.category,
             triageReasoning: triage.reasoning,
             status: 'PENDING',
+            latitude: latitude ? parseFloat(latitude) : null,
+            longitude: longitude ? parseFloat(longitude) : null,
         });
 
         return res.status(201).json({
@@ -184,12 +186,55 @@ async function listNearbyRequests(req, res) {
             return res.status(403).json({ error: 'Account pending credential verification.' });
         }
 
-        // Match doctor's city string with location (checks sub-strings case-insensitively)
+        const lat = parseFloat(req.query.lat) || (doctorProfile.latitude ? parseFloat(doctorProfile.latitude) : null);
+        const lng = parseFloat(req.query.lng) || (doctorProfile.longitude ? parseFloat(doctorProfile.longitude) : null);
+        const radiusKm = parseFloat(req.query.radiusKm) || 25;
+        const category = req.query.category;
+        const search = req.query.search || "";
+
+        const whereClause = {
+            status: 'PENDING',
+        };
+
+        if (category && category !== 'ALL') {
+            whereClause.triageCategory = category;
+        }
+
+        if (search) {
+            whereClause.symptoms = { [Op.iLike]: `%${search}%` };
+        }
+
+        const sequelize = require('../config/db');
+        const attributes = [
+            'id', 'patientId', 'doctorId', 'symptoms', 'location', 'requirement',
+            'triageCategory', 'triageReasoning', 'status', 'createdAt',
+            'latitude', 'longitude'
+        ];
+
+        let order = [['createdAt', 'ASC']];
+        let hasCoords = lat !== null && lng !== null && !isNaN(lat) && !isNaN(lng);
+
+        if (hasCoords) {
+            const distanceFormula = `
+              (6371 * acos(
+                LEAST(1.0, GREATEST(-1.0, 
+                  cos(radians(${lat})) * cos(radians("PatientRequest"."latitude")) * 
+                  cos(radians("PatientRequest"."longitude") - radians(${lng})) + 
+                  sin(radians(${lat})) * sin(radians("PatientRequest"."latitude"))
+                ))
+              ))
+            `;
+            attributes.push([sequelize.literal(distanceFormula), 'distanceKm']);
+            whereClause[Op.and] = sequelize.where(sequelize.literal(distanceFormula), '<=', radiusKm);
+            order = [
+                ['triageCategory', 'ASC'],
+                [sequelize.literal('distanceKm'), 'ASC']
+            ];
+        }
+
         const list = await PatientRequest.findAll({
-            where: {
-                status: 'PENDING',
-                location: { [Op.iLike]: `%${doctorProfile.city}%` },
-            },
+            where: whereClause,
+            attributes,
             include: [
                 {
                     model: User,
@@ -198,11 +243,36 @@ async function listNearbyRequests(req, res) {
                     include: [{ model: PatientProfile, as: 'patientProfile', attributes: ['fullName', 'dateOfBirth', 'sex'] }],
                 },
             ],
-            order: [['createdAt', 'ASC']],
+            order,
         });
 
-        return res.json({ requests: list });
+        let requests = list.map(r => {
+            const rObj = r.toJSON();
+            if (r.get('distanceKm') !== undefined) {
+                rObj.distanceKm = parseFloat(Number(r.get('distanceKm')).toFixed(1));
+            }
+            return rObj;
+        });
+
+        if (!hasCoords) {
+            const targetCity = (req.query.city || doctorProfile.city || '').trim().toLowerCase();
+            if (targetCity) {
+                requests = requests.filter(reqItem => {
+                    const reqLoc = (reqItem.location || '').trim().toLowerCase();
+                    if (!reqLoc) return false;
+
+                    const cityMatch = reqLoc.includes(targetCity) || targetCity.includes(reqLoc);
+                    if (cityMatch) return true;
+
+                    const regions = (doctorProfile.regionsServed || []).map(r => r.trim().toLowerCase());
+                    return regions.some(r => reqLoc.includes(r) || r.includes(reqLoc));
+                });
+            }
+        }
+
+        return res.json({ requests });
     } catch (err) {
+        console.error(err);
         return res.status(500).json({ error: 'Server error listing nearby requests.' });
     }
 }
