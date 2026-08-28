@@ -114,10 +114,42 @@ const DoctorProfile = sequelize.define(
       type: DataTypes.TEXT,
       allowNull: true,
     },
+    latitude: {
+      type: DataTypes.DECIMAL(10, 8),
+      allowNull: true,
+    },
+    longitude: {
+      type: DataTypes.DECIMAL(11, 8),
+      allowNull: true,
+    },
+    // PostGIS geography column — auto-synced from latitude/longitude via beforeSave hook.
+    // Callers set latitude/longitude; this column is maintained automatically.
+    location: {
+      type: DataTypes.GEOGRAPHY('POINT', 4326),
+      allowNull: true,
+    },
   },
+
   {
     tableName: 'doctor_profiles',
     timestamps: true,
+    hooks: {
+      // Keep the geography column in sync with lat/lng — callers never touch 'location' directly.
+      beforeSave: (profile) => {
+        const latChanged = profile.changed('latitude');
+        const lngChanged = profile.changed('longitude');
+        if (latChanged || lngChanged) {
+          const lat = parseFloat(profile.latitude);
+          const lng = parseFloat(profile.longitude);
+          if (!isNaN(lat) && !isNaN(lng)) {
+            // GeoJSON order: [longitude, latitude]
+            profile.location = { type: 'Point', coordinates: [lng, lat] };
+          } else {
+            profile.location = null;
+          }
+        }
+      },
+    },
   }
 );
 
