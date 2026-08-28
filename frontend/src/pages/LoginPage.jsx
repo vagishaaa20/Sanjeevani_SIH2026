@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { dashboardPathForRole } from "../config/roleRoutes";
 
 const styles = {
   container: {
@@ -79,6 +81,18 @@ const styles = {
     width: "100%",
     marginTop: "4px",
   },
+  btnSecondary: {
+    background: "none",
+    border: "1.5px solid #d1d5db",
+    color: "#374151",
+    padding: "11px 20px",
+    borderRadius: "8px",
+    cursor: "pointer",
+    fontSize: "0.9375rem",
+    fontWeight: "600",
+    width: "100%",
+    marginTop: "4px",
+  },
   footerText: { textAlign: "center", fontSize: "0.875rem", color: "#6b7280", marginTop: "20px" },
   error: {
     background: "#fef2f2",
@@ -125,9 +139,10 @@ const styles = {
 
 export default function Login() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [loginMethod, setLoginMethod] = useState("doctor"); // "doctor" | "admin" | "patient"
   const [emailForm, setEmailForm] = useState({ email: "", password: "" });
-  
+
   // Phone login states
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
@@ -137,6 +152,21 @@ export default function Login() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [alreadyLoggedIn, setAlreadyLoggedIn] = useState(null);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("user");
+    const token = localStorage.getItem("accessToken");
+    if (stored && token) {
+      try {
+        setAlreadyLoggedIn(JSON.parse(stored));
+      } catch (e) {
+        // ignore
+      }
+    } else {
+      setAlreadyLoggedIn(null);
+    }
+  }, []);
 
   const handleEmailChange = (e) =>
     setEmailForm({ ...emailForm, [e.target.name]: e.target.value });
@@ -159,15 +189,8 @@ export default function Login() {
       if (!res.ok) {
         setError(data.error || "Login failed. Check your credentials.");
       } else {
-        localStorage.setItem("accessToken", data.accessToken);
-        localStorage.setItem("refreshToken", data.refreshToken);
-        localStorage.setItem("user", JSON.stringify(data.user));
-
-        const role = data.user?.role;
-        if (role === "admin") navigate("/admin/dashboard");
-        else if (role === "doctor") navigate("/doctor/dashboard");
-        else if (role === "hitl_reviewer") navigate("/reviewer/dashboard");
-        else navigate("/");
+        login(data); // stores user + tokens in context (and localStorage)
+        navigate(dashboardPathForRole(data.user?.role));
       }
     } catch {
       setError("Could not connect to the server. Is the backend running?");
@@ -192,10 +215,8 @@ export default function Login() {
       if (!res.ok) {
         setError(data.error || "Login failed.");
       } else {
-        localStorage.setItem("accessToken", data.accessToken);
-        localStorage.setItem("refreshToken", data.refreshToken);
-        localStorage.setItem("user", JSON.stringify(data.user));
-        navigate("/admin/dashboard");
+        login(data);
+        navigate(dashboardPathForRole(data.user?.role));
       }
     } catch {
       setError("Could not connect to the server.");
@@ -254,11 +275,8 @@ export default function Login() {
       if (!res.ok) {
         setError(data.error || "Invalid or expired OTP.");
       } else {
-        localStorage.setItem("accessToken", data.accessToken);
-        localStorage.setItem("refreshToken", data.refreshToken);
-        localStorage.setItem("user", JSON.stringify(data.user));
-        
-        navigate("/dashboard");
+        login(data);
+        navigate(dashboardPathForRole(data.user?.role)); // patients -> "/dashboard"
       }
     } catch {
       setError("Could not connect to the server.");
@@ -266,6 +284,40 @@ export default function Login() {
       setLoading(false);
     }
   };
+
+  if (alreadyLoggedIn) {
+    return (
+      <div style={styles.container}>
+        <div style={styles.card}>
+          <h2 style={styles.heading}>Already Signed In</h2>
+          <p style={styles.subtitle}>You are currently logged in as {alreadyLoggedIn.email}</p>
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "24px" }}>
+            <button
+              style={styles.btnPrimary}
+              onClick={() => {
+                if (alreadyLoggedIn.role === "admin") navigate("/admin/dashboard");
+                else if (alreadyLoggedIn.role === "doctor") navigate("/doctor/dashboard");
+                else if (alreadyLoggedIn.role === "hitl_reviewer") navigate("/reviewer/dashboard");
+                else navigate("/dashboard");
+              }}
+            >
+              Go to Dashboard →
+            </button>
+            <button
+              style={styles.btnSecondary}
+              onClick={() => {
+                localStorage.clear();
+                setAlreadyLoggedIn(null);
+                window.location.reload();
+              }}
+            >
+              Logout & Switch Accounts
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={styles.container}>
@@ -389,7 +441,7 @@ export default function Login() {
                 >
                   {loading ? "Verifying…" : "Verify & Login"}
                 </button>
-                <button 
+                <button
                   style={{ background: "none", border: "none", color: "#2563eb", cursor: "pointer", fontSize: "0.875rem", padding: "0", textAlign: "center" }}
                   type="button"
                   onClick={() => setOtpSent(false)}

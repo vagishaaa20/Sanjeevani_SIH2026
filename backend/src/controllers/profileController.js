@@ -166,4 +166,35 @@ async function updateReviewerProfile(req, res) {
   return res.json({ message: 'Profile updated', profile });
 }
 
-module.exports = { getMyProfile, updatePatientProfile, updateDoctorProfile, updateReviewerProfile };
+/**
+ * Developer helper to auto-verify a doctor's account in dev/local environments.
+ * Sets verificationStatus to VERIFIED and user.isVerified to true.
+ */
+async function devVerifyDoctor(req, res) {
+  if (req.user.role !== ROLES.DOCTOR) {
+    return res.status(403).json({ error: 'Only doctor accounts can request dev-verification' });
+  }
+
+  const t = await User.sequelize.transaction();
+  try {
+    const user = await User.findByPk(req.user.id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    user.isVerified = true;
+    await user.save({ transaction: t });
+
+    const profile = await DoctorProfile.findOne({ where: { userId: req.user.id } });
+    if (!profile) return res.status(404).json({ error: 'Doctor profile not found' });
+
+    profile.verificationStatus = 'VERIFIED';
+    await profile.save({ transaction: t });
+
+    await t.commit();
+    return res.json({ message: 'Doctor profile auto-verified successfully in development mode.', profile });
+  } catch (err) {
+    await t.rollback();
+    return res.status(500).json({ error: err.message || 'Auto-verification failed' });
+  }
+}
+
+module.exports = { getMyProfile, updatePatientProfile, updateDoctorProfile, updateReviewerProfile, devVerifyDoctor };

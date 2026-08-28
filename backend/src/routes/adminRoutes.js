@@ -16,6 +16,9 @@ router.get('/pending', controller.listPending);
 router.get('/users', controller.listUsers);
 router.get('/users/:userId', controller.getUserDetail);
 
+// ── Patient requests audit ────────────────────────────────────────────────────
+router.get('/requests', controller.listAllRequests);
+
 // ── Verification actions ──────────────────────────────────────────────────────
 router.patch('/verify/:userId', controller.verifyUser);
 

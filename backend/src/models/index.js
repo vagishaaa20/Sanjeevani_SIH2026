@@ -4,6 +4,7 @@ const DoctorProfile = require('./DoctorProfile');
 const AdminProfile = require('./AdminProfile');
 const ReviewerProfile = require('./ReviewerProfile');
 const ProfessionalDocument = require('./ProfessionalDocument');
+const PatientRequest = require('./PatientRequest');
 
 // ── User → profile associations (1:1, cascade delete) ────────────────────────
 User.hasOne(PatientProfile, { foreignKey: 'userId', as: 'patientProfile', onDelete: 'CASCADE' });
@@ -23,6 +24,11 @@ ReviewerProfile.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 User.hasMany(ProfessionalDocument, { foreignKey: 'ownerId', as: 'documents' });
 ProfessionalDocument.belongsTo(User, { foreignKey: 'ownerId', as: 'owner' });
 
+User.hasMany(PatientRequest, { foreignKey: 'patientId', as: 'patientRequests' });
+User.hasMany(PatientRequest, { foreignKey: 'doctorId', as: 'doctorRequests' });
+PatientRequest.belongsTo(User, { foreignKey: 'patientId', as: 'patientUser' });
+PatientRequest.belongsTo(User, { foreignKey: 'doctorId', as: 'doctorUser' });
+
 module.exports = {
   User,
   PatientProfile,
@@ -30,4 +36,5 @@ module.exports = {
   AdminProfile,
   ReviewerProfile,
   ProfessionalDocument,
+  PatientRequest,
 };

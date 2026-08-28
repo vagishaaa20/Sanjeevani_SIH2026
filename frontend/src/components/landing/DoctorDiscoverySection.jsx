@@ -184,7 +184,7 @@ export default function DoctorDiscoverySection() {
             </p>
           </div>
           <Link
-            to="/register"
+            to="/register?role=patient"
             id="discovery-cta"
             className="flex items-center gap-2 px-7 py-3.5 rounded-full text-white font-semibold text-sm flex-shrink-0 hover:-translate-y-0.5 transition-all duration-200 shadow-md hover:shadow-lg"
             style={{ background: "#0d7a8a" }}

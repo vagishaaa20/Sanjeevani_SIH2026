@@ -15,4 +15,7 @@ router.patch('/patient', controller.updatePatientProfile);
 router.patch('/doctor', controller.updateDoctorProfile);
 router.patch('/reviewer', controller.updateReviewerProfile);
 
+// ── Dev Auto-Verification (Local Development Helper) ────────────────────────
+router.post('/doctor/dev-verify', controller.devVerifyDoctor);
+
 module.exports = router;

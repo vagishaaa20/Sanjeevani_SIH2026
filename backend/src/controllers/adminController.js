@@ -1,5 +1,5 @@
 const { Op } = require('sequelize');
-const { User, DoctorProfile, ReviewerProfile, ProfessionalDocument } = require('../models');
+const { User, DoctorProfile, ReviewerProfile, ProfessionalDocument, PatientRequest, PatientProfile } = require('../models');
 const { VERIFICATION_STATUS, ROLES, DOCUMENT_STATUS } = require('../config/roles');
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -201,4 +201,31 @@ async function reviewDocument(req, res) {
   return res.json({ message: 'Document status updated', document: updated });
 }
 
-module.exports = { listPending, listUsers, getUserDetail, verifyUser, reviewDocument };
+// ── GET /api/admin/requests ──────────────────────────────────────────────────
+async function listAllRequests(req, res) {
+  try {
+    const list = await PatientRequest.findAll({
+      include: [
+        {
+          model: User,
+          as: 'patientUser',
+          attributes: ['id', 'email', 'phone'],
+          include: [{ model: PatientProfile, as: 'patientProfile', attributes: ['fullName'] }]
+        },
+        {
+          model: User,
+          as: 'doctorUser',
+          attributes: ['id', 'email', 'phone'],
+          include: [{ model: DoctorProfile, as: 'doctorProfile', attributes: ['fullName'] }]
+        }
+      ],
+      order: [['createdAt', 'DESC']]
+    });
+    return res.json({ requests: list });
+  } catch (err) {
+    console.error('Error listing all requests for admin:', err);
+    return res.status(500).json({ error: 'Server error listing all patient requests.' });
+  }
+}
+
+module.exports = { listPending, listUsers, getUserDetail, verifyUser, reviewDocument, listAllRequests };

@@ -48,7 +48,7 @@ export default function CTASection() {
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
-                to="/register"
+                to="/register?role=patient"
                 id="cta-patient"
                 className="flex items-center gap-2 bg-white text-[#0a5561] hover:bg-white/95 font-semibold text-base px-8 py-4 rounded-full shadow-xl hover:shadow-2xl hover:-translate-y-0.5 transition-all duration-200"
               >
@@ -56,7 +56,7 @@ export default function CTASection() {
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
-                to="/register"
+                to="/register?role=doctor"
                 id="cta-doctor"
                 className="flex items-center gap-2 text-white border border-white/30 hover:border-white/60 font-semibold text-base px-8 py-4 rounded-full transition-all duration-200 hover:-translate-y-0.5"
                 style={{ background: "rgba(255,255,255,0.1)", backdropFilter: "blur(8px)" }}

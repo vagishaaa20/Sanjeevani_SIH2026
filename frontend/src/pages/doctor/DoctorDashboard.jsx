@@ -111,9 +111,59 @@ export default function DoctorDashboard() {
   const [successMsg, setSuccessMsg] = useState("");
   const [updating, setUpdating] = useState(false);
 
+  // Clinical Requests
+  const [nearbyRequests, setNearbyRequests] = useState([]);
+  const [acceptedRequests, setAcceptedRequests] = useState([]);
+  const [requestsLoading, setRequestsLoading] = useState(true);
+  const [acceptingId, setAcceptingId] = useState(null);
+
   // New clinic form state
   const [showClinicForm, setShowClinicForm] = useState(false);
   const [clinicForm, setClinicForm] = useState({ name: "", address: "", fee: "", days: [], start: "09:00", end: "17:00" });
+
+  const loadRequests = useCallback(async () => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) return;
+    try {
+      const [nearbyRes, acceptedRes] = await Promise.all([
+        fetch("/api/requests/nearby", { headers: { Authorization: `Bearer ${token}` } }),
+        fetch("/api/requests/accepted", { headers: { Authorization: `Bearer ${token}` } })
+      ]);
+      const nearbyData = await nearbyRes.json();
+      const acceptedData = await acceptedRes.json();
+
+      if (nearbyRes.ok) setNearbyRequests(nearbyData.requests || []);
+      if (acceptedRes.ok) setAcceptedRequests(acceptedData.requests || []);
+    } catch (e) {
+      console.error("Error loading doctor requests:", e);
+    } finally {
+      setRequestsLoading(false);
+    }
+  }, []);
+
+  const handleAcceptRequest = async (requestId) => {
+    setAcceptingId(requestId);
+    setErrorMsg("");
+    setSuccessMsg("");
+    const token = localStorage.getItem("accessToken");
+    try {
+      const res = await fetch(`/api/requests/${requestId}/accept`, {
+        method: "PATCH",
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setErrorMsg(data.error || "Failed to accept request.");
+      } else {
+        setSuccessMsg("Patient request accepted successfully! Added to your queue.");
+        await loadRequests();
+      }
+    } catch {
+      setErrorMsg("Network error accepting request.");
+    } finally {
+      setAcceptingId(null);
+    }
+  };
 
   const loadData = useCallback(async () => {
     const token = localStorage.getItem("accessToken");
@@ -128,12 +178,16 @@ export default function DoctorDashboard() {
         const avail = pRes.profile.availability || {};
         setBookingDisabled(avail.bookingDisabled || false);
         setTeleFee(avail.teleconsultationFee || pRes.profile.consultationFee || "");
+
+        if (pRes.profile.verificationStatus === "VERIFIED") {
+          await loadRequests();
+        }
       }
       setDocs(dRes.documents || []);
     } catch (e) {
       console.error(e);
     }
-  }, []);
+  }, [loadRequests]);
 
   useEffect(() => {
     const stored = localStorage.getItem("user");
@@ -328,7 +382,7 @@ export default function DoctorDashboard() {
                 <span style={styles.lockIcon}>🔒</span>
                 <h2 style={styles.lockTitle}>Verification Pending</h2>
                 <p style={{ color: "#64748b", fontSize: "0.875rem", marginTop: "8px" }}>
-                  Your account is pending professional verification by our medical administration team. 
+                  Your account is pending professional verification by our medical administration team.
                   You will gain access to the clinical dashboard and patient queues once your credentials are approved.
                 </p>
               </div>
@@ -391,9 +445,34 @@ export default function DoctorDashboard() {
                 })}
               </div>
 
-              <div style={{ textAlign: "center" }}>
+              <div style={{ textAlign: "center", display: "flex", justifyContent: "center", gap: "12px", marginTop: "16px" }}>
                 <button style={styles.btnSec} onClick={loadData}>
-                  🔄 Refresh Verification Status
+                  🔄 Refresh Status
+                </button>
+                <button
+                  style={{ ...styles.button, background: "#10b981", cursor: "pointer" }}
+                  onClick={async () => {
+                    setErrorMsg("");
+                    setSuccessMsg("");
+                    const token = localStorage.getItem("accessToken");
+                    try {
+                      const res = await fetch("/api/profile/doctor/dev-verify", {
+                        method: "POST",
+                        headers: { Authorization: `Bearer ${token}` }
+                      });
+                      const data = await res.json();
+                      if (!res.ok) {
+                        setErrorMsg(data.error || "Failed to auto-verify.");
+                      } else {
+                        setSuccessMsg("Account auto-verified! Reloading dashboard...");
+                        setTimeout(() => window.location.reload(), 1000);
+                      }
+                    } catch {
+                      setErrorMsg("Network error.");
+                    }
+                  }}
+                >
+                  ⚡ Developer Auto-Verify
                 </button>
               </div>
             </div>
@@ -449,38 +528,122 @@ export default function DoctorDashboard() {
           {activeTab === "dashboard" && (
             <div style={styles.dashboardGrid}>
               <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-                {/* Teleconsultation requests widget */}
+                {/* Nearby Patient Requests */}
                 <div style={styles.card}>
                   <div style={styles.cardTitle}>
-                    <span>Teleconsultation Requests</span>
-                    <span style={styles.badge("blue")}>0 Pending</span>
+                    <span>Nearby Patient Requests ({profile?.city})</span>
+                    <span style={styles.badge(nearbyRequests.length > 0 ? "yellow" : "green")}>
+                      {nearbyRequests.length} Pending
+                    </span>
                   </div>
-                  <div style={styles.emptyState}>No virtual teleconsultation requests at the moment.</div>
+                  {requestsLoading ? (
+                    <div style={styles.emptyState}>Loading clinical requests...</div>
+                  ) : nearbyRequests.length === 0 ? (
+                    <div style={styles.emptyState}>No pending patient requests in {profile?.city} at the moment.</div>
+                  ) : (
+                    <table style={styles.table}>
+                      <thead>
+                        <tr>
+                          <th style={styles.th}>Patient</th>
+                          <th style={styles.th}>Symptoms</th>
+                          <th style={styles.th}>Triage Recommendation</th>
+                          <th style={styles.th}>Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {nearbyRequests.map((req) => (
+                          <tr key={req.id}>
+                            <td style={styles.td}>
+                              <div style={{ fontWeight: "700" }}>{req.patientUser?.patientProfile?.fullName || "Patient"}</div>
+                              <div style={{ fontSize: "0.75rem", color: "#64748b" }}>
+                                {req.patientUser?.patientProfile?.sex}, {req.patientUser?.patientProfile?.dateOfBirth ? (new Date().getFullYear() - new Date(req.patientUser.patientProfile.dateOfBirth).getFullYear()) + " y/o" : ""}
+                              </div>
+                            </td>
+                            <td style={styles.td}>
+                              <div style={{ fontWeight: "500", color: "#334155" }}>{req.symptoms}</div>
+                              <div style={{ fontSize: "0.75rem", color: "#64748b", marginTop: "2px" }}>Req: {req.requirement}</div>
+                            </td>
+                            <td style={styles.td}>
+                              <span style={{
+                                ...styles.badge(
+                                  req.triageCategory === 'EMERGENCY_ESCALATION' ? 'red' : req.triageCategory === 'PHYSICAL_VISIT' ? 'yellow' : 'green'
+                                ),
+                                display: "inline-block",
+                                marginBottom: "4px"
+                              }}>
+                                {req.triageCategory?.replace(/_/g, " ")}
+                              </span>
+                              {req.triageReasoning && (
+                                <div style={{ fontSize: "0.7rem", color: "#64748b", maxWidth: "250px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={req.triageReasoning}>
+                                  {req.triageReasoning}
+                                </div>
+                              )}
+                            </td>
+                            <td style={styles.td}>
+                              <button
+                                style={{ ...styles.button, background: "#10b981" }}
+                                onClick={() => handleAcceptRequest(req.id)}
+                                disabled={acceptingId === req.id}
+                              >
+                                {acceptingId === req.id ? "..." : "Accept"}
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
                 </div>
 
                 {/* Today's appointments queue widget */}
                 <div style={styles.card}>
                   <div style={styles.cardTitle}>
-                    <span>Today's Appointment Queue</span>
-                    <span style={styles.badge("green")}>0 Scheduled</span>
+                    <span>Your Active Patient Queue</span>
+                    <span style={styles.badge("green")}>{acceptedRequests.length} Ongoing</span>
                   </div>
-                  <table style={styles.table}>
-                    <thead>
-                      <tr>
-                        <th style={styles.th}>Time</th>
-                        <th style={styles.th}>Patient</th>
-                        <th style={styles.th}>Consultation Type</th>
-                        <th style={styles.th}>Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td colSpan={4} style={{ textAlign: "center" }}>
-                          <div style={styles.emptyState}>No patient appointments scheduled for today.</div>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
+                  {requestsLoading ? (
+                    <div style={styles.emptyState}>Loading clinical queue...</div>
+                  ) : acceptedRequests.length === 0 ? (
+                    <div style={styles.emptyState}>No accepted patient requests in your queue. Accept cases above to treat patients.</div>
+                  ) : (
+                    <table style={styles.table}>
+                      <thead>
+                        <tr>
+                          <th style={styles.th}>Patient</th>
+                          <th style={styles.th}>Symptoms</th>
+                          <th style={styles.th}>Triage Category</th>
+                          <th style={styles.th}>Contact Info</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {acceptedRequests.map((req) => (
+                          <tr key={req.id}>
+                            <td style={styles.td}>
+                              <div style={{ fontWeight: "700" }}>{req.patientUser?.patientProfile?.fullName || "Patient"}</div>
+                              <div style={{ fontSize: "0.75rem", color: "#64748b" }}>
+                                {req.patientUser?.patientProfile?.sex}, {req.patientUser?.patientProfile?.dateOfBirth ? (new Date().getFullYear() - new Date(req.patientUser.patientProfile.dateOfBirth).getFullYear()) + " y/o" : ""}
+                              </div>
+                            </td>
+                            <td style={styles.td}>
+                              <div style={{ fontWeight: "500", color: "#334155" }}>{req.symptoms}</div>
+                              <div style={{ fontSize: "0.75rem", color: "#64748b" }}>Req: {req.requirement}</div>
+                            </td>
+                            <td style={styles.td}>
+                              <span style={styles.badge(
+                                req.triageCategory === 'EMERGENCY_ESCALATION' ? 'red' : req.triageCategory === 'PHYSICAL_VISIT' ? 'yellow' : 'green'
+                              )}>
+                                {req.triageCategory?.replace(/_/g, " ")}
+                              </span>
+                            </td>
+                            <td style={styles.td}>
+                              <div style={{ fontSize: "0.85rem", color: "#0f172a", fontWeight: "600" }}>{req.patientUser?.phone || "No Phone"}</div>
+                              <div style={{ fontSize: "0.75rem", color: "#64748b" }}>{req.patientUser?.email || "No Email"}</div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
                 </div>
               </div>
 

@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 /* ─── Shared styles ──────────────────────────────────────────────────────── */
 const s = {
@@ -443,9 +443,71 @@ function ProfessionalForm({ role }) {
 
 /* ─── Main Register page ─────────────────────────────────────────────────── */
 export default function Register() {
-  const [role, setRole] = useState("patient");
-  const [showForm, setShowForm] = useState(false);
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const queryRole = searchParams.get("role");
+
+  const [role, setRole] = useState(queryRole || "patient");
+  const [showForm, setShowForm] = useState(!!queryRole);
+  const [alreadyLoggedIn, setAlreadyLoggedIn] = useState(null);
+
   const selectedRole = ROLES.find((r) => r.value === role);
+
+  useEffect(() => {
+    const r = searchParams.get("role");
+    if (r) {
+      setRole(r);
+      setShowForm(true);
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("user");
+    const token = localStorage.getItem("accessToken");
+    if (stored && token) {
+      try {
+        setAlreadyLoggedIn(JSON.parse(stored));
+      } catch (e) {
+        // ignore
+      }
+    } else {
+      setAlreadyLoggedIn(null);
+    }
+  }, []);
+
+  if (alreadyLoggedIn) {
+    return (
+      <div style={s.page}>
+        <div style={s.card}>
+          <h1 style={s.title}>Already Signed In</h1>
+          <p style={s.subtitle}>You are currently logged in as {alreadyLoggedIn.email}</p>
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "24px" }}>
+            <button
+              style={s.btn}
+              onClick={() => {
+                if (alreadyLoggedIn.role === "admin") navigate("/admin/dashboard");
+                else if (alreadyLoggedIn.role === "doctor") navigate("/doctor/dashboard");
+                else if (alreadyLoggedIn.role === "hitl_reviewer") navigate("/reviewer/dashboard");
+                else navigate("/dashboard");
+              }}
+            >
+              Go to Dashboard →
+            </button>
+            <button
+              style={s.btnGhost}
+              onClick={() => {
+                localStorage.clear();
+                setAlreadyLoggedIn(null);
+                window.location.reload();
+              }}
+            >
+              Logout & Switch Accounts
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={s.page}>

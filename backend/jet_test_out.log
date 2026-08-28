@@ -1,0 +1,120 @@
+﻿  console.log
+    Γùç injected env (10) from .env // tip: Γîÿ multiple files { path: ['.env.local', '.env'] }
+
+      at _log (node_modules/dotenv/lib/main.js:131:11)
+
+  console.log
+    Γùç injected env (0) from .env // tip: Γîÿ override existing { override: true }
+
+      at _log (node_modules/dotenv/lib/main.js:131:11)
+
+node.exe : FAIL 
+tests/request.test.js
+At C:\Program 
+Files\nodejs\npx.ps1:29 
+char:3
++   & $NODE_EXE 
+$NPX_CLI_JS $args
++   ~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~
+    + CategoryInfo        
+      : NotSpecified: (F  
+  AIL tests/request.tes   
+ t.js:String) [], Remo    
+teException
+    + FullyQualifiedError 
+   Id : NativeCommandErr  
+  or
+ 
+  Triage controller & 
+helper routing protection
+    ΓêÜ POST 
+/api/requests ΓÇö rejects 
+unauthenticated request 
+(58 ms)
+    ΓêÜ GET 
+/api/requests/my ΓÇö 
+rejects unauthenticated 
+request (8 ms)
+    ΓêÜ GET 
+/api/requests/nearby ΓÇö 
+rejects unauthenticated 
+request (6 ms)
+  Triage controller role 
+check & input validation
+    ΓêÜ POST 
+/api/requests ΓÇö rejects 
+request from doctor role 
+(12 ms)
+    ΓêÜ POST 
+/api/requests ΓÇö rejects 
+missing parameters (9 ms)
+    ├ù GET 
+/api/requests/nearby ΓÇö 
+rejects request from 
+patient role (279 ms)
+
+  ΓùÅ Triage controller 
+role check & input 
+validation ΓÇ║ GET 
+/api/requests/nearby ΓÇö 
+rejects request from 
+patient role
+
+    expect(received).toBe(
+expected) // Object.is 
+equality
+
+    Expected: 403
+    Received: 500
+
+    [0m [90m 50 |[39m  
+           [33m.[39m[36
+mget[39m([32m'/api/reque
+sts/nearby'[39m)
+     [90m 51 |[39m      
+       [33m.[39m[36mset
+[39m([32m'Authorization'
+[39m[33m,[39m 
+[32m`Bearer ${patientToke
+n}`[39m)[33m;[39m
+    
+[31m[1m>[22m[39m[90m 
+52 |[39m         expect(r
+es[33m.[39mstatusCode)[
+33m.[39mtoBe([35m403[39
+m)[33m;[39m
+     [90m    |[39m      
+                          
+[31m[1m^[22m[39m
+     [90m 53 |[39m     
+})[33m;[39m
+     [90m 54 |[39m 
+})[33m;[39m
+     [90m 55 |[39m[0m
+
+      at Object.toBe (test
+s/request.test.js:52:32)
+
+Test Suites: 1 failed, 1 
+total
+Tests:       1 failed, 5 
+passed, 6 total
+Snapshots:   0 total
+Time:        1.698 s, 
+estimated 2 s
+Ran all test suites 
+matching 
+tests/request.test.js.
+Jest did not exit one 
+second after the test run 
+has completed.
+
+'This usually means that 
+there are asynchronous 
+operations that weren't 
+stopped in your tests. 
+Consider running Jest 
+with 
+`--detectOpenHandles` to 
+troubleshoot this issue.
