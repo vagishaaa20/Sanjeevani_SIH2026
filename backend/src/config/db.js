@@ -5,7 +5,13 @@ const sequelize = new Sequelize(env.db.name, env.db.user, env.db.password, {
   host: env.db.host,
   port: env.db.port,
   dialect: 'postgres',
-  logging: env.nodeEnv === 'development' ? false : false,
+  logging: env.nodeEnv === 'development' ? (msg) => console.log('[SQL]', msg) : false,
+  dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false, // required for Supabase / hosted PG providers
+    },
+  },
 });
 
 async function authenticateDatabase() {
