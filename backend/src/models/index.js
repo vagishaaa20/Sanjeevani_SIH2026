@@ -5,6 +5,7 @@ const AdminProfile = require('./AdminProfile');
 const ReviewerProfile = require('./ReviewerProfile');
 const ProfessionalDocument = require('./ProfessionalDocument');
 const PatientRequest = require('./PatientRequest');
+const TriageCorrection = require('./TriageCorrection');
 
 // ── User → profile associations (1:1, cascade delete) ────────────────────────
 User.hasOne(PatientProfile, { foreignKey: 'userId', as: 'patientProfile', onDelete: 'CASCADE' });
@@ -18,9 +19,6 @@ AdminProfile.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 ReviewerProfile.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 
 // ── ProfessionalDocument: ownerId is a logical FK (no DB constraint) ──────────
-// We intentionally avoid a DB-level FK here because ownerId can refer to either
-// a doctor or a reviewer user. Referential integrity is enforced at the
-// application layer (see documentController).
 User.hasMany(ProfessionalDocument, { foreignKey: 'ownerId', as: 'documents' });
 ProfessionalDocument.belongsTo(User, { foreignKey: 'ownerId', as: 'owner' });
 
@@ -28,6 +26,9 @@ User.hasMany(PatientRequest, { foreignKey: 'patientId', as: 'patientRequests' })
 User.hasMany(PatientRequest, { foreignKey: 'doctorId', as: 'doctorRequests' });
 PatientRequest.belongsTo(User, { foreignKey: 'patientId', as: 'patientUser' });
 PatientRequest.belongsTo(User, { foreignKey: 'doctorId', as: 'doctorUser' });
+
+User.hasMany(TriageCorrection, { foreignKey: 'reviewerId', as: 'reviewerCorrections' });
+TriageCorrection.belongsTo(User, { foreignKey: 'reviewerId', as: 'reviewerUser' });
 
 module.exports = {
   User,
@@ -37,4 +38,5 @@ module.exports = {
   ReviewerProfile,
   ProfessionalDocument,
   PatientRequest,
+  TriageCorrection,
 };

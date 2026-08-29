@@ -363,10 +363,39 @@ function PatientForm() {
 }
 
 /* ─── Doctor / Medical Reviewer form ─────────────────────────────────────── */
+const PRIMARY_SPECIALTIES = [
+  "General Physician",
+  "Dermatologist",
+  "Cardiologist",
+  "Pulmonologist",
+  "Orthopedic Surgeon",
+  "Gastroenterologist",
+  "ENT Specialist",
+  "Pediatrician",
+  "Neurologist",
+  "Gynecologist",
+  "Psychiatrist",
+  "Ophthalmologist",
+  "Endocrinologist",
+  "Oncologist"
+];
+
 function ProfessionalForm({ role }) {
   const navigate = useNavigate();
   const [step, setStep] = useState("form"); // form | docs
-  const [form, setForm] = useState({ fullName: "", email: "", password: "", city: "", professionalCategory: "" });
+  const [form, setForm] = useState({
+    fullName: "",
+    email: "",
+    password: "",
+    city: "",
+    specialization: "General Physician",
+    customSpecialization: "",
+    subSpecializations: [],
+    customSubSpec: "",
+    yearsOfExperience: 3,
+    clinicOrHospital: "",
+    professionalCategory: ""
+  });
   const [accessToken, setAccessToken] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -374,10 +403,44 @@ function ProfessionalForm({ role }) {
   const set = (e) => setForm({ ...form, [e.target.name]: e.target.value });
   const endpoint = role === "doctor" ? "/api/auth/register/doctor" : "/api/auth/register/hitl";
 
+  const addSubSpec = () => {
+    if (!form.customSubSpec.trim()) return;
+    const item = form.customSubSpec.trim();
+    if (!form.subSpecializations.includes(item)) {
+      setForm({
+        ...form,
+        subSpecializations: [...form.subSpecializations, item],
+        customSubSpec: ""
+      });
+    } else {
+      setForm({ ...form, customSubSpec: "" });
+    }
+  };
+
+  const removeSubSpec = (index) => {
+    setForm({
+      ...form,
+      subSpecializations: form.subSpecializations.filter((_, i) => i !== index)
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault(); setError(""); setLoading(true);
     try {
-      const body = { fullName: form.fullName, email: form.email, password: form.password, city: form.city };
+      const spec = form.specialization === "Other" && form.customSpecialization.trim()
+        ? form.customSpecialization.trim()
+        : form.specialization;
+
+      const body = {
+        fullName: form.fullName,
+        email: form.email,
+        password: form.password,
+        city: form.city,
+        specialization: spec,
+        subSpecialization: form.subSpecializations.join(", "),
+        yearsOfExperience: parseInt(form.yearsOfExperience, 10) || 1,
+        clinicOrHospital: form.clinicOrHospital
+      };
       if (role === "medical_reviewer" && form.professionalCategory) body.professionalCategory = form.professionalCategory;
       const res = await fetch(endpoint, {
         method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
@@ -416,9 +479,78 @@ function ProfessionalForm({ role }) {
         <input style={s.input} type="password" name="password" placeholder="Minimum 8 characters" value={form.password} onChange={set} minLength={8} required />
       </div>
       <div style={s.fg}>
-        <label style={s.label}>City / Region <span style={s.req}>*</span></label>
-        <input style={s.input} type="text" name="city" placeholder="e.g. Delhi, Mumbai" value={form.city} onChange={set} required />
+        <label style={s.label}>City / Practice Region <span style={s.req}>*</span></label>
+        <input style={s.input} type="text" name="city" placeholder="e.g. Delhi, Mumbai, Ranchi" value={form.city} onChange={set} required />
       </div>
+
+      {role === "doctor" && (
+        <>
+          <div style={s.divider} />
+          <span style={s.secLabel}>Medical Specializations & Clinical Focus</span>
+
+          <div style={s.fg}>
+            <label style={s.label}>Primary Specialization <span style={s.req}>*</span></label>
+            <select style={s.select} name="specialization" value={form.specialization} onChange={set} required>
+              {PRIMARY_SPECIALTIES.map((spec) => (
+                <option key={spec} value={spec}>{spec}</option>
+              ))}
+              <option value="Other">Other (Custom Specialization)</option>
+            </select>
+          </div>
+
+          {form.specialization === "Other" && (
+            <div style={s.fg}>
+              <label style={s.label}>Specify Specialization</label>
+              <input style={s.input} type="text" name="customSpecialization" placeholder="e.g. Rheumatologist" value={form.customSpecialization} onChange={set} required />
+            </div>
+          )}
+
+          {/* Additional Sub-Specializations / Super-specialities */}
+          <div style={s.fg}>
+            <label style={s.label}>Additional Specializations / Sub-Specialities</label>
+            <div style={{ display: "flex", gap: "8px" }}>
+              <input
+                style={s.input}
+                type="text"
+                name="customSubSpec"
+                placeholder="e.g. Diabetology, Pediatric Dermatology, Sports Medicine…"
+                value={form.customSubSpec}
+                onChange={set}
+                onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addSubSpec(); } }}
+              />
+              <button
+                type="button"
+                style={{ ...s.uploadBtn, background: "#0284c7" }}
+                onClick={addSubSpec}
+              >
+                + Add
+              </button>
+            </div>
+            {form.subSpecializations.length > 0 && (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginTop: "8px" }}>
+                {form.subSpecializations.map((sub, i) => (
+                  <span key={i} style={{ display: "inline-flex", alignItems: "center", gap: "6px", background: "#e0f2fe", color: "#0369a1", padding: "4px 10px", borderRadius: "100px", fontSize: "0.8rem", fontWeight: "700" }}>
+                    {sub}
+                    <button type="button" onClick={() => removeSubSpec(i)} style={{ background: "none", border: "none", color: "#0369a1", cursor: "pointer", fontSize: "0.8rem", padding: 0 }}>✕</button>
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div style={s.row}>
+            <div style={s.fg}>
+              <label style={s.label}>Years of Experience</label>
+              <input style={s.input} type="number" name="yearsOfExperience" min="1" max="60" value={form.yearsOfExperience} onChange={set} />
+            </div>
+            <div style={s.fg}>
+              <label style={s.label}>Hospital / Clinic Name</label>
+              <input style={s.input} type="text" name="clinicOrHospital" placeholder="e.g. Max Hospital / Private" value={form.clinicOrHospital} onChange={set} />
+            </div>
+          </div>
+        </>
+      )}
+
       {role === "medical_reviewer" && (
         <div style={s.fg}>
           <label style={s.label}>Professional Category</label>

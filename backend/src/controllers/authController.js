@@ -100,7 +100,7 @@ async function registerPatient(req, res) {
  * happens through the admin panel after document submission.
  */
 async function registerDoctor(req, res) {
-  const { fullName, email, phone, password, city } = req.body;
+  const { fullName, email, phone, password, city, specialization, subSpecialization, yearsOfExperience, clinicOrHospital } = req.body;
 
   if (!email || !password) return res.status(400).json({ error: 'Email and password are required' });
   if (!fullName) return res.status(400).json({ error: 'fullName is required' });
@@ -119,6 +119,10 @@ async function registerDoctor(req, res) {
         userId: user.id,
         fullName,
         city: city || null,
+        specialization: specialization || 'General Physician',
+        subSpecialization: subSpecialization || null,
+        yearsOfExperience: yearsOfExperience ? parseInt(yearsOfExperience, 10) : 1,
+        clinicOrHospital: clinicOrHospital || null,
         verificationStatus: VERIFICATION_STATUS.PENDING_VERIFICATION,
       },
       { transaction: t }

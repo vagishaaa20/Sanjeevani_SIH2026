@@ -32,6 +32,10 @@ const PatientProfile = sequelize.define(
       type: DataTypes.STRING(120),
       allowNull: true,
     },
+    bloodGroup: {
+      type: DataTypes.STRING(10),
+      allowNull: true,
+    },
 
     // ── ABHA / ABDM linkage (all optional) ───────────────────────────────────
     abhaNumber: {

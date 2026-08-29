@@ -194,22 +194,67 @@ export default function RequestDetailPage() {
                 </span>
               </div>
             </div>
+
+            {request.attachments && request.attachments.length > 0 && (
+              <div style={{ marginTop: "1.25rem", borderTop: "1px solid #e2e8f0", paddingTop: "1rem" }}>
+                <span style={styles.itemLabel}>Uploaded Evidence & Documents ({request.attachments.length})</span>
+                <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginTop: "8px" }}>
+                  {request.attachments.map((att, idx) => (
+                    <div key={idx} style={{ border: "1px solid #e2e8f0", borderRadius: "8px", padding: "8px", background: "#f8fafc", maxWidth: "220px" }}>
+                      {att.mimetype?.includes("image") ? (
+                        <a href={att.url} target="_blank" rel="noreferrer">
+                          <img src={att.url} alt={att.filename} style={{ width: "100%", height: "100px", objectFit: "cover", borderRadius: "6px" }} />
+                        </a>
+                      ) : (
+                        <div style={{ fontSize: "2rem", textAlign: "center" }}>📄</div>
+                      )}
+                      <div style={{ fontSize: "0.75rem", fontWeight: "600", color: "#334155", marginTop: "4px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {att.filename}
+                      </div>
+                      <a href={att.url} target="_blank" rel="noreferrer" style={{ fontSize: "0.7rem", color: "#0ea5e9", textDecoration: "underline" }}>
+                        View File ↗
+                      </a>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
-          <div style={{ ...styles.card, backgroundColor: theme.bg, borderColor: theme.border }}>
-            <h3 style={{ ...styles.sectionTitle, color: theme.text }}>AI Triage Recommendation</h3>
-            <p style={{ ...styles.recommendationLabel, color: theme.text }}>
-              {theme.label}
-            </p>
-            <p style={{ ...styles.recommendationDesc, color: theme.text }}>
-              {theme.desc}
-            </p>
-            <div style={styles.reasoningBox}>
-              <h4 style={{ margin: "0 0 0.5rem 0", fontSize: "0.9rem", color: "#334155" }}>Clinical Analysis Reasoning:</h4>
-              <p style={{ margin: 0, fontSize: "0.925rem", color: "#475569", lineHeight: "1.6" }}>
-                {request.triageReasoning || "Triage classification generated automatically. Verified safe for consultations."}
-              </p>
-            </div>
+          <div style={{ ...styles.card, backgroundColor: request.hitlStatus === "PENDING" ? "#f0f9ff" : theme.bg, borderColor: request.hitlStatus === "PENDING" ? "#bae6fd" : theme.border }}>
+            <h3 style={{ ...styles.sectionTitle, color: request.hitlStatus === "PENDING" ? "#0369a1" : theme.text }}>
+              {request.hitlStatus === "PENDING" ? "⏱️ Clinical Intake Under Review" : "Validated Clinical Triage"}
+            </h3>
+            {request.hitlStatus === "PENDING" ? (
+              <div>
+                <p style={{ fontWeight: "750", fontSize: "1.05rem", color: "#0c4a6e", margin: "0 0 6px" }}>
+                  Medical Reviewer Audit in Progress
+                </p>
+                <p style={{ fontSize: "0.875rem", color: "#334155", lineHeight: "1.5", margin: 0 }}>
+                  Your symptoms and diagnostic attachments have been securely logged. A certified clinician is reviewing this case. Recommended track and specialist consult paths will unlock once validated.
+                </p>
+              </div>
+            ) : (
+              <>
+                <p style={{ ...styles.recommendationLabel, color: theme.text }}>
+                  {theme.label}
+                </p>
+                <p style={{ ...styles.recommendationDesc, color: theme.text }}>
+                  {theme.desc}
+                </p>
+                {request.hitlReviewerName && (
+                  <div style={{ fontSize: "0.8rem", color: "#166534", fontWeight: "700", marginBottom: "8px" }}>
+                    ✓ Validated by Reviewer: {request.hitlReviewerName}
+                  </div>
+                )}
+                <div style={styles.reasoningBox}>
+                  <h4 style={{ margin: "0 0 0.5rem 0", fontSize: "0.9rem", color: "#334155" }}>Clinical Analysis Reasoning:</h4>
+                  <p style={{ margin: 0, fontSize: "0.925rem", color: "#475569", lineHeight: "1.6" }}>
+                    {request.triageReasoning || "Triage classification generated automatically. Verified safe for consultations."}
+                  </p>
+                </div>
+              </>
+            )}
           </div>
         </div>
 

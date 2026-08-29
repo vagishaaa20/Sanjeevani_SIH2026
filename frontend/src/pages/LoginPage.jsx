@@ -329,15 +329,57 @@ export default function Login() {
 
         <div style={styles.tabs}>
           <button style={styles.tab(loginMethod === "doctor")} onClick={() => { setLoginMethod("doctor"); setError(""); }}>
-            Staff Login
+            Doctor
+          </button>
+          <button style={styles.tab(loginMethod === "reviewer")} onClick={() => { setLoginMethod("reviewer"); setError(""); }}>
+            Reviewer (HITL)
           </button>
           <button style={styles.tab(loginMethod === "admin")} onClick={() => { setLoginMethod("admin"); setError(""); }}>
-            Admin Login
+            Admin
           </button>
           <button style={styles.tab(loginMethod === "patient")} onClick={() => { setLoginMethod("patient"); setError(""); }}>
-            Patient Login
+            Patient
           </button>
         </div>
+
+        {loginMethod === "reviewer" && (
+          <div style={{ ...styles.adminHelper, background: "#f0fdf4", borderColor: "#86efac", color: "#166534" }}>
+            <div>
+              <strong>Seeded HITL Reviewer Credentials:</strong>
+              <div style={{ marginTop: "4px", fontSize: "0.75rem", fontFamily: "monospace" }}>
+                User: reviewer@sanjeevani.gov.in
+                <br />Pass: reviewer1234
+              </div>
+            </div>
+            <button
+              style={{ ...styles.quickLoginBtn, background: "#16a34a" }}
+              onClick={async () => {
+                setError("");
+                setLoading(true);
+                try {
+                  const res = await fetch("/api/auth/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email: "reviewer@sanjeevani.gov.in", password: "reviewer1234" }),
+                  });
+                  const data = await res.json();
+                  if (!res.ok) setError(data.error || "Login failed.");
+                  else {
+                    login(data);
+                    navigate(dashboardPathForRole(data.user?.role));
+                  }
+                } catch {
+                  setError("Could not connect to the server.");
+                } finally {
+                  setLoading(false);
+                }
+              }}
+              disabled={loading}
+            >
+              {loading ? "Logging in..." : "⚡ Quick Login as HITL Reviewer"}
+            </button>
+          </div>
+        )}
 
         {loginMethod === "admin" && (
           <div style={styles.adminHelper}>
@@ -354,7 +396,7 @@ export default function Login() {
           </div>
         )}
 
-        {loginMethod === "doctor" || loginMethod === "admin" ? (
+        {loginMethod === "doctor" || loginMethod === "reviewer" || loginMethod === "admin" ? (
           <form style={styles.form} onSubmit={handleEmailSubmit}>
             <div style={styles.fieldGroup}>
               <label style={styles.label}>Email Address</label>
@@ -362,7 +404,7 @@ export default function Login() {
                 style={styles.input}
                 type="email"
                 name="email"
-                placeholder={loginMethod === "admin" ? "admin@sanjeevani.gov.in" : "you@hospital.com"}
+                placeholder={loginMethod === "admin" ? "admin@sanjeevani.gov.in" : loginMethod === "reviewer" ? "reviewer@sanjeevani.gov.in" : "you@hospital.com"}
                 value={emailForm.email}
                 onChange={handleEmailChange}
                 required

@@ -18,6 +18,11 @@ const env = {
     accessExpiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN || '15m',
     refreshExpiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN || '7d',
   },
+  llm: {
+    geminiApiKey: process.env.GEMINI_API_KEY || '',
+    openaiApiKey: process.env.OPENAI_API_KEY || '',
+    groqApiKey: process.env.GROQ_API_KEY || '',
+  },
 };
 
 module.exports = env;

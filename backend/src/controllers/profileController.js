@@ -75,7 +75,7 @@ async function updatePatientProfile(req, res) {
     return res.status(403).json({ error: 'Only patient accounts can update the patient profile' });
 
   const ALLOWED = [
-    'fullName', 'dateOfBirth', 'sex', 'preferredLanguage', 'region',
+    'fullName', 'dateOfBirth', 'sex', 'preferredLanguage', 'region', 'bloodGroup',
     'abhaNumber', 'abhaLinked', 'abhaConsentStatus',
     'medicalConditions', 'allergies', 'currentMedications',
     'pastMedicalHistory', 'familyMedicalHistory', 'lifestyle', 'emergencyContact',
@@ -90,12 +90,18 @@ async function updatePatientProfile(req, res) {
     return res.status(400).json({ error: 'No valid fields provided for update' });
 
   let profile = await PatientProfile.findOne({ where: { userId: req.user.id } });
-  if (!profile) return res.status(404).json({ error: 'Patient profile not found' });
+  if (!profile) {
+    profile = await PatientProfile.create({
+      userId: req.user.id,
+      ...updates,
+      accountStatus: PATIENT_STATUS.PROFILE_COMPLETE,
+    });
+  } else {
+    await profile.update(updates);
+    profile = await refreshPatientStatus(profile);
+  }
 
-  await profile.update(updates);
-  profile = await refreshPatientStatus(profile);
-
-  return res.json({ message: 'Profile updated', profile });
+  return res.json({ message: 'Profile updated successfully', profile });
 }
 
 // ── PATCH /api/profile/doctor ─────────────────────────────────────────────────

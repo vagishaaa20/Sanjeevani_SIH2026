@@ -10,10 +10,15 @@ const requestRoutes = require('./routes/requestRoutes');
 const triageRoutes = require('./routes/triageRoutes');
 const errorHandler = require('./middleware/errorHandler');
 
+const path = require('path');
+
 const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// ── Serve uploaded patient & doctor documents ─────────────────────────────────
+app.use('/uploads', express.static(path.resolve(__dirname, '../uploads')));
 
 // ── Health check ──────────────────────────────────────────────────────────────
 app.get('/api/health', (req, res) => res.json({ status: 'ok', message: 'Sanjeevani API is running' }));

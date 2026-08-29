@@ -10,8 +10,16 @@ const router = express.Router();
 router.use(authenticate);
 
 // Patient routes
+router.post('/upload-attachment', requireRole(ROLES.PATIENT), controller.uploadAttachmentMulter.single('file'), controller.uploadAttachment);
+router.post('/ai-triage-preview', requireRole(ROLES.PATIENT), controller.previewTriage);
 router.post('/', requireRole(ROLES.PATIENT), controller.createRequest);
 router.get('/my', requireRole(ROLES.PATIENT), controller.listMyRequests);
+router.post('/:id/hitl-timeout', requireRole(ROLES.PATIENT), controller.fallbackHitlTimeout);
+
+// HITL Reviewer & Admin routes
+router.get('/hitl/queue', controller.listHitlQueue);
+router.post('/hitl/:id/approve', controller.approveHitlTriage);
+router.post('/hitl/:id/override', controller.overrideHitlTriage);
 
 // Doctor routes
 router.get('/nearby', requireRole(ROLES.DOCTOR), controller.listNearbyRequests);

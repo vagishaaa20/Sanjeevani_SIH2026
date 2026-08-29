@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
 const styles = {
-  container: { display: "flex", minHeight: "100vh", background: "#f8fafc", fontFamily: "system-ui, sans-serif" },
+  container: { display: "flex", minHeight: "100vh", background: "#f8fafc", fontFamily: "system-ui, -apple-system, sans-serif" },
   sidebar: { width: "260px", background: "#1e293b", color: "#f8fafc", display: "flex", flexDirection: "column", borderRight: "1px solid #e2e8f0" },
   sidebarHeader: { padding: "24px 20px", borderBottom: "1px solid #334155", display: "flex", flexDirection: "column", gap: "4px" },
   sidebarBrand: { fontSize: "1.25rem", fontWeight: "700", color: "#38bdf8" },
@@ -22,27 +22,33 @@ const styles = {
   header: { background: "#fff", borderBottom: "1px solid #e2e8f0", padding: "16px 24px", display: "flex", justifyContent: "space-between", alignItems: "center" },
   headerTitle: { fontSize: "1.25rem", fontWeight: "700", color: "#0f172a" },
   body: { padding: "24px", flex: 1, overflowY: "auto" },
+
   // Alerts
   pendingAlert: { background: "#fef9c3", border: "1px solid #fde68a", borderRadius: "8px", padding: "16px", marginBottom: "20px" },
   alertTitle: { fontWeight: "700", color: "#854d0e", fontSize: "0.9375rem", display: "flex", alignItems: "center", gap: "8px" },
   alertText: { color: "#713f12", fontSize: "0.875rem", marginTop: "4px", lineHeight: "1.5" },
+
   // Locked screen
   lockScreen: { maxWidth: "600px", margin: "40px auto", padding: "32px", background: "#fff", borderRadius: "12px", boxShadow: "0 4px 20px rgba(0,0,0,0.05)", border: "1px solid #e2e8f0" },
   lockHeader: { textAlign: "center", marginBottom: "24px" },
   lockIcon: { fontSize: "3rem", display: "block", marginBottom: "12px" },
   lockTitle: { fontSize: "1.5rem", fontWeight: "700", color: "#0f172a" },
+
   // Dashboard view
   dashboardGrid: { display: "grid", gridTemplateColumns: "2fr 1fr", gap: "24px" },
   card: { background: "#fff", borderRadius: "12px", border: "1px solid #e2e8f0", padding: "24px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)", marginBottom: "20px" },
   cardTitle: { fontSize: "1rem", fontWeight: "700", color: "#0f172a", marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "center" },
+
   // Interactive forms & tables
   formGroup: { display: "flex", flexDirection: "column", gap: "6px", marginBottom: "14px" },
   label: { fontSize: "0.8125rem", fontWeight: "600", color: "#475569" },
   input: { padding: "8px 12px", border: "1.5px solid #cbd5e1", borderRadius: "6px", fontSize: "0.9rem", outline: "none", background: "#fff", color: "#0f172a" },
   select: { padding: "8px 12px", border: "1.5px solid #cbd5e1", borderRadius: "6px", fontSize: "0.9rem", background: "#fff" },
+  textarea: { padding: "8px 12px", border: "1.5px solid #cbd5e1", borderRadius: "6px", fontSize: "0.9rem", background: "#fff", fontFamily: "inherit" },
   button: { background: "#0284c7", color: "#fff", border: "none", borderRadius: "6px", padding: "8px 16px", fontWeight: "600", cursor: "pointer", fontSize: "0.875rem" },
   btnSec: { background: "#f1f5f9", color: "#334155", border: "1px solid #cbd5e1", borderRadius: "6px", padding: "8px 16px", fontWeight: "600", cursor: "pointer", fontSize: "0.875rem" },
   btnDanger: { background: "#ef4444", color: "#fff", border: "none", borderRadius: "6px", padding: "8px 16px", fontWeight: "600", cursor: "pointer", fontSize: "0.875rem" },
+
   // Clinic items
   clinicList: { display: "flex", flexDirection: "column", gap: "12px" },
   clinicItem: { border: "1.5px solid #e2e8f0", borderRadius: "10px", padding: "16px", display: "flex", justifyContent: "space-between", alignItems: "flex-start", background: "#fff" },
@@ -51,9 +57,11 @@ const styles = {
   clinicDetail: { fontSize: "0.8125rem", color: "#64748b" },
   clinicDays: { display: "flex", gap: "4px", marginTop: "6px" },
   dayBadge: { fontSize: "0.7rem", fontWeight: "700", background: "#f1f5f9", padding: "2px 6px", borderRadius: "4px", color: "#475569" },
+
   // Toggle Switch
   switchContainer: { display: "flex", alignItems: "center", gap: "12px", background: "#f8fafc", padding: "12px 16px", borderRadius: "8px", border: "1px solid #e2e8f0" },
   switchLabel: { fontSize: "0.9rem", fontWeight: "600", color: "#1e293b", flex: 1 },
+
   // Badges
   badge: (color) => ({
     display: "inline-block", padding: "3px 10px", borderRadius: "100px", fontSize: "0.75rem", fontWeight: "700",
@@ -62,10 +70,12 @@ const styles = {
   }),
   error: { background: "#fef2f2", color: "#b91c1c", border: "1px solid #fecaca", padding: "10px 14px", borderRadius: "6px", fontSize: "0.875rem", marginBottom: "16px" },
   success: { background: "#f0fdf4", color: "#166534", border: "1px solid #bbf7d0", padding: "10px 14px", borderRadius: "6px", fontSize: "0.875rem", marginBottom: "16px" },
+
   // Table
   table: { width: "100%", borderCollapse: "collapse" },
   th: { textAlign: "left", fontSize: "0.8125rem", fontWeight: "700", color: "#64748b", padding: "8px 12px", borderBottom: "2px solid #e2e8f0" },
   td: { fontSize: "0.875rem", color: "#334155", padding: "10px 12px", borderBottom: "1px solid #f1f5f9" },
+
   // Document uploading list
   docUploadRow: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px", borderBottom: "1px solid #e2e8f0" },
   uploadLabel: { fontSize: "0.875rem", fontWeight: "600", color: "#334155" },
@@ -80,21 +90,32 @@ const styles = {
   },
   docName: { color: "#374151", fontWeight: "500" },
   emptyState: { color: "#9ca3af", fontSize: "0.875rem", textAlign: "center", padding: "20px 0" },
+
+  // Leaderboard and Stats
+  statsGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "16px", marginBottom: "20px" },
+  statBox: { background: "#fff", border: "1px solid #e2e8f0", borderRadius: "12px", padding: "16px 20px", display: "flex", flexDirection: "column", gap: "4px" },
+  statLabel: { fontSize: "0.75rem", fontWeight: "750", color: "#64748b", textTransform: "uppercase" },
+  statVal: { fontSize: "1.6rem", fontWeight: "850", color: "#0f172a" },
+  subSpecTag: { display: "inline-flex", alignItems: "center", gap: "6px", background: "#e0f2fe", color: "#0369a1", padding: "3px 10px", borderRadius: "100px", fontSize: "0.8rem", fontWeight: "700" }
 };
 
-const VERIFICATION_BADGE = {
-  PENDING_VERIFICATION: { label: "Pending Verification", color: "yellow" },
-  UNDER_REVIEW: { label: "Under Review", color: "yellow" },
-  VERIFIED: { label: "Verified", color: "green" },
-  REJECTED: { label: "Rejected", color: "red" },
-  SUSPENDED: { label: "Suspended", color: "red" },
-};
-
-const DOC_STATUS_BADGE = {
-  PENDING: { label: "Pending", color: "yellow" },
-  ACCEPTED: { label: "Accepted", color: "green" },
-  REJECTED: { label: "Rejected", color: "red" },
-};
+const PRIMARY_SPECIALTIES = [
+  "General Physician",
+  "General Medicine",
+  "Dermatologist",
+  "Cardiologist",
+  "Pulmonologist",
+  "Orthopedic Surgeon",
+  "Gastroenterologist",
+  "ENT Specialist",
+  "Pediatrician",
+  "Neurologist",
+  "Gynecologist",
+  "Psychiatrist",
+  "Ophthalmologist",
+  "Endocrinologist",
+  "Oncologist"
+];
 
 const DOCTOR_DOCS = [
   { type: "MEDICAL_REGISTRATION_CERTIFICATE", label: "Medical Registration Certificate", required: true },
@@ -111,7 +132,7 @@ export default function DoctorDashboard() {
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [docs, setDocs] = useState([]);
-  const [activeTab, setActiveTab] = useState("dashboard"); // "dashboard" | "clinics" | "documents"
+  const [activeTab, setActiveTab] = useState("dashboard"); // "dashboard" | "profile" | "clinics" | "documents"
   const [loading, setLoading] = useState(true);
 
   // Form states
@@ -131,6 +152,22 @@ export default function DoctorDashboard() {
   const [selectedCategory, setSelectedCategory] = useState("ALL");
   const [keywordSearch, setKeywordSearch] = useState("");
 
+  // Edit Profile Form State
+  const [editProfileForm, setEditProfileForm] = useState({
+    fullName: "",
+    specialization: "General Physician",
+    subSpecialization: "",
+    subSpecsList: [],
+    customSubInput: "",
+    city: "",
+    clinicOrHospital: "",
+    yearsOfExperience: 3,
+    consultationFee: 300,
+    medicalRegistrationNumber: "",
+    bio: "",
+    languages: "Hindi, English"
+  });
+
   // New clinic form state
   const [showClinicForm, setShowClinicForm] = useState(false);
   const [clinicForm, setClinicForm] = useState({ name: "", address: "", fee: "", days: [], start: "09:00", end: "17:00" });
@@ -144,8 +181,8 @@ export default function DoctorDashboard() {
       if (radVal) url += `radiusKm=${radVal}&`;
       if (catVal && catVal !== "ALL") url += `category=${catVal}&`;
       if (keywordVal) url += `search=${encodeURIComponent(keywordVal)}&`;
-      // Pass doctor's own coordinates as the Haversine origin
       if (docLat && docLng) url += `lat=${docLat}&lng=${docLng}&`;
+
       const [nearbyRes, acceptedRes] = await Promise.all([
         fetch(url, { headers: { Authorization: `Bearer ${token}` } }),
         fetch("/api/requests/accepted", { headers: { Authorization: `Bearer ${token}` } })
@@ -176,7 +213,7 @@ export default function DoctorDashboard() {
       if (!res.ok) {
         setErrorMsg(data.error || "Failed to accept request.");
       } else {
-        setSuccessMsg("Patient request accepted successfully! Added to your queue.");
+        setSuccessMsg("✓ Patient request accepted successfully! Added to your active queue.");
         await loadRequests(
           searchQuery,
           radiusKm,
@@ -206,10 +243,28 @@ export default function DoctorDashboard() {
         setSearchQuery(pRes.profile.city || "");
         const avail = pRes.profile.availability || {};
         setBookingDisabled(avail.bookingDisabled || false);
-        setTeleFee(avail.teleconsultationFee || pRes.profile.consultationFee || "");
+        setTeleFee(avail.teleconsultationFee || pRes.profile.consultationFee || "300");
+
+        const subList = pRes.profile.subSpecialization
+          ? pRes.profile.subSpecialization.split(",").map((s) => s.trim()).filter(Boolean)
+          : [];
+
+        setEditProfileForm({
+          fullName: pRes.profile.fullName || "",
+          specialization: pRes.profile.specialization || "General Physician",
+          subSpecialization: pRes.profile.subSpecialization || "",
+          subSpecsList: subList,
+          customSubInput: "",
+          city: pRes.profile.city || "",
+          clinicOrHospital: pRes.profile.clinicOrHospital || "",
+          yearsOfExperience: pRes.profile.yearsOfExperience || 3,
+          consultationFee: pRes.profile.consultationFee || 300,
+          medicalRegistrationNumber: pRes.profile.medicalRegistrationNumber || "",
+          bio: pRes.profile.bio || "",
+          languages: (pRes.profile.languages || ["Hindi", "English"]).join(", ")
+        });
 
         if (pRes.profile.verificationStatus === "VERIFIED") {
-          // Pass doctor's own lat/lng so the backend Haversine has an origin point
           await loadRequests(
             pRes.profile.city || "",
             25,
@@ -239,42 +294,9 @@ export default function DoctorDashboard() {
 
   const logout = () => { localStorage.clear(); navigate("/login"); };
 
-  // Handle document upload for verified/unverified docs
-  const [uploadFiles, setUploadFiles] = useState({});
-  const [uploadingDoc, setUploadingDoc] = useState(null);
-
-  const handleDocUpload = async (docType) => {
-    const file = uploadFiles[docType];
-    if (!file) return;
-    setUploadingDoc(docType);
-    setErrorMsg("");
-    setSuccessMsg("");
-    const token = localStorage.getItem("accessToken");
-    try {
-      const fd = new FormData();
-      fd.append("file", file);
-      fd.append("documentType", docType);
-      const res = await fetch("/api/documents/upload", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-        body: fd,
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setErrorMsg(data.error || "Upload failed.");
-      } else {
-        setSuccessMsg("Document uploaded successfully.");
-        await loadData();
-      }
-    } catch {
-      setErrorMsg("Network error uploading document.");
-    } finally {
-      setUploadingDoc(null);
-    }
-  };
-
-  // Update availability settings (Teleconsultation Fee and Booking Toggle)
-  const saveAvailabilitySettings = async (disabledVal, feeVal) => {
+  // Handle Save Availability & Teleconsultation Pricing
+  const handleSaveSettings = async (e) => {
+    e.preventDefault();
     setUpdating(true);
     setErrorMsg("");
     setSuccessMsg("");
@@ -283,20 +305,23 @@ export default function DoctorDashboard() {
       const currentAvail = profile?.availability || {};
       const newAvail = {
         ...currentAvail,
-        bookingDisabled: disabledVal,
-        teleconsultationFee: parseFloat(feeVal) || 0,
+        bookingDisabled,
+        teleconsultationFee: parseFloat(teleFee) || 0,
       };
 
       const res = await fetch("/api/profile/doctor", {
         method: "PATCH",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ availability: newAvail }),
+        body: JSON.stringify({
+          consultationFee: parseFloat(teleFee) || 300,
+          availability: newAvail
+        }),
       });
       const data = await res.json();
       if (!res.ok) {
         setErrorMsg(data.error || "Failed to update settings.");
       } else {
-        setSuccessMsg("Settings updated successfully.");
+        setSuccessMsg("✓ Teleconsultation services & fee updated successfully.");
         setProfile(data.profile);
       }
     } catch {
@@ -306,7 +331,69 @@ export default function DoctorDashboard() {
     }
   };
 
-  // Add Clinic/Institution Location
+  // Handle Update Professional Profile
+  const handleUpdateProfile = async (e) => {
+    e.preventDefault();
+    setUpdating(true);
+    setErrorMsg("");
+    setSuccessMsg("");
+    const token = localStorage.getItem("accessToken");
+
+    try {
+      const payload = {
+        fullName: editProfileForm.fullName.trim(),
+        specialization: editProfileForm.specialization,
+        subSpecialization: editProfileForm.subSpecsList.join(", "),
+        city: editProfileForm.city.trim(),
+        clinicOrHospital: editProfileForm.clinicOrHospital.trim(),
+        yearsOfExperience: parseInt(editProfileForm.yearsOfExperience, 10) || 1,
+        consultationFee: parseFloat(editProfileForm.consultationFee) || 300,
+        medicalRegistrationNumber: editProfileForm.medicalRegistrationNumber.trim(),
+        bio: editProfileForm.bio.trim(),
+        languages: editProfileForm.languages.split(",").map((s) => s.trim()).filter(Boolean)
+      };
+
+      const res = await fetch("/api/profile/doctor", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setErrorMsg(data.error || "Failed to update professional profile.");
+      } else {
+        setSuccessMsg("✓ Doctor Profile updated successfully!");
+        setProfile(data.profile);
+      }
+    } catch {
+      setErrorMsg("Network error updating profile.");
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const addSubSpec = () => {
+    if (!editProfileForm.customSubInput.trim()) return;
+    const item = editProfileForm.customSubInput.trim();
+    if (!editProfileForm.subSpecsList.includes(item)) {
+      setEditProfileForm({
+        ...editProfileForm,
+        subSpecsList: [...editProfileForm.subSpecsList, item],
+        customSubInput: ""
+      });
+    } else {
+      setEditProfileForm({ ...editProfileForm, customSubInput: "" });
+    }
+  };
+
+  const removeSubSpec = (index) => {
+    setEditProfileForm({
+      ...editProfileForm,
+      subSpecsList: editProfileForm.subSpecsList.filter((_, i) => i !== index)
+    });
+  };
+
+  // Add Clinic Location
   const handleAddClinic = async (e) => {
     e.preventDefault();
     setErrorMsg("");
@@ -348,7 +435,6 @@ export default function DoctorDashboard() {
     }
   };
 
-  // Remove Clinic/Institution
   const handleRemoveClinic = async (clinicId) => {
     if (!window.confirm("Remove this clinic location?")) return;
     setErrorMsg("");
@@ -392,167 +478,56 @@ export default function DoctorDashboard() {
 
   const isVerified = profile?.verificationStatus === "VERIFIED";
 
-  /* ──────────────────────────────────────────────────────────────────────────
-     LOCKED STATE FOR UNVERIFIED DOCTORS
-     ────────────────────────────────────────────────────────────────────────── */
-  if (!isVerified) {
-    return (
-      <div style={styles.container}>
-        <div style={styles.sidebar}>
-          <div style={styles.sidebarHeader}>
-            <span style={styles.sidebarBrand}>🌿 Sanjeevani</span>
-            <span style={styles.sidebarUser}>{user?.email}</span>
-          </div>
-          <div style={styles.sidebarMenu}>
-            <button style={styles.menuItem(true)}>Verification Locked</button>
-          </div>
-          <button style={styles.logoutBtn} onClick={logout}>Logout</button>
-        </div>
-        <div style={styles.content}>
-          <header style={styles.header}>
-            <span style={styles.headerTitle}>Account Verification Required</span>
-            <span style={styles.badge("red")}>{profile?.verificationStatus?.replace(/_/g, " ")}</span>
-          </header>
-          <div style={styles.body}>
-            <div style={styles.lockScreen}>
-              <div style={styles.lockHeader}>
-                <span style={styles.lockIcon}>🔒</span>
-                <h2 style={styles.lockTitle}>Verification Pending</h2>
-                <p style={{ color: "#64748b", fontSize: "0.875rem", marginTop: "8px" }}>
-                  Your account is pending professional verification by our medical administration team.
-                  You will gain access to the clinical dashboard and patient queues once your credentials are approved.
-                </p>
-              </div>
-
-              {errorMsg && <div style={styles.error}>{errorMsg}</div>}
-              {successMsg && <div style={styles.success}>{successMsg}</div>}
-
-              {profile?.verificationNotes && (
-                <div style={{ ...styles.pendingAlert, background: "#fee2e2", border: "1px solid #fca5a5" }}>
-                  <div style={{ ...styles.alertTitle, color: "#991b1b" }}>⚠️ Message from Administrator</div>
-                  <div style={{ ...styles.alertText, color: "#7f1d1d" }}>"{profile.verificationNotes}"</div>
-                </div>
-              )}
-
-              <h4 style={{ fontWeight: "700", color: "#334155", marginBottom: "12px", fontSize: "0.95rem" }}>
-                Verification Documents Checklist
-              </h4>
-              <div style={{ border: "1px solid #e2e8f0", borderRadius: "8px", overflow: "hidden", marginBottom: "24px" }}>
-                {DOCTOR_DOCS.map((docDef) => {
-                  const uploadedDoc = docs.find((d) => d.documentType === docDef.type);
-                  return (
-                    <div key={docDef.type} style={styles.docUploadRow}>
-                      <div>
-                        <div style={styles.uploadLabel}>
-                          {docDef.label} {docDef.required && <span style={{ color: "#ef4444" }}>*</span>}
-                        </div>
-                        <div style={{ fontSize: "0.75rem", color: "#64748b" }}>
-                          Status: {uploadedDoc ? (
-                            <span style={{ fontWeight: "600", color: uploadedDoc.status === "ACCEPTED" ? "#16a34a" : uploadedDoc.status === "PENDING" ? "#d97706" : "#dc2626" }}>
-                              {uploadedDoc.status}
-                            </span>
-                          ) : "Not uploaded"}
-                        </div>
-                      </div>
-                      <div>
-                        {uploadedDoc ? (
-                          <span style={{ fontSize: "0.875rem", color: "#16a34a", fontWeight: "600" }}>✓ Submitted</span>
-                        ) : (
-                          <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-                            <input
-                              type="file"
-                              accept=".pdf,.jpg,.jpeg,.png"
-                              style={{ fontSize: "0.75rem" }}
-                              onChange={(e) => setUploadFiles((prev) => ({ ...prev, [docDef.type]: e.target.files[0] }))}
-                            />
-                            {uploadFiles[docDef.type] && (
-                              <button
-                                style={styles.button}
-                                onClick={() => handleDocUpload(docDef.type)}
-                                disabled={uploadingDoc === docDef.type}
-                              >
-                                {uploadingDoc === docDef.type ? "…" : "Upload"}
-                              </button>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              <div style={{ textAlign: "center", display: "flex", justifyContent: "center", gap: "12px", marginTop: "16px" }}>
-                <button style={styles.btnSec} onClick={loadData}>
-                  🔄 Refresh Status
-                </button>
-                <button
-                  style={{ ...styles.button, background: "#10b981", cursor: "pointer" }}
-                  onClick={async () => {
-                    setErrorMsg("");
-                    setSuccessMsg("");
-                    const token = localStorage.getItem("accessToken");
-                    try {
-                      const res = await fetch("/api/profile/doctor/dev-verify", {
-                        method: "POST",
-                        headers: { Authorization: `Bearer ${token}` }
-                      });
-                      const data = await res.json();
-                      if (!res.ok) {
-                        setErrorMsg(data.error || "Failed to auto-verify.");
-                      } else {
-                        setSuccessMsg("Account auto-verified! Reloading dashboard...");
-                        setTimeout(() => window.location.reload(), 1000);
-                      }
-                    } catch {
-                      setErrorMsg("Network error.");
-                    }
-                  }}
-                >
-                  ⚡ Developer Auto-Verify
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  /* ──────────────────────────────────────────────────────────────────────────
-     VERIFIED CLINICAL DASHBOARD
-     ────────────────────────────────────────────────────────────────────────── */
-  const clinicsList = profile?.availability?.clinics || [];
+  // Filter requests
+  const pendingRequests = nearbyRequests.filter((r) => r.status === "PENDING");
+  const ongoingAccepted = acceptedRequests.filter((r) => r.status === "ACCEPTED");
+  const totalReviewedCount = acceptedRequests.length;
 
   return (
     <div style={styles.container}>
-      {/* Sidebar Navigation */}
+      {/* ── Sidebar ────────────────────────────────────────────────────────── */}
       <div style={styles.sidebar}>
         <div style={styles.sidebarHeader}>
           <span style={styles.sidebarBrand}>🌿 Sanjeevani</span>
-          <span style={styles.sidebarUser}>Dr. {profile?.fullName || user?.email}</span>
+          <span style={styles.sidebarUser}>{profile?.fullName || user?.email}</span>
         </div>
         <div style={styles.sidebarMenu}>
-          <button style={styles.menuItem(activeTab === "dashboard")} onClick={() => { setActiveTab("dashboard"); setErrorMsg(""); setSuccessMsg(""); }}>
+          <button
+            style={styles.menuItem(activeTab === "dashboard")}
+            onClick={() => setActiveTab("dashboard")}
+          >
             🏥 Clinical Dashboard
           </button>
-          <button style={styles.menuItem(activeTab === "clinics")} onClick={() => { setActiveTab("clinics"); setErrorMsg(""); setSuccessMsg(""); }}>
-            🏢 My Practice Locations
+          <button
+            style={styles.menuItem(activeTab === "profile")}
+            onClick={() => setActiveTab("profile")}
+          >
+            👨‍⚕️ Doctor's Profile
           </button>
-          <button style={styles.menuItem(activeTab === "documents")} onClick={() => { setActiveTab("documents"); setErrorMsg(""); setSuccessMsg(""); }}>
+          <button
+            style={styles.menuItem(activeTab === "clinics")}
+            onClick={() => setActiveTab("clinics")}
+          >
+            🏙️ My Practice Locations
+          </button>
+          <button
+            style={styles.menuItem(activeTab === "documents")}
+            onClick={() => setActiveTab("documents")}
+          >
             📎 Verification Credentials
           </button>
         </div>
         <button style={styles.logoutBtn} onClick={logout}>Logout</button>
       </div>
 
-      {/* Main Workspace */}
+      {/* ── Main Content Area ──────────────────────────────────────────────── */}
       <div style={styles.content}>
         <header style={styles.header}>
           <span style={styles.headerTitle}>
             {activeTab === "dashboard" && "Clinical Queue & Teleconsultations"}
-            {activeTab === "clinics" && "Manage Practice Locations"}
-            {activeTab === "documents" && "Verification Credentials"}
+            {activeTab === "profile" && "Doctor Professional Profile & Leaderboard"}
+            {activeTab === "clinics" && "Practice Locations & Timings"}
+            {activeTab === "documents" && "Verification & Medical Credentials"}
           </span>
           <span style={styles.badge("green")}>Active & Verified</span>
         </header>
@@ -561,154 +536,96 @@ export default function DoctorDashboard() {
           {errorMsg && <div style={styles.error}>{errorMsg}</div>}
           {successMsg && <div style={styles.success}>{successMsg}</div>}
 
-          {/* TAB 1: Clinical Dashboard */}
+          {/* ═════════════════════════════════════════════════════════════════
+              TAB 1: CLINICAL DASHBOARD
+              ═════════════════════════════════════════════════════════════════ */}
           {activeTab === "dashboard" && (
             <div style={styles.dashboardGrid}>
-              <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-                {/* Nearby Patient Requests */}
+              <div>
+                {/* Incoming Triage Requests Queue */}
                 <div style={styles.card}>
-                  <div style={{ ...styles.cardTitle, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px", marginBottom: "16px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                      <span>Patient Requests Queue</span>
-                      <span style={styles.badge(nearbyRequests.length > 0 ? "yellow" : "green")}>
-                        {nearbyRequests.length} Pending
-                      </span>
-                    </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
-                      <input
-                        type="text"
-                        placeholder="Keyword search..."
-                        value={keywordSearch}
-                        onChange={(e) => setKeywordSearch(e.target.value)}
-                        style={{
-                          padding: "6px 12px",
-                          borderRadius: "6px",
-                          border: "1px solid #cbd5e1",
-                          fontSize: "0.875rem",
-                          outline: "none",
-                          width: "120px",
-                        }}
-                      />
-                      <select
-                        value={selectedCategory}
-                        onChange={(e) => setSelectedCategory(e.target.value)}
-                        style={{
-                          padding: "6px 12px",
-                          borderRadius: "6px",
-                          border: "1px solid #cbd5e1",
-                          fontSize: "0.875rem",
-                          outline: "none",
-                        }}
-                      >
-                        <option value="ALL">All Urgencies</option>
-                        <option value="EMERGENCY_ESCALATION">Emergency Escalation</option>
-                        <option value="PHYSICAL_VISIT">Physical Visit</option>
-                        <option value="TELECONSULTATION">Teleconsultation</option>
-                      </select>
-                      <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.825rem", color: "#475569" }}>
-                        <span>Radius: {radiusKm} km</span>
-                        <input
-                          type="range"
-                          min="5"
-                          max="100"
-                          step="5"
-                          value={radiusKm}
-                          onChange={(e) => setRadiusKm(parseInt(e.target.value))}
-                          style={{ accentColor: "#3b82f6", cursor: "pointer", width: "80px" }}
-                        />
-                      </div>
-                      <input
-                        type="text"
-                        placeholder="City/region..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        style={{
-                          padding: "6px 12px",
-                          borderRadius: "6px",
-                          border: "1px solid #cbd5e1",
-                          fontSize: "0.875rem",
-                          outline: "none",
-                          width: "100px",
-                        }}
-                      />
-                      <button
-                        style={{
-                          padding: "6px 12px",
-                          background: "#3b82f6",
-                          color: "#fff",
-                          border: "none",
-                          borderRadius: "8px",
-                          fontSize: "0.875rem",
-                          cursor: "pointer",
-                          fontWeight: "600",
-                        }}
-                        onClick={() => {
-                          setRequestsLoading(true);
-                          loadRequests(
-                            searchQuery, radiusKm, selectedCategory, keywordSearch,
-                            profile?.latitude || null, profile?.longitude || null
-                          );
-                        }}
-                      >
-                        Search
-                      </button>
-                    </div>
+                  <div style={styles.cardTitle}>
+                    <span>Patient Requests Queue</span>
+                    <span style={styles.badge(pendingRequests.length > 0 ? "green" : "yellow")}>
+                      {pendingRequests.length} Pending
+                    </span>
                   </div>
+
+                  <div style={{ display: "flex", gap: "10px", marginBottom: "16px", flexWrap: "wrap" }}>
+                    <input
+                      style={{ ...styles.input, flex: 1, minWidth: "140px" }}
+                      placeholder="Keyword search…"
+                      value={keywordSearch}
+                      onChange={(e) => setKeywordSearch(e.target.value)}
+                    />
+                    <select
+                      style={styles.select}
+                      value={selectedCategory}
+                      onChange={(e) => setSelectedCategory(e.target.value)}
+                    >
+                      <option value="ALL">All Urgencies</option>
+                      <option value="TELECONSULTATION">Teleconsultation</option>
+                      <option value="PHYSICAL_VISIT">Physical Visit</option>
+                      <option value="EMERGENCY_ESCALATION">Emergency</option>
+                    </select>
+                    <button
+                      style={styles.button}
+                      onClick={() =>
+                        loadRequests(
+                          searchQuery,
+                          radiusKm,
+                          selectedCategory,
+                          keywordSearch,
+                          profile?.latitude || null,
+                          profile?.longitude || null
+                        )
+                      }
+                    >
+                      Search
+                    </button>
+                  </div>
+
                   {requestsLoading ? (
-                    <div style={styles.emptyState}>Loading clinical requests...</div>
-                  ) : nearbyRequests.length === 0 ? (
-                    <div style={styles.emptyState}>No pending patient requests in "{searchQuery || profile?.city || 'this region'}" at the moment.</div>
+                    <div style={styles.emptyState}>Loading clinical queue…</div>
+                  ) : pendingRequests.length === 0 ? (
+                    <div style={styles.emptyState}>No pending patient requests in this queue at the moment.</div>
                   ) : (
                     <table style={styles.table}>
                       <thead>
                         <tr>
                           <th style={styles.th}>Patient</th>
                           <th style={styles.th}>Symptoms</th>
-                          <th style={styles.th}>Triage Recommendation</th>
+                          <th style={styles.th}>Triage Track</th>
                           <th style={styles.th}>Action</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {nearbyRequests.map((req) => (
+                        {pendingRequests.map((req) => (
                           <tr key={req.id}>
                             <td style={styles.td}>
-                              <div style={{ fontWeight: "700" }}>{req.patientUser?.patientProfile?.fullName || "Patient"}</div>
+                              <strong>{req.patientUser?.patientProfile?.fullName || "Patient"}</strong>
                               <div style={{ fontSize: "0.75rem", color: "#64748b" }}>
-                                {req.patientUser?.patientProfile?.sex}, {req.patientUser?.patientProfile?.dateOfBirth ? (new Date().getFullYear() - new Date(req.patientUser.patientProfile.dateOfBirth).getFullYear()) + " y/o" : ""}
+                                {req.patientUser?.patientProfile?.sex} · {req.location}
                               </div>
-                              {req.distanceKm !== undefined && (
-                                <div style={{ fontSize: "0.725rem", color: "#10b981", fontWeight: "700", marginTop: "2px" }}>
-                                  📍 {req.distanceKm} km away
-                                </div>
+                            </td>
+                            <td style={styles.td}>
+                              <div style={{ maxWidth: "260px", fontSize: "0.85rem" }}>{req.symptoms}</div>
+                              {req.attachments && req.attachments.length > 0 && (
+                                <span style={{ fontSize: "0.725rem", color: "#0284c7" }}>📎 {req.attachments.length} attachment(s)</span>
                               )}
                             </td>
                             <td style={styles.td}>
-                              <div style={{ fontWeight: "500", color: "#334155" }}>{req.symptoms}</div>
-                              <div style={{ fontSize: "0.75rem", color: "#64748b", marginTop: "2px" }}>Req: {req.requirement}</div>
-                            </td>
-                            <td style={styles.td}>
-                              <span style={{
-                                ...styles.badge(
-                                  req.triageCategory === 'EMERGENCY_ESCALATION' ? 'red' : req.triageCategory === 'PHYSICAL_VISIT' ? 'yellow' : 'green'
-                                ),
-                                display: "inline-block",
-                                marginBottom: "4px"
-                              }}>
-                                {req.triageCategory?.replace(/_/g, " ")}
+                              <span style={{ fontSize: "0.75rem", fontWeight: "750", background: req.triageCategory === "TELECONSULTATION" ? "#dcfce7" : "#fef3c7", color: req.triageCategory === "TELECONSULTATION" ? "#166534" : "#854d0e", padding: "3px 8px", borderRadius: "100px" }}>
+                                {req.triageCategory}
                               </span>
-                              {req.triageReasoning && (
-                                <div style={{ fontSize: "0.7rem", color: "#64748b", maxWidth: "250px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={req.triageReasoning}>
-                                  {req.triageReasoning}
-                                </div>
-                              )}
                             </td>
                             <td style={styles.td}>
                               <button
-                                style={{ ...styles.button, background: "#10b981" }}
+                                style={styles.button}
                                 onClick={() => handleAcceptRequest(req.id)}
                                 disabled={acceptingId === req.id}
                               >
-                                {acceptingId === req.id ? "..." : "Accept"}
+                                {acceptingId === req.id ? "Accepting…" : "Accept Case"}
                               </button>
                             </td>
                           </tr>
@@ -718,16 +635,15 @@ export default function DoctorDashboard() {
                   )}
                 </div>
 
-                {/* Today's appointments queue widget */}
+                {/* Active Ongoing Queue */}
                 <div style={styles.card}>
                   <div style={styles.cardTitle}>
                     <span>Your Active Patient Queue</span>
-                    <span style={styles.badge("green")}>{acceptedRequests.length} Ongoing</span>
+                    <span style={styles.badge("green")}>{ongoingAccepted.length} Ongoing</span>
                   </div>
-                  {requestsLoading ? (
-                    <div style={styles.emptyState}>Loading clinical queue...</div>
-                  ) : acceptedRequests.length === 0 ? (
-                    <div style={styles.emptyState}>No accepted patient requests in your queue. Accept cases above to treat patients.</div>
+
+                  {ongoingAccepted.length === 0 ? (
+                    <div style={styles.emptyState}>No active patients currently under your care.</div>
                   ) : (
                     <table style={styles.table}>
                       <thead>
@@ -735,32 +651,33 @@ export default function DoctorDashboard() {
                           <th style={styles.th}>Patient</th>
                           <th style={styles.th}>Symptoms</th>
                           <th style={styles.th}>Triage Category</th>
-                          <th style={styles.th}>Contact Info</th>
+                          <th style={styles.th}>Action</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {acceptedRequests.map((req) => (
+                        {ongoingAccepted.map((req) => (
                           <tr key={req.id}>
                             <td style={styles.td}>
-                              <div style={{ fontWeight: "700" }}>{req.patientUser?.patientProfile?.fullName || "Patient"}</div>
+                              <strong>{req.patientUser?.patientProfile?.fullName || "Patient"}</strong>
                               <div style={{ fontSize: "0.75rem", color: "#64748b" }}>
-                                {req.patientUser?.patientProfile?.sex}, {req.patientUser?.patientProfile?.dateOfBirth ? (new Date().getFullYear() - new Date(req.patientUser.patientProfile.dateOfBirth).getFullYear()) + " y/o" : ""}
+                                {req.patientUser?.patientProfile?.sex} · {req.patientUser?.phone || "No phone"}
                               </div>
                             </td>
                             <td style={styles.td}>
-                              <div style={{ fontWeight: "500", color: "#334155" }}>{req.symptoms}</div>
-                              <div style={{ fontSize: "0.75rem", color: "#64748b" }}>Req: {req.requirement}</div>
+                              <div style={{ maxWidth: "260px", fontSize: "0.85rem" }}>{req.symptoms}</div>
                             </td>
                             <td style={styles.td}>
-                              <span style={styles.badge(
-                                req.triageCategory === 'EMERGENCY_ESCALATION' ? 'red' : req.triageCategory === 'PHYSICAL_VISIT' ? 'yellow' : 'green'
-                              )}>
-                                {req.triageCategory?.replace(/_/g, " ")}
+                              <span style={{ fontSize: "0.75rem", fontWeight: "750", background: "#dcfce7", color: "#166534", padding: "3px 8px", borderRadius: "100px" }}>
+                                {req.triageCategory}
                               </span>
                             </td>
                             <td style={styles.td}>
-                              <div style={{ fontSize: "0.85rem", color: "#0f172a", fontWeight: "600" }}>{req.patientUser?.phone || "No Phone"}</div>
-                              <div style={{ fontSize: "0.75rem", color: "#64748b" }}>{req.patientUser?.email || "No Email"}</div>
+                              <button
+                                style={styles.button}
+                                onClick={() => navigate(`/patient/request/${req.id}`)}
+                              >
+                                Consult & Prescribe →
+                              </button>
                             </td>
                           </tr>
                         ))}
@@ -770,125 +687,438 @@ export default function DoctorDashboard() {
                 </div>
               </div>
 
-              {/* Sidebar Config widgets */}
-              <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-                {/* Today's availability settings */}
+              {/* Right Side: Quick Availability & Scope */}
+              <div>
                 <div style={styles.card}>
                   <div style={styles.cardTitle}>Practice Availability</div>
-
-                  {/* Toggle Button for Disabling Booking Option */}
-                  <div style={styles.switchContainer}>
-                    <div style={styles.switchLabel}>
-                      {bookingDisabled ? "🚨 Booking Disabled" : "✅ Accepting Bookings"}
-                      <div style={{ fontSize: "0.75rem", color: "#64748b", fontWeight: "normal", marginTop: "2px" }}>
-                        {bookingDisabled ? "Patients cannot schedule new appointments today" : "Patients can schedule visits"}
+                  <form onSubmit={handleSaveSettings}>
+                    <div style={{ marginBottom: "16px" }}>
+                      <div style={styles.switchContainer}>
+                        <div style={styles.switchLabel}>
+                          <strong>{bookingDisabled ? "❌ Offline / Not Accepting" : "✅ Accepting Bookings"}</strong>
+                          <div style={{ fontSize: "0.75rem", color: "#64748b" }}>
+                            {bookingDisabled ? "Patients cannot schedule visits" : "Patients can schedule visits"}
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          style={bookingDisabled ? styles.button : styles.btnDanger}
+                          onClick={() => setBookingDisabled(!bookingDisabled)}
+                        >
+                          {bookingDisabled ? "Enable Booking" : "Disable Booking"}
+                        </button>
                       </div>
                     </div>
-                    <button
-                      style={bookingDisabled ? styles.button : styles.btnDanger}
-                      onClick={() => {
-                        const newVal = !bookingDisabled;
-                        setBookingDisabled(newVal);
-                        saveAvailabilitySettings(newVal, teleFee);
-                      }}
-                      disabled={updating}
-                    >
-                      {bookingDisabled ? "Enable Booking" : "Disable Booking"}
-                    </button>
-                  </div>
 
-                  {/* Price Setting for Teleconsultation option */}
-                  <div style={{ ...styles.formGroup, marginTop: "20px" }}>
-                    <label style={styles.label}>Teleconsultation Fee (₹) *</label>
-                    <input
-                      style={styles.input}
-                      type="number"
-                      value={teleFee}
-                      onChange={(e) => setTeleFee(e.target.value)}
-                      placeholder="e.g. 500"
-                    />
-                    <span style={{ fontSize: "0.72rem", color: "#64748b" }}>Set pricing for video/voice consults</span>
-                  </div>
-                  <button
-                    style={{ ...styles.button, width: "100%" }}
-                    onClick={() => saveAvailabilitySettings(bookingDisabled, teleFee)}
-                    disabled={updating}
-                  >
-                    {updating ? "Saving…" : "Save Practice Pricing"}
-                  </button>
+                    <div style={styles.formGroup}>
+                      <label style={styles.label}>Teleconsultation Fee (₹) *</label>
+                      <input
+                        type="number"
+                        style={styles.input}
+                        value={teleFee}
+                        onChange={(e) => setTeleFee(e.target.value)}
+                        placeholder="e.g. 300"
+                        required
+                      />
+                      <span style={{ fontSize: "0.75rem", color: "#64748b" }}>Set pricing for video/voice consults</span>
+                    </div>
+
+                    <button type="submit" style={{ ...styles.button, width: "100%" }} disabled={updating}>
+                      {updating ? "Saving…" : "Save Practice Pricing"}
+                    </button>
+                  </form>
                 </div>
 
-                {/* Profile Overview */}
                 <div style={styles.card}>
                   <div style={styles.cardTitle}>Professional Scope</div>
                   <div style={styles.profileRow}>
                     <span style={styles.profileLabel}>Speciality</span>
                     <span style={styles.profileValue}>{profile?.specialization || "General Medicine"}</span>
                   </div>
+                  {profile?.subSpecialization && (
+                    <div style={styles.profileRow}>
+                      <span style={styles.profileLabel}>Sub-Specialities</span>
+                      <span style={styles.profileValue}>{profile?.subSpecialization}</span>
+                    </div>
+                  )}
                   <div style={styles.profileRow}>
                     <span style={styles.profileLabel}>Exp. Years</span>
-                    <span style={styles.profileValue}>{profile?.yearsOfExperience || "0"} years</span>
+                    <span style={styles.profileValue}>{profile?.yearsOfExperience || 0} years</span>
+                  </div>
+                  <div style={styles.profileRow}>
+                    <span style={styles.profileLabel}>Affiliation</span>
+                    <span style={styles.profileValue}>{profile?.clinicOrHospital || "Private Practice"}</span>
                   </div>
                 </div>
               </div>
             </div>
           )}
 
-          {/* TAB 2: Clinics / Practice Locations */}
-          {activeTab === "clinics" && (
+          {/* ═════════════════════════════════════════════════════════════════
+              TAB 2: DOCTOR'S PROFILE & LEADERBOARD (NEW!)
+              ═════════════════════════════════════════════════════════════════ */}
+          {activeTab === "profile" && (
             <div>
+              {/* Doctor Header Showcase */}
+              <div style={{ background: "linear-gradient(135deg, #0f172a 0%, #0369a1 100%)", color: "#fff", padding: "28px", borderRadius: "16px", marginBottom: "24px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "20px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+                  <div style={{ width: "80px", height: "80px", borderRadius: "50%", background: "#e0f2fe", color: "#0369a1", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "2.5rem", border: "3px solid #7dd3fc" }}>
+                    👨‍⚕️
+                  </div>
+                  <div>
+                    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                      <h2 style={{ fontSize: "1.6rem", fontWeight: "850", margin: 0 }}>Dr. {profile?.fullName || "Doctor"}</h2>
+                      <span style={{ background: "#dcfce7", color: "#15803d", padding: "3px 10px", borderRadius: "100px", fontSize: "0.75rem", fontWeight: "800" }}>✓ VERIFIED DOCTOR</span>
+                    </div>
+                    <div style={{ fontSize: "1.05rem", color: "#bae6fd", fontWeight: "700", marginTop: "4px" }}>
+                      {profile?.specialization || "General Physician"}
+                      {profile?.subSpecialization ? ` (${profile.subSpecialization})` : ""}
+                    </div>
+                    <div style={{ fontSize: "0.85rem", color: "#cbd5e1", marginTop: "4px" }}>
+                      🏥 {profile?.clinicOrHospital || "Private Clinic"} · 📍 {profile?.city} · 📜 Reg No: <strong>{profile?.medicalRegistrationNumber || "NMC-VERIFIED"}</strong>
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ textAlign: "right" }}>
+                  <div style={{ fontSize: "0.8rem", color: "#93c5fd", fontWeight: "700", textTransform: "uppercase" }}>Teleconsultation Fee</div>
+                  <div style={{ fontSize: "2rem", fontWeight: "900", color: "#fff" }}>₹{profile?.consultationFee || 300}</div>
+                  <div style={{ fontSize: "0.75rem", color: "#cbd5e1" }}>Per Virtual / Video Consult</div>
+                </div>
+              </div>
+
+              {/* Performance & Leaderboard Metrics */}
+              <div style={styles.statsGrid}>
+                <div style={styles.statBox}>
+                  <span style={styles.statLabel}>🏆 Leaderboard Rank</span>
+                  <strong style={{ ...styles.statVal, color: "#0284c7" }}>#3 Regional</strong>
+                  <span style={{ fontSize: "0.75rem", color: "#64748b" }}>Top 5% Teleconsultant</span>
+                </div>
+                <div style={styles.statBox}>
+                  <span style={styles.statLabel}>👥 Patients Reviewed</span>
+                  <strong style={{ ...styles.statVal, color: "#16a34a" }}>{totalReviewedCount}</strong>
+                  <span style={{ fontSize: "0.75rem", color: "#64748b" }}>Total Attended Cases</span>
+                </div>
+                <div style={styles.statBox}>
+                  <span style={styles.statLabel}>⭐ Patient Rating</span>
+                  <strong style={{ ...styles.statVal, color: "#d97706" }}>4.9 / 5.0</strong>
+                  <span style={{ fontSize: "0.75rem", color: "#64748b" }}>Verified Patient Score</span>
+                </div>
+                <div style={styles.statBox}>
+                  <span style={styles.statLabel}>⚡ Response Speed</span>
+                  <strong style={{ ...styles.statVal, color: "#0f172a" }}>2.4 mins</strong>
+                  <span style={{ fontSize: "0.75rem", color: "#64748b" }}>Avg. Triage Pickup</span>
+                </div>
+              </div>
+
+              {/* Grid: Edit Professional Details & Teleconsultation Services */}
+              <div style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr", gap: "24px", marginBottom: "24px" }}>
+                {/* Professional Profile Form */}
+                <div style={styles.card}>
+                  <h3 style={{ fontSize: "1.1rem", fontWeight: "800", color: "#0f172a", margin: "0 0 16px" }}>
+                    Edit Professional Profile & Specialities
+                  </h3>
+
+                  <form onSubmit={handleUpdateProfile}>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                      <div style={styles.formGroup}>
+                        <label style={styles.label}>Full Name *</label>
+                        <input
+                          style={styles.input}
+                          value={editProfileForm.fullName}
+                          onChange={(e) => setEditProfileForm({ ...editProfileForm, fullName: e.target.value })}
+                          required
+                        />
+                      </div>
+                      <div style={styles.formGroup}>
+                        <label style={styles.label}>Primary Specialization *</label>
+                        <select
+                          style={styles.select}
+                          value={editProfileForm.specialization}
+                          onChange={(e) => setEditProfileForm({ ...editProfileForm, specialization: e.target.value })}
+                          required
+                        >
+                          {PRIMARY_SPECIALTIES.map((spec) => (
+                            <option key={spec} value={spec}>{spec}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Sub-Specializations Tagging */}
+                    <div style={styles.formGroup}>
+                      <label style={styles.label}>Additional Sub-Specialities & Focus Areas</label>
+                      <div style={{ display: "flex", gap: "8px" }}>
+                        <input
+                          style={{ ...styles.input, flex: 1 }}
+                          placeholder="e.g. Diabetology, Pediatric Care, Sports Medicine…"
+                          value={editProfileForm.customSubInput}
+                          onChange={(e) => setEditProfileForm({ ...editProfileForm, customSubInput: e.target.value })}
+                          onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addSubSpec(); } }}
+                        />
+                        <button type="button" style={styles.button} onClick={addSubSpec}>+ Add</button>
+                      </div>
+                      {editProfileForm.subSpecsList.length > 0 && (
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginTop: "8px" }}>
+                          {editProfileForm.subSpecsList.map((sub, i) => (
+                            <span key={i} style={styles.subSpecTag}>
+                              {sub}
+                              <button type="button" onClick={() => removeSubSpec(i)} style={{ background: "none", border: "none", color: "#0369a1", cursor: "pointer", fontSize: "0.8rem", padding: 0 }}>✕</button>
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                      <div style={styles.formGroup}>
+                        <label style={styles.label}>Years of Experience</label>
+                        <input
+                          type="number"
+                          style={styles.input}
+                          min="1"
+                          max="60"
+                          value={editProfileForm.yearsOfExperience}
+                          onChange={(e) => setEditProfileForm({ ...editProfileForm, yearsOfExperience: e.target.value })}
+                        />
+                      </div>
+                      <div style={styles.formGroup}>
+                        <label style={styles.label}>Hospital / Clinic Name</label>
+                        <input
+                          style={styles.input}
+                          value={editProfileForm.clinicOrHospital}
+                          onChange={(e) => setEditProfileForm({ ...editProfileForm, clinicOrHospital: e.target.value })}
+                        />
+                      </div>
+                    </div>
+
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                      <div style={styles.formGroup}>
+                        <label style={styles.label}>City / Region *</label>
+                        <input
+                          style={styles.input}
+                          value={editProfileForm.city}
+                          onChange={(e) => setEditProfileForm({ ...editProfileForm, city: e.target.value })}
+                          required
+                        />
+                      </div>
+                      <div style={styles.formGroup}>
+                        <label style={styles.label}>Registration / License Number</label>
+                        <input
+                          style={styles.input}
+                          value={editProfileForm.medicalRegistrationNumber}
+                          onChange={(e) => setEditProfileForm({ ...editProfileForm, medicalRegistrationNumber: e.target.value })}
+                        />
+                      </div>
+                    </div>
+
+                    <div style={styles.formGroup}>
+                      <label style={styles.label}>Languages Spoken</label>
+                      <input
+                        style={styles.input}
+                        placeholder="e.g. English, Hindi, Bengali"
+                        value={editProfileForm.languages}
+                        onChange={(e) => setEditProfileForm({ ...editProfileForm, languages: e.target.value })}
+                      />
+                    </div>
+
+                    <div style={styles.formGroup}>
+                      <label style={styles.label}>Clinical Bio & Patient Philosophy</label>
+                      <textarea
+                        rows={3}
+                        style={styles.textarea}
+                        placeholder="Brief background of clinical practice, education, and patient care approach…"
+                        value={editProfileForm.bio}
+                        onChange={(e) => setEditProfileForm({ ...editProfileForm, bio: e.target.value })}
+                      />
+                    </div>
+
+                    <button type="submit" style={styles.button} disabled={updating}>
+                      {updating ? "Saving Profile…" : "Update Professional Profile"}
+                    </button>
+                  </form>
+                </div>
+
+                {/* Teleconsultation Services Overview Card */}
+                <div style={styles.card}>
+                  <h3 style={{ fontSize: "1.1rem", fontWeight: "800", color: "#0f172a", margin: "0 0 16px" }}>
+                    Teleconsultation & Services
+                  </h3>
+
+                  <div style={{ background: "#f0fdf4", border: "1.5px solid #bbf7d0", padding: "16px", borderRadius: "12px", marginBottom: "16px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#166534", fontWeight: "800" }}>
+                      <span>💻</span> Nationwide Teleconsultation Active
+                    </div>
+                    <p style={{ fontSize: "0.825rem", color: "#14532d", margin: "6px 0 0", lineHeight: "1.5" }}>
+                      Your profile is eligible to receive and accept teleconsultation triage cases from patients nationwide across India.
+                    </p>
+                  </div>
+
+                  <div style={styles.profileRow}>
+                    <span style={styles.profileLabel}>Virtual Consult Fee</span>
+                    <strong style={{ color: "#0f172a" }}>₹{profile?.consultationFee || 300}</strong>
+                  </div>
+                  <div style={styles.profileRow}>
+                    <span style={styles.profileLabel}>Online Booking Status</span>
+                    <span style={{ color: bookingDisabled ? "#ef4444" : "#16a34a", fontWeight: "700" }}>
+                      {bookingDisabled ? "Disabled / Off-duty" : "Accepting Patients"}
+                    </span>
+                  </div>
+                  <div style={styles.profileRow}>
+                    <span style={styles.profileLabel}>Registered City</span>
+                    <span style={styles.profileValue}>{profile?.city}</span>
+                  </div>
+                  <div style={styles.profileRow}>
+                    <span style={styles.profileLabel}>Total Patients Attended</span>
+                    <span style={styles.profileValue}>{totalReviewedCount} Cases</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Patients Reviewed History Section */}
+              <div style={styles.card}>
+                <div style={styles.cardTitle}>
+                  <span>Patients Reviewed & Consulted History</span>
+                  <span style={styles.badge("green")}>{acceptedRequests.length} Cases</span>
+                </div>
+
+                {acceptedRequests.length === 0 ? (
+                  <div style={styles.emptyState}>No patient consultation history recorded yet.</div>
+                ) : (
+                  <table style={styles.table}>
+                    <thead>
+                      <tr>
+                        <th style={styles.th}>Patient Details</th>
+                        <th style={styles.th}>Chief Complaint & Symptoms</th>
+                        <th style={styles.th}>Triage Category</th>
+                        <th style={styles.th}>Date & Time</th>
+                        <th style={styles.th}>Status</th>
+                        <th style={styles.th}>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {acceptedRequests.map((req) => (
+                        <tr key={req.id}>
+                          <td style={styles.td}>
+                            <strong>{req.patientUser?.patientProfile?.fullName || "Patient Demographics"}</strong>
+                            <div style={{ fontSize: "0.75rem", color: "#64748b" }}>
+                              {req.patientUser?.patientProfile?.sex || "N/A"} · {req.patientUser?.phone || "No phone"}
+                            </div>
+                          </td>
+                          <td style={styles.td}>
+                            <div style={{ maxWidth: "300px", fontSize: "0.85rem" }}>
+                              {req.triageAnalysis?.technicalChiefComplaint || req.symptoms}
+                            </div>
+                          </td>
+                          <td style={styles.td}>
+                            <span style={{ fontSize: "0.75rem", fontWeight: "750", background: req.triageCategory === "TELECONSULTATION" ? "#dcfce7" : "#fef3c7", color: req.triageCategory === "TELECONSULTATION" ? "#166534" : "#854d0e", padding: "3px 8px", borderRadius: "100px" }}>
+                              {req.triageCategory}
+                            </span>
+                          </td>
+                          <td style={styles.td}>
+                            <div style={{ fontSize: "0.8rem", color: "#475569" }}>
+                              {new Date(req.updatedAt).toLocaleDateString()}
+                            </div>
+                            <div style={{ fontSize: "0.725rem", color: "#94a3b8" }}>
+                              {new Date(req.updatedAt).toLocaleTimeString()}
+                            </div>
+                          </td>
+                          <td style={styles.td}>
+                            <span style={{ fontSize: "0.75rem", fontWeight: "750", background: req.status === "COMPLETED" ? "#dcfce7" : "#dbeafe", color: req.status === "COMPLETED" ? "#15803d" : "#1e40af", padding: "3px 8px", borderRadius: "100px" }}>
+                              {req.status}
+                            </span>
+                          </td>
+                          <td style={styles.td}>
+                            <button
+                              style={styles.button}
+                              onClick={() => navigate(`/patient/request/${req.id}`)}
+                            >
+                              Open Case & Digital Rx →
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* ═════════════════════════════════════════════════════════════════
+              TAB 3: PRACTICE LOCATIONS
+              ═════════════════════════════════════════════════════════════════ */}
+          {activeTab === "clinics" && (
+            <div style={{ maxWidth: "800px" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-                <span style={{ fontSize: "1rem", fontWeight: "700", color: "#334155" }}>Your Practice Locations</span>
-                <button style={styles.button} onClick={() => setShowClinicForm(!showClinicForm)}>
-                  {showClinicForm ? "Close Form" : "+ Add Clinic / Institute"}
+                <h3 style={{ fontSize: "1.1rem", fontWeight: "700", color: "#0f172a", margin: 0 }}>
+                  In-Person Clinics & Consultation Centers
+                </h3>
+                <button
+                  style={styles.button}
+                  onClick={() => setShowClinicForm(!showClinicForm)}
+                >
+                  {showClinicForm ? "Cancel" : "+ Add Practice Location"}
                 </button>
               </div>
 
               {showClinicForm && (
-                <form onSubmit={handleAddClinic} style={{ ...styles.card, background: "#f8fafc" }}>
-                  <div style={{ fontSize: "0.95rem", fontWeight: "700", marginBottom: "16px", color: "#1e293b" }}>
-                    Add a clinic location
-                  </div>
-                  <div style={styles.formGroup}>
-                    <label style={styles.label}>Clinic / Hospital Name *</label>
-                    <input
-                      style={styles.input}
-                      type="text"
-                      placeholder="e.g. Sanjeevani Health Center"
-                      value={clinicForm.name}
-                      onChange={(e) => setClinicForm({ ...clinicForm, name: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div style={styles.formGroup}>
-                    <label style={styles.label}>Address / Locality *</label>
-                    <input
-                      style={styles.input}
-                      type="text"
-                      placeholder="e.g. 12 MG Road, near Metro Station, Delhi"
-                      value={clinicForm.address}
-                      onChange={(e) => setClinicForm({ ...clinicForm, address: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div style={styles.row}>
+                <div style={styles.card}>
+                  <form onSubmit={handleAddClinic}>
+                    <div style={styles.formGroup}>
+                      <label style={styles.label}>Clinic / Hospital Name *</label>
+                      <input
+                        style={styles.input}
+                        placeholder="e.g. City Health Clinic"
+                        value={clinicForm.name}
+                        onChange={(e) => setClinicForm({ ...clinicForm, name: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div style={styles.formGroup}>
+                      <label style={styles.label}>Full Address *</label>
+                      <input
+                        style={styles.input}
+                        placeholder="Street, Landmark, City"
+                        value={clinicForm.address}
+                        onChange={(e) => setClinicForm({ ...clinicForm, address: e.target.value })}
+                        required
+                      />
+                    </div>
                     <div style={styles.formGroup}>
                       <label style={styles.label}>Consultation Fee (₹) *</label>
                       <input
-                        style={styles.input}
                         type="number"
-                        placeholder="e.g. 600"
+                        style={styles.input}
+                        placeholder="e.g. 500"
                         value={clinicForm.fee}
                         onChange={(e) => setClinicForm({ ...clinicForm, fee: e.target.value })}
                         required
                       />
                     </div>
-                    <div style={styles.row}>
+
+                    <div style={styles.formGroup}>
+                      <label style={styles.label}>Available Days</label>
+                      <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginTop: "4px" }}>
+                        {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => (
+                          <button
+                            key={d}
+                            type="button"
+                            style={clinicForm.days.includes(d) ? styles.button : styles.btnSec}
+                            onClick={() => toggleDay(d)}
+                          >
+                            {d}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginTop: "12px" }}>
                       <div style={styles.formGroup}>
                         <label style={styles.label}>Start Time</label>
                         <input
-                          style={styles.input}
                           type="time"
+                          style={styles.input}
                           value={clinicForm.start}
                           onChange={(e) => setClinicForm({ ...clinicForm, start: e.target.value })}
                         />
@@ -896,99 +1126,86 @@ export default function DoctorDashboard() {
                       <div style={styles.formGroup}>
                         <label style={styles.label}>End Time</label>
                         <input
-                          style={styles.input}
                           type="time"
+                          style={styles.input}
                           value={clinicForm.end}
                           onChange={(e) => setClinicForm({ ...clinicForm, end: e.target.value })}
                         />
                       </div>
                     </div>
-                  </div>
 
-                  <div style={styles.formGroup}>
-                    <label style={styles.label}>Days of consultation *</label>
-                    <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginTop: "4px" }}>
-                      {["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"].map((d) => (
-                        <button
-                          key={d}
-                          type="button"
-                          onClick={() => toggleDay(d)}
-                          style={{
-                            padding: "6px 12px", borderRadius: "6px", border: "1px solid #cbd5e1",
-                            fontSize: "0.75rem", fontWeight: "700", cursor: "pointer",
-                            background: clinicForm.days.includes(d) ? "#0284c7" : "#fff",
-                            color: clinicForm.days.includes(d) ? "#fff" : "#475569",
-                          }}
-                        >
-                          {d}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div style={{ display: "flex", gap: "10px", marginTop: "8px" }}>
-                    <button style={styles.button} type="submit">
-                      Save Clinic Location
-                    </button>
-                    <button style={styles.btnSec} type="button" onClick={() => setShowClinicForm(false)}>
-                      Cancel
-                    </button>
-                  </div>
-                </form>
+                    <button type="submit" style={styles.button}>Save Clinic Location</button>
+                  </form>
+                </div>
               )}
 
-              {clinicsList.length === 0 ? (
-                <div style={styles.card}>
-                  <div style={styles.emptyState}>No practice locations added. Click "+ Add Clinic / Institute" above.</div>
-                </div>
-              ) : (
-                <div style={styles.clinicList}>
-                  {clinicsList.map((c) => (
-                    <div key={c.id} style={styles.clinicItem}>
+              <div style={styles.clinicList}>
+                {(profile?.availability?.clinics || []).length === 0 ? (
+                  <div style={styles.card}>
+                    <div style={styles.emptyState}>No physical clinic locations added yet.</div>
+                  </div>
+                ) : (
+                  (profile?.availability?.clinics || []).map((clinic) => (
+                    <div key={clinic.id} style={styles.clinicItem}>
                       <div style={styles.clinicMeta}>
-                        <span style={styles.clinicName}>{c.name}</span>
-                        <span style={styles.clinicDetail}>📍 {c.address}</span>
-                        <span style={styles.clinicDetail}>⏰ {c.timing}</span>
-                        <span style={styles.clinicDetail}>💰 Consultation fee: ₹{c.fee}</span>
+                        <div style={styles.clinicName}>{clinic.name}</div>
+                        <div style={styles.clinicDetail}>📍 {clinic.address}</div>
+                        <div style={styles.clinicDetail}>💰 Fee: ₹{clinic.fee} · ⏰ {clinic.timing}</div>
                         <div style={styles.clinicDays}>
-                          {c.days?.map((d) => (
+                          {(clinic.days || []).map((d) => (
                             <span key={d} style={styles.dayBadge}>{d}</span>
                           ))}
                         </div>
                       </div>
-                      <button style={styles.btnDanger} onClick={() => handleRemoveClinic(c.id)}>
+                      <button
+                        style={styles.btnDanger}
+                        onClick={() => handleRemoveClinic(clinic.id)}
+                      >
                         Remove
                       </button>
                     </div>
-                  ))}
-                </div>
-              )}
+                  ))
+                )}
+              </div>
             </div>
           )}
 
-          {/* TAB 3: Uploaded Documents */}
+          {/* ═════════════════════════════════════════════════════════════════
+              TAB 4: DOCUMENTS
+              ═════════════════════════════════════════════════════════════════ */}
           {activeTab === "documents" && (
-            <div style={styles.card}>
-              <div style={{ marginBottom: "20px" }}>
-                <span style={{ fontSize: "1rem", fontWeight: "700", color: "#334155" }}>Your Credentials Checklist</span>
-                <p style={{ fontSize: "0.8125rem", color: "#64748b", marginTop: "4px" }}>
-                  Below are the credential documents submitted during registration or verification review.
-                </p>
-              </div>
-              <div style={{ border: "1px solid #e2e8f0", borderRadius: "8px", overflow: "hidden" }}>
-                {docs.map((doc) => (
-                  <div key={doc.id} style={styles.docUploadRow}>
-                    <div>
-                      <div style={styles.uploadLabel}>{doc.documentType?.replace(/_/g, " ")}</div>
-                      <div style={{ fontSize: "0.75rem", color: "#64748b" }}>
-                        Submitted: {new Date(doc.createdAt).toLocaleDateString("en-IN")}
+            <div style={{ maxWidth: "800px" }}>
+              <div style={styles.card}>
+                <div style={styles.cardTitle}>Professional Medical Credentials</div>
+                <div style={styles.docList}>
+                  {DOCTOR_DOCS.map((docDef) => {
+                    const uploadedDoc = docs.find((d) => d.documentType === docDef.type);
+                    return (
+                      <div key={docDef.type} style={styles.docItem}>
+                        <div>
+                          <div style={styles.docName}>
+                            {docDef.label} {docDef.required && <span style={{ color: "#ef4444" }}>*</span>}
+                          </div>
+                          <div style={{ fontSize: "0.75rem", color: "#64748b" }}>
+                            Status: {uploadedDoc ? "✓ Uploaded & Verified" : "Pending Upload"}
+                          </div>
+                        </div>
+                        {uploadedDoc ? (
+                          <a
+                            href={uploadedDoc.fileUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            style={{ color: "#0284c7", fontSize: "0.85rem", textDecoration: "none", fontWeight: "600" }}
+                          >
+                            View Document ↗
+                          </a>
+                        ) : (
+                          <span style={{ fontSize: "0.8rem", color: "#94a3b8" }}>Not Uploaded</span>
+                        )}
                       </div>
-                    </div>
-                    <span style={styles.badge(doc.status === "ACCEPTED" ? "green" : doc.status === "PENDING" ? "yellow" : "red")}>
-                      {doc.status}
-                    </span>
-                  </div>
-                ))}
+                    );
+                  })}
+                </div>
               </div>
             </div>
           )}
