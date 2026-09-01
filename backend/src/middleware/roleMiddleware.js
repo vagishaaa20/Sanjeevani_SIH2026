@@ -1,4 +1,4 @@
-const { ALL_ROLES } = require('../config/roles');
+const { ALL_ROLES } = require('../constants/roles');
 
 function requireRole(roles) {
   const allowedRoles = Array.isArray(roles) ? roles : [roles];

@@ -1,12 +1,10 @@
 const { Op } = require('sequelize');
-const { User, DoctorProfile, ReviewerProfile, ProfessionalDocument } = require('../models');
-const { VERIFICATION_STATUS, ROLES, DOCUMENT_STATUS } = require('../config/roles');
+const path = require('path');
+const { User, DoctorProfile, ClinicProfile, ProfessionalDocument } = require('../models');
+const { VERIFICATION_STATUS, ROLES, DOCUMENT_STATUS } = require('../constants/roles');
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-/**
- * Allowed verification actions and their resulting verificationStatus values.
- */
 const ACTION_TO_STATUS = {
   approve: VERIFICATION_STATUS.VERIFIED,
   reject: VERIFICATION_STATUS.REJECTED,
@@ -15,44 +13,36 @@ const ACTION_TO_STATUS = {
   set_under_review: VERIFICATION_STATUS.UNDER_REVIEW,
 };
 
+const PROFILE_MODEL_BY_ROLE = {
+  [ROLES.DOCTOR]: DoctorProfile,
+  [ROLES.CLINIC_ADMIN]: ClinicProfile,
+};
+
 // ── GET /api/admin/pending ────────────────────────────────────────────────────
 
-/**
- * Returns all doctors and HITL reviewers whose verificationStatus is
- * PENDING_VERIFICATION or UNDER_REVIEW, sorted oldest-first.
- *
- * Does NOT return document storageKeys.
- */
 async function listPending(req, res) {
-  const [doctors, reviewers] = await Promise.all([
+  const pendingStatuses = {
+    [Op.in]: [VERIFICATION_STATUS.PENDING_VERIFICATION, VERIFICATION_STATUS.UNDER_REVIEW],
+  };
+
+  const [doctors, clinics] = await Promise.all([
     DoctorProfile.findAll({
-      where: {
-        verificationStatus: {
-          [Op.in]: [VERIFICATION_STATUS.PENDING_VERIFICATION, VERIFICATION_STATUS.UNDER_REVIEW],
-        },
-      },
+      where: { verificationStatus: pendingStatuses },
       include: [{ model: User, as: 'user', attributes: ['id', 'email', 'phone', 'isVerified', 'createdAt'] }],
       order: [['createdAt', 'ASC']],
     }),
-    ReviewerProfile.findAll({
-      where: {
-        verificationStatus: {
-          [Op.in]: [VERIFICATION_STATUS.PENDING_VERIFICATION, VERIFICATION_STATUS.UNDER_REVIEW],
-        },
-      },
+    ClinicProfile.findAll({
+      where: { verificationStatus: pendingStatuses },
       include: [{ model: User, as: 'user', attributes: ['id', 'email', 'phone', 'isVerified', 'createdAt'] }],
       order: [['createdAt', 'ASC']],
     }),
   ]);
 
-  return res.json({ doctors, reviewers });
+  return res.json({ doctors, clinics });
 }
 
 // ── GET /api/admin/users ──────────────────────────────────────────────────────
 
-/**
- * List all users with optional filters: role, verificationStatus, page/limit.
- */
 async function listUsers(req, res) {
   const page = Math.max(1, parseInt(req.query.page, 10) || 1);
   const limit = Math.min(100, Math.max(1, parseInt(req.query.limit, 10) || 20));
@@ -75,8 +65,8 @@ async function listUsers(req, res) {
 // ── GET /api/admin/users/:userId ──────────────────────────────────────────────
 
 /**
- * Get a single user with their full role-specific profile.
- * Document storageKeys are NOT returned — only document metadata.
+ * Now includes the user's submitted documents (metadata only, no storageKey)
+ * so admin can review identity/license proof alongside the profile.
  */
 async function getUserDetail(req, res) {
   const user = await User.findByPk(req.params.userId, {
@@ -84,75 +74,50 @@ async function getUserDetail(req, res) {
   });
   if (!user) return res.status(404).json({ error: 'User not found' });
 
-  let profile = null;
-  if (user.role === ROLES.DOCTOR) {
-    profile = await DoctorProfile.findOne({ where: { userId: user.id } });
-  } else if (user.role === ROLES.HITL_REVIEWER) {
-    profile = await ReviewerProfile.findOne({ where: { userId: user.id } });
-  }
+  const profileModel = PROFILE_MODEL_BY_ROLE[user.role];
+  const profile = profileModel ? await profileModel.findOne({ where: { userId: user.id } }) : null;
 
-  // Documents: return metadata only, strip storageKey
-  const rawDocs = await ProfessionalDocument.findAll({
+  const documents = await ProfessionalDocument.findAll({
     where: { ownerId: user.id },
-    attributes: ['id', 'documentType', 'mimeType', 'fileSizeBytes', 'status', 'verifiedAt', 'uploadedAt', 'createdAt'],
+    attributes: { exclude: ['storageKey'] },
+    order: [['createdAt', 'DESC']],
   });
 
-  return res.json({ user, profile, documents: rawDocs });
+  return res.json({ user, profile, documents });
 }
 
 // ── PATCH /api/admin/verify/:userId ──────────────────────────────────────────
 
-/**
- * Perform a verification action on a doctor or HITL reviewer.
- * Body: { action*, notes }
- *
- * action: 'approve' | 'reject' | 'suspend' | 'request_resubmission' | 'set_under_review'
- *
- * When approved:
- *  - verificationStatus → VERIFIED
- *  - User.isVerified → true
- *  - For HITL reviewers: admin can also set allowedActions, supervisionRequired,
- *    specialityScope, reviewLevel in the same request.
- */
 async function verifyUser(req, res) {
-  const { action, notes, allowedActions, supervisionRequired, specialityScope, reviewLevel } = req.body;
+  const { action, notes } = req.body;
 
-  if (!action || !ACTION_TO_STATUS[action])
+  if (!action || !ACTION_TO_STATUS[action]) {
     return res.status(400).json({
       error: `Invalid action. Must be one of: ${Object.keys(ACTION_TO_STATUS).join(', ')}`,
     });
+  }
 
   const targetUser = await User.findByPk(req.params.userId);
   if (!targetUser) return res.status(404).json({ error: 'User not found' });
-  if (targetUser.role !== ROLES.DOCTOR && targetUser.role !== ROLES.HITL_REVIEWER)
-    return res.status(400).json({ error: 'Verification is only applicable to doctor and hitl_reviewer accounts' });
 
-  const newStatus = ACTION_TO_STATUS[action];
-  const isApproving = action === 'approve';
-  const now = new Date();
+  const profileModel = PROFILE_MODEL_BY_ROLE[targetUser.role];
+  if (!profileModel) {
+    return res.status(400).json({ error: 'Verification is only applicable to doctor and clinic_admin accounts' });
+  }
 
-  const profileModel = targetUser.role === ROLES.DOCTOR ? DoctorProfile : ReviewerProfile;
   const profile = await profileModel.findOne({ where: { userId: targetUser.id } });
   if (!profile) return res.status(404).json({ error: 'Profile not found for this user' });
 
-  const profileUpdates = {
+  const newStatus = ACTION_TO_STATUS[action];
+  const isApproving = action === 'approve';
+
+  await profile.update({
     verificationStatus: newStatus,
     verifiedBy: req.user.id,
-    verifiedAt: now,
+    verifiedAt: new Date(),
     verificationNotes: notes || null,
-  };
+  });
 
-  // Reviewer-specific scope fields — only set when approving
-  if (isApproving && targetUser.role === ROLES.HITL_REVIEWER) {
-    if (allowedActions !== undefined) profileUpdates.allowedActions = allowedActions;
-    if (supervisionRequired !== undefined) profileUpdates.supervisionRequired = supervisionRequired;
-    if (specialityScope !== undefined) profileUpdates.specialityScope = specialityScope;
-    if (reviewLevel !== undefined) profileUpdates.reviewLevel = reviewLevel;
-  }
-
-  await profile.update(profileUpdates);
-
-  // Mark the user as verified/unverified based on action
   await targetUser.update({ isVerified: isApproving });
 
   return res.json({
@@ -165,17 +130,16 @@ async function verifyUser(req, res) {
 // ── PATCH /api/admin/documents/:documentId ────────────────────────────────────
 
 /**
- * Accept or reject a specific document during the review process.
+ * Accept or reject a specific document during review.
  * Body: { status*, notes }  status: 'ACCEPTED' | 'REJECTED'
  */
 async function reviewDocument(req, res) {
   const { status, notes } = req.body;
-  if (!status || !Object.values(DOCUMENT_STATUS).includes(status))
+  if (!status || !Object.values(DOCUMENT_STATUS).includes(status)) {
     return res.status(400).json({ error: `status must be one of: ${Object.values(DOCUMENT_STATUS).join(', ')}` });
+  }
 
-  const doc = await ProfessionalDocument.findByPk(req.params.documentId, {
-    attributes: { exclude: ['storageKey'] }, // never return storageKey
-  });
+  const doc = await ProfessionalDocument.findByPk(req.params.documentId);
   if (!doc) return res.status(404).json({ error: 'Document not found' });
 
   const auditEntry = {
@@ -193,12 +157,28 @@ async function reviewDocument(req, res) {
     auditLog: [...(doc.auditLog || []), auditEntry],
   });
 
-  // Re-fetch without storageKey for the response
-  const updated = await ProfessionalDocument.findByPk(req.params.documentId, {
-    attributes: { exclude: ['storageKey'] },
-  });
-
-  return res.json({ message: 'Document status updated', document: updated });
+  const { storageKey, ...safeDoc } = doc.toJSON();
+  return res.json({ message: 'Document status updated', document: safeDoc });
 }
 
-module.exports = { listPending, listUsers, getUserDetail, verifyUser, reviewDocument };
+// ── GET /api/admin/documents/:documentId/file ────────────────────────────────
+
+/**
+ * Stream the actual document file to the admin browser.
+ * Never exposes the storageKey to non-admin callers — this route is
+ * already gated behind authenticate + requireRole('admin').
+ */
+async function serveDocument(req, res) {
+  const doc = await ProfessionalDocument.findByPk(req.params.documentId);
+  if (!doc) return res.status(404).json({ error: 'Document not found' });
+
+  const absolutePath = path.resolve(doc.storageKey);
+  return res.sendFile(absolutePath, (err) => {
+    if (err) {
+      console.error('[adminController] serveDocument error:', err.message);
+      if (!res.headersSent) res.status(500).json({ error: 'Could not serve file' });
+    }
+  });
+}
+
+module.exports = { listPending, listUsers, getUserDetail, verifyUser, reviewDocument, serveDocument };

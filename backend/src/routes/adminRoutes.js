@@ -21,5 +21,6 @@ router.patch('/verify/:userId', controller.verifyUser);
 
 // ── Document review ───────────────────────────────────────────────────────────
 router.patch('/documents/:documentId', controller.reviewDocument);
+router.get('/documents/:documentId/file', controller.serveDocument);
 
 module.exports = router;

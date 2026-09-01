@@ -1,4 +1,4 @@
-const { User, PatientProfile, DoctorProfile, ReviewerProfile, AdminProfile } = require('../models');
+const { User, PatientProfile, DoctorProfile, ReviewerProfile, AdminProfile, ClinicProfile } = require('../models');
 const { ROLES, PATIENT_STATUS } = require('../config/roles');
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -8,17 +8,24 @@ const { ROLES, PATIENT_STATUS } = require('../config/roles');
  * Returns null if no profile exists yet.
  */
 async function fetchProfile(user) {
-  switch (user.role) {
-    case ROLES.PATIENT:
-      return PatientProfile.findOne({ where: { userId: user.id } });
-    case ROLES.DOCTOR:
-      return DoctorProfile.findOne({ where: { userId: user.id } });
-    case ROLES.HITL_REVIEWER:
-      return ReviewerProfile.findOne({ where: { userId: user.id } });
-    case ROLES.ADMIN:
-      return AdminProfile.findOne({ where: { userId: user.id } });
-    default:
-      return null;
+  try {
+    switch (user.role) {
+      case ROLES.PATIENT:
+        return await PatientProfile.findOne({ where: { userId: user.id } });
+      case ROLES.DOCTOR:
+        return await DoctorProfile.findOne({ where: { userId: user.id } });
+      case ROLES.HITL_REVIEWER:
+        return await ReviewerProfile.findOne({ where: { userId: user.id } });
+      case ROLES.ADMIN:
+        return await AdminProfile.findOne({ where: { userId: user.id } });
+      case ROLES.CLINIC_ADMIN:
+        return await ClinicProfile.findOne({ where: { userId: user.id } });
+      default:
+        return null;
+    }
+  } catch (err) {
+    console.warn(`[profileController] fetchProfile failed for role=${user.role}:`, err.message);
+    return null;
   }
 }
 
@@ -51,13 +58,18 @@ async function refreshPatientStatus(profile) {
  * Does NOT expose passwordHash or internal storageKeys.
  */
 async function getMyProfile(req, res) {
-  const user = await User.findByPk(req.user.id, {
-    attributes: ['id', 'email', 'phone', 'role', 'isVerified', 'createdAt'],
-  });
-  if (!user) return res.status(404).json({ error: 'User not found' });
+  try {
+    const user = await User.findByPk(req.user.id, {
+      attributes: ['id', 'email', 'phone', 'role', 'isVerified', 'createdAt'],
+    });
+    if (!user) return res.status(404).json({ error: 'User not found' });
 
-  const profile = await fetchProfile(user);
-  return res.json({ user, profile: profile || null });
+    const profile = await fetchProfile(user);
+    return res.json({ user, profile: profile || null });
+  } catch (err) {
+    console.error('[profileController] getMyProfile error:', err);
+    return res.status(500).json({ error: 'Failed to load profile', detail: err.message });
+  }
 }
 
 // ── PATCH /api/profile/patient ────────────────────────────────────────────────
@@ -166,4 +178,76 @@ async function updateReviewerProfile(req, res) {
   return res.json({ message: 'Profile updated', profile });
 }
 
-module.exports = { getMyProfile, updatePatientProfile, updateDoctorProfile, updateReviewerProfile };
+// ── PATCH /api/profile/clinic ──────────────────────────────────────────────────
+async function updateClinicProfile(req, res) {
+  if (req.user.role !== ROLES.CLINIC_ADMIN)
+    return res.status(403).json({ error: 'Only clinic admistrators can update the clinic profile' });
+
+  const ALLOWED = ['clinicName', 'city', 'address', 'latitude', 'longitude', 'departments'];
+
+  const updates = {};
+  for (const key of ALLOWED) {
+    if (Object.prototype.hasOwnProperty.call(req.body, key)) updates[key] = req.body[key];
+  }
+
+  if (Object.keys(updates).length === 0)
+    return res.status(400).json({ error: 'No valid fields provided for update' });
+
+  const profile = await ClinicProfile.findOne({ where: { userId: req.user.id } });
+  if (!profile) return res.status(404).json({ error: 'Clinic profile not found' });
+
+  await profile.update(updates);
+  return res.json({ message: 'Profile updated', profile });
+}
+
+// ── PATCH /api/profile/location ──────────────────────────────────────────────
+
+/**
+ * Saves the user's current GPS coordinates to their role-specific profile.
+ * Works for 'patient', 'doctor', and 'clinic_admin' roles.
+ * Body: { lat: number, lng: number }
+ */
+async function updateLocation(req, res) {
+  const { lat, lng } = req.body;
+
+  if (lat === undefined || lng === undefined)
+    return res.status(400).json({ error: 'lat and lng are required' });
+
+  const latitude = parseFloat(lat);
+  const longitude = parseFloat(lng);
+
+  if (isNaN(latitude) || isNaN(longitude))
+    return res.status(400).json({ error: 'lat and lng must be valid numbers' });
+
+  if (latitude < -90 || latitude > 90) return res.status(400).json({ error: 'lat must be between -90 and 90' });
+  if (longitude < -180 || longitude > 180) return res.status(400).json({ error: 'lng must be between -180 and 180' });
+
+  const locationUpdatedAt = new Date();
+  const updates = { latitude, longitude, locationUpdatedAt };
+
+  try {
+    let profile;
+    const role = req.user.role;
+
+    if (role === ROLES.PATIENT) {
+      profile = await PatientProfile.findOne({ where: { userId: req.user.id } });
+    } else if (role === ROLES.DOCTOR) {
+      profile = await DoctorProfile.findOne({ where: { userId: req.user.id } });
+    } else if (role === ROLES.CLINIC_ADMIN) {
+      profile = await ClinicProfile.findOne({ where: { userId: req.user.id } });
+    } else {
+      return res.status(403).json({ error: 'Location update not supported for this role' });
+    }
+
+    if (!profile) return res.status(404).json({ error: 'Profile not found' });
+
+    await profile.update(updates);
+    return res.json({ message: 'Location updated', latitude, longitude, locationUpdatedAt });
+  } catch (err) {
+    console.error('[updateLocation] error:', err.message);
+    return res.status(500).json({ error: 'Failed to update location' });
+  }
+}
+
+module.exports = { getMyProfile, updatePatientProfile, updateDoctorProfile, updateReviewerProfile, updateClinicProfile, updateLocation };
+

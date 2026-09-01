@@ -1,27 +1,17 @@
 const express = require('express');
+const controller = require('../controllers/documentController');
 const authenticate = require('../middleware/authMiddleware');
-const { upload, uploadDocument, getMyDocuments, deleteDocument } = require('../controllers/documentController');
+const requireRole = require('../middleware/roleMiddleware');
+const upload = require('../middleware/uploadMiddleware');
+const { ROLES } = require('../constants/roles');
 
 const router = express.Router();
 
-// ── Authenticated routes (doctor and hitl_reviewer only) ─────────────────────
+router.use(authenticate);
+router.use(requireRole([ROLES.DOCTOR, ROLES.CLINIC_ADMIN]));
 
-// Upload a single document file
-// Field name must be "file" in the multipart form
-router.post(
-  '/upload',
-  authenticate,
-  (req, res, next) => upload.single('file')(req, res, (err) => {
-    if (err) return res.status(400).json({ error: err.message });
-    next();
-  }),
-  uploadDocument
-);
-
-// List own documents (metadata only)
-router.get('/my', authenticate, getMyDocuments);
-
-// Delete a pending document
-router.delete('/:id', authenticate, deleteDocument);
+router.post('/', upload.single('document'), controller.uploadDocument);
+router.get('/me', controller.listMyDocuments);
+router.delete('/:documentId', controller.deleteMyDocument);
 
 module.exports = router;

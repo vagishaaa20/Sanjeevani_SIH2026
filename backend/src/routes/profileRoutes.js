@@ -14,5 +14,9 @@ router.get('/me', controller.getMyProfile);
 router.patch('/patient', controller.updatePatientProfile);
 router.patch('/doctor', controller.updateDoctorProfile);
 router.patch('/reviewer', controller.updateReviewerProfile);
+router.patch('/clinic', controller.updateClinicProfile);
+
+// ── Auto-save GPS location (patient, doctor, clinic_admin) ────────────────────
+router.patch('/location', controller.updateLocation);
 
 module.exports = router;
