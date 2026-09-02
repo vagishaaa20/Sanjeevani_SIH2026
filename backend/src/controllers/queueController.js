@@ -1,4 +1,4 @@
-const { Queue, DoctorProfile, User } = require('../models');
+const { Queue, DoctorProfile, User, Consultation } = require('../models');
 const { QUEUE_STATUS } = require('../constants/queueStatus');
 const { enqueueFreeText } = require('../services/waCloudService');
 
@@ -12,28 +12,33 @@ async function requestConsultation(req, res) {
     const { doctorId } = req.body;
     const patientId = req.user.id;
 
-    if (!doctorId) {
-        return res.status(400).json({ error: 'doctorId is required' });
-    }
+    // Allow doctorId to be null for an open pool request, but validate if provided.
+    // if (!doctorId) {
+    //     return res.status(400).json({ error: 'doctorId is required' });
+    // }
 
     try {
-        // Verify the doctor exists and is verified
-        const doctor = await DoctorProfile.findOne({ where: { userId: doctorId } });
-        if (!doctor) {
-            return res.status(404).json({ error: 'Doctor not found' });
+        let doctor = null;
+        if (doctorId) {
+            doctor = await DoctorProfile.findOne({ where: { userId: doctorId } });
+            if (!doctor) {
+                return res.status(404).json({ error: 'Doctor not found' });
+            }
         }
 
-        // Check for duplicate active request (patient already in this doctor's queue)
+        // Check for duplicate active request
         const existing = await Queue.findOne({
             where: {
                 patientId,
-                doctorId,
-                status: QUEUE_STATUS.WAITING,
+                status: QUEUE_STATUS.WAITING, // Only allow one waiting queue at a time
             },
+            include: [{ model: DoctorProfile, as: 'doctor' }]
         });
+
         if (existing) {
+            const docName = existing.doctor?.fullName || 'a doctor';
             return res.status(409).json({
-                error: 'You already have an active consultation request with this doctor',
+                error: `You already have an active request with ${docName} (Token #${existing.tokenNumber}). Cancel it first to book with a different doctor.`,
                 queue: existing,
             });
         }
@@ -43,7 +48,7 @@ async function requestConsultation(req, res) {
         todayStart.setHours(0, 0, 0, 0);
         const queueCount = await Queue.count({
             where: {
-                doctorId,
+                doctorId: doctorId || null,
                 status: QUEUE_STATUS.WAITING,
             },
         });
@@ -51,22 +56,20 @@ async function requestConsultation(req, res) {
 
         const queueEntry = await Queue.create({
             patientId,
-            doctorId,
-            clinicId: doctor.clinicId || null,
+            doctorId: doctorId || null,
+            clinicId: doctor ? doctor.clinicId : null,
             tokenNumber,
             status: QUEUE_STATUS.WAITING,
         });
 
         // ── WhatsApp booking confirmation (fire-and-forget) ──────────────────
-        // ⚠️ FREE-FORM: Only within 24 h patient service window.
-        //    For out-of-window sends use template 'sanjeevani_booking_confirmation'
-        //    (requires Meta Business Manager approval — see waCloudService comments).
         User.findByPk(patientId).then((patientUser) => {
             if (patientUser?.phone) {
                 const phone = patientUser.phone.replace('+', '');
+                const docName = doctor ? (doctor.fullName || 'your doctor') : 'the next available doctor';
                 enqueueFreeText(
                     phone,
-                    `✅ *Appointment Confirmed!*\n\nYou are in the queue for *${doctor.fullName || 'your doctor'}* (Token #${tokenNumber}).\n\nReply *MENU* on WhatsApp to view or manage your appointments.`
+                    `✅ *Appointment Confirmed!*\n\nYou are in the queue for *${docName}* (Token #${tokenNumber}).\n\nReply *MENU* on WhatsApp to view or manage your appointments.`
                 ).catch((err) => console.error('[queueController] WhatsApp enqueue failed:', err.message));
             }
         }).catch(() => { });
@@ -90,10 +93,28 @@ async function requestConsultation(req, res) {
 async function myQueue(req, res) {
     try {
         const entries = await Queue.findAll({
-            where: { patientId: req.user.id },
+            where: {
+                patientId: req.user.id,
+                status: ['WAITING', 'SERVING']
+            },
             order: [['createdAt', 'DESC']],
+            raw: true
         });
-        return res.json({ queue: entries });
+
+        // For each entry, attach the active consultation (if they were accepted)
+        const entriesWithConsultations = await Promise.all(entries.map(async (q) => {
+            if (q.status === 'SERVING') {
+                const consultation = await Consultation.findOne({
+                    where: { patientId: req.user.id, doctorId: q.doctorId },
+                    order: [['createdAt', 'DESC']],
+                    raw: true
+                });
+                return { ...q, consultation };
+            }
+            return q;
+        }));
+
+        return res.json({ queue: entriesWithConsultations });
     } catch (err) {
         console.error('[myQueue] error:', err);
         return res.status(500).json({ error: 'Failed to fetch queue' });

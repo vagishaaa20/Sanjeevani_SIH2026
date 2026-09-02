@@ -16,6 +16,8 @@ const { MedicationReminder } = require('./medicationReminderModel');
 const MedicationLog = require('./medicationLogModel');
 const DiseaseReport = require('./diseaseReportModel');
 const OutbreakAlert = require('./outbreakAlertModel');
+const ConsultationDocument = require('./consultationDocumentModel');
+const QueueSkipped = require('./queueSkippedModel');
 
 // ── User → profile associations (1:1, cascade delete) ────────────────────────
 User.hasOne(PatientProfile, { foreignKey: 'userId', as: 'patientProfile', onDelete: 'CASCADE' });
@@ -68,6 +70,18 @@ MedicationLog.belongsTo(MedicationReminder, { foreignKey: 'reminderId', as: 'rem
 PatientProfile.hasMany(DiseaseReport, { foreignKey: 'patientId', as: 'diseaseReports' });
 DiseaseReport.belongsTo(PatientProfile, { foreignKey: 'patientId', as: 'patient' });
 
+// ── ConsultationDocument associations ────────────────────────────────────
+Consultation.hasMany(ConsultationDocument, { foreignKey: 'consultationId', as: 'documents' });
+ConsultationDocument.belongsTo(Consultation, { foreignKey: 'consultationId', as: 'consultation' });
+PatientProfile.hasMany(ConsultationDocument, { foreignKey: 'patientId', as: 'documents' });
+ConsultationDocument.belongsTo(PatientProfile, { foreignKey: 'patientId', as: 'patient' });
+
+// ── Queue associations ───────────────────────────────────────────────────
+Queue.belongsTo(PatientProfile, { foreignKey: 'patientId', as: 'patient' });
+PatientProfile.hasMany(Queue, { foreignKey: 'patientId', as: 'queues' });
+Queue.belongsTo(DoctorProfile, { foreignKey: 'doctorId', as: 'doctor' });
+DoctorProfile.hasMany(Queue, { foreignKey: 'doctorId', as: 'queues' });
+
 module.exports = {
   User,
   PatientProfile,
@@ -87,4 +101,6 @@ module.exports = {
   MedicationLog,
   DiseaseReport,
   OutbreakAlert,
+  ConsultationDocument,
+  QueueSkipped,
 };

@@ -8,6 +8,10 @@ import NearbyDoctorCard from '../../components/patient/NearbyDoctorCard';
 import WhatsAppModal from '../../components/patient/WhatsAppModal';
 import TodaysMedicationsWidget from '../../components/patient/TodaysMedicationsWidget';
 import OutbreakBanner from '../../components/patient/OutbreakBanner';
+import PreCallDocumentSubmit from '../../components/patient/PreCallDocumentSubmit';
+import ActiveQueueBanner from '../../components/patient/ActiveQueueBanner';
+import { SocketContext } from '../../context/SocketContext';
+import { useContext } from 'react';
 import ngeohash from 'ngeohash';
 
 // Feature grid card definitions
@@ -57,6 +61,15 @@ const FEATURE_CARDS = [
         enabled: true,
         colors: 'border-ink-black hover:bg-ink-black hover:text-white',
     },
+    {
+        id: 'requests',
+        icon: '⏳',
+        title: 'My Active Queue',
+        subtitle: 'Check your waitlist position in real-time',
+        route: '/patient/requests',
+        enabled: true,
+        colors: 'border-ink-black hover:bg-ink-black hover:text-white',
+    },
 ];
 
 export const PatientDashboard = () => {
@@ -72,6 +85,25 @@ export const PatientDashboard = () => {
     const [doctorsLoading, setDoctorsLoading] = useState(false);
     const [doctorsError, setDoctorsError] = useState(null);
     const [waModalOpen, setWaModalOpen] = useState(false);
+    const [acceptedConsultationId, setAcceptedConsultationId] = useState(null);
+    const { socket } = useContext(SocketContext);
+
+    useEffect(() => {
+        if (!socket) return;
+        const handleAccepted = (data) => {
+            console.log('Doctor accepted!', data);
+            setAcceptedConsultationId(data.consultationId);
+        };
+        const handleCompleted = () => {
+            setAcceptedConsultationId(null);
+        };
+        socket.on('consultation:accepted', handleAccepted);
+        socket.on('consultation:completed', handleCompleted);
+        return () => {
+            socket.off('consultation:accepted', handleAccepted);
+            socket.off('consultation:completed', handleCompleted);
+        };
+    }, [socket]);
 
     useEffect(() => {
         if (!coords) return;
@@ -105,7 +137,12 @@ export const PatientDashboard = () => {
         : null;
 
     return (
-        <div className="w-full flex flex-col gap-6 text-left">
+        <div className="w-full flex flex-col gap-6 text-left relative">
+            {acceptedConsultationId && <PreCallDocumentSubmit consultationId={acceptedConsultationId} />}
+
+            {/* Sticky Queue Banner */}
+            <ActiveQueueBanner />
+
             {/* Outbreak Alert Banner */}
             {userRegionGeohash && <OutbreakBanner userRegionGeohash={userRegionGeohash} />}
 

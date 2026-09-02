@@ -66,8 +66,88 @@ async function startServer() {
         }
       }
 
+      // ── WebRTC Teleconsultation signaling ──────────────────────────────────
+      const disconnectTimers = new Map();
+
+      socket.on('join-room', async ({ roomId, userId }) => {
+        socket.join(roomId);
+        socket.activeRoomId = roomId;
+
+        console.log(`[Socket.io] User ${userId} joined room ${roomId}`);
+
+        // If they had a pending disconnect timer, clear it because they rejoined
+        if (disconnectTimers.has(roomId)) {
+          clearTimeout(disconnectTimers.get(roomId));
+          disconnectTimers.delete(roomId);
+        }
+
+        // Wait, block join if completed
+        const { Consultation } = require('./src/models');
+        const consultation = await Consultation.findOne({ where: { roomId } });
+        if (consultation && consultation.status === 'completed') {
+          socket.emit('webrtc:error', { message: 'Consultation is already completed.' });
+          return;
+        }
+
+        if (consultation && ['assigned', 'queued', 'waiting'].includes(consultation.status)) {
+          consultation.status = 'in_progress';
+          consultation.webrtcStatus = 'in_progress';
+          await consultation.save();
+        }
+
+        socket.to(roomId).emit('user-joined', { userId });
+      });
+
+      socket.on('leave-room', ({ roomId, userId }) => {
+        socket.leave(roomId);
+        socket.to(roomId).emit('user-left', { userId });
+      });
+
+      socket.on('webrtc:offer', ({ roomId, offer, senderId }) => {
+        socket.to(roomId).emit('webrtc:offer', { offer, senderId });
+      });
+
+      socket.on('webrtc:answer', ({ roomId, answer, senderId }) => {
+        socket.to(roomId).emit('webrtc:answer', { answer, senderId });
+      });
+
+      socket.on('webrtc:ice-candidate', ({ roomId, candidate, senderId }) => {
+        socket.to(roomId).emit('webrtc:ice-candidate', { candidate, senderId });
+      });
+
+      socket.on('webrtc:chat-message', (data) => {
+        socket.to(data.roomId).emit('webrtc:chat-message', data);
+      });
+
+      socket.on('webrtc:quality-fallback', ({ roomId, senderId }) => {
+        socket.to(roomId).emit('webrtc:quality-fallback', { senderId });
+      });
+
       socket.on('disconnect', () => {
         console.log(`[Socket.io] Client disconnected: ${socket.id}`);
+        // Optionally emit user-left to rooms if you track socket-to-room arrays
+        if (socket.activeRoomId) {
+          const roomId = socket.activeRoomId;
+          // set 30s timeout
+          const timer = setTimeout(async () => {
+            const { Consultation, Queue } = require('./src/models');
+            try {
+              const consultation = await Consultation.findOne({ where: { roomId } });
+              if (consultation && consultation.status === 'in_progress') {
+                consultation.status = 'disconnected';
+                consultation.webrtcStatus = 'disconnected';
+                await consultation.save();
+
+                // Sync with Queue status so banner shows something distinct if necessary?
+                // Or just let UI parse consultation.status
+              }
+            } catch (e) {
+              console.error('Timeout disconnect error', e);
+            }
+            disconnectTimers.delete(roomId);
+          }, 30000);
+          disconnectTimers.set(roomId, timer);
+        }
       });
     });
 

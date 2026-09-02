@@ -8,7 +8,7 @@ import React from 'react';
  *   doctor  — doctor object from GET /api/doctors/nearby
  *   onBook  — optional callback(doctor); when provided renders a "Book" button
  */
-const NearbyDoctorCard = ({ doctor, onBook }) => {
+const NearbyDoctorCard = ({ doctor, onBook, hasActiveQueue }) => {
     return (
         <div className="border-2 border-ink-black rounded-xl p-4 flex flex-col gap-2 hover:bg-neutral-50 transition-colors">
             <div className="flex justify-between items-start gap-2">
@@ -42,7 +42,9 @@ const NearbyDoctorCard = ({ doctor, onBook }) => {
                 <button
                     type="button"
                     onClick={() => onBook(doctor)}
-                    className="mt-1 w-full py-2 rounded-xl border-2 border-ink-black bg-ink-black text-white text-sm font-bold hover:bg-white hover:text-ink-black transition-all duration-150 cursor-pointer"
+                    disabled={hasActiveQueue}
+                    title={hasActiveQueue ? "You already have an active request — cancel it to book with a different doctor" : undefined}
+                    className="mt-1 w-full py-2 rounded-xl border-2 border-ink-black bg-ink-black text-white text-sm font-bold hover:bg-white hover:text-ink-black transition-all duration-150 cursor-pointer disabled:opacity-40 disabled:hover:bg-ink-black disabled:hover:text-white disabled:cursor-not-allowed"
                 >
                     Book Consultation
                 </button>

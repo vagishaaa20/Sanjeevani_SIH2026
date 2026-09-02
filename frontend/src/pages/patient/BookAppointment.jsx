@@ -5,6 +5,7 @@ import doctorService from '../../services/doctorService';
 import api from '../../services/api';
 import NearbyDoctorCard from '../../components/patient/NearbyDoctorCard';
 import Modal from '../../components/common/Modal';
+import ActiveQueueBanner from '../../components/patient/ActiveQueueBanner';
 
 const BookAppointment = () => {
     const navigate = useNavigate();
@@ -13,6 +14,7 @@ const BookAppointment = () => {
     const [doctors, setDoctors] = useState([]);
     const [doctorsLoading, setDoctorsLoading] = useState(false);
     const [doctorsError, setDoctorsError] = useState(null);
+    const [hasActiveQueue, setHasActiveQueue] = useState(false);
 
     // Booking modal state
     const [selectedDoctor, setSelectedDoctor] = useState(null);
@@ -42,7 +44,8 @@ const BookAppointment = () => {
         setBookingError('');
         try {
             const res = await api.post('/queues/request', { doctorId: selectedDoctor.userId });
-            setBookingSuccess(res.data);
+            closeModal();
+            navigate('/patient/requests');
         } catch (err) {
             setBookingError(
                 err.response?.data?.error || 'Failed to submit request. Please try again.'
@@ -60,6 +63,8 @@ const BookAppointment = () => {
 
     return (
         <div className="w-full flex flex-col gap-6 text-left">
+            <ActiveQueueBanner onStateChange={(queue) => setHasActiveQueue(!!queue)} />
+
             {/* Header */}
             <div className="flex items-center gap-4">
                 <button
@@ -106,6 +111,7 @@ const BookAppointment = () => {
                                 key={doctor.userId}
                                 doctor={doctor}
                                 onBook={handleBook}
+                                hasActiveQueue={hasActiveQueue}
                             />
                         ))}
                     </div>

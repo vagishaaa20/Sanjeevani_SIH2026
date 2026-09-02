@@ -19,10 +19,16 @@ const whatsappRoutes = require('./whatsappRoutes');
 const medicationReminderRoutes = require('./medicationReminderRoutes');
 const outbreakRoutes = require('./outbreakRoutes');
 const triageRoutes = require('./triageRoutes');
+const doctorQueueRoutes = require('./doctorQueueRoutes');
+const consultationDocumentRoutes = require('./consultationDocumentRoutes');
 
 router.use('/auth', authRoutes);
 router.use('/patients', patientRoutes);
+
+// More specific doctor routes must go before generic /doctors
+router.use('/doctors/queue', doctorQueueRoutes);
 router.use('/doctors', doctorRoutes);
+
 router.use('/clinics', clinicRoutes);
 router.use('/appointments', appointmentRoutes);
 router.use('/queues', queueRoutes);
@@ -38,5 +44,6 @@ router.use('/whatsapp', whatsappRoutes);
 router.use('/medication-reminders', medicationReminderRoutes);
 router.use('/outbreaks', outbreakRoutes);
 router.use('/triage', triageRoutes);
+router.use('/consultations', consultationDocumentRoutes);
 
 module.exports = router;

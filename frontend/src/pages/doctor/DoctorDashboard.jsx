@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
 import DoctorOutbreakWidget from '../../components/doctor/DoctorOutbreakWidget';
+import DoctorQueueList from '../../components/doctor/DoctorQueueList';
 
 const STATUS_MESSAGES = {
     PENDING_VERIFICATION: {
@@ -192,11 +193,8 @@ const DoctorDashboard = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="md:col-span-2 bg-white border-2 border-ink-black rounded-2xl p-6 flex flex-col gap-4">
-                    <h3 className="text-lg font-bold text-ink-black">Welcome to your Dashboard</h3>
-                    <p className="text-sm text-ink-charcoal">
-                        Your consultation queue, telemedicine setup, and patient management tools are coming soon.
-                    </p>
+                <div className="md:col-span-2 flex flex-col gap-4">
+                    <DoctorQueueList />
                 </div>
                 <div>
                     <DoctorOutbreakWidget />

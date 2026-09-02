@@ -20,6 +20,8 @@ import AiTriage from './pages/patient/AiTriage';
 import PatientConsultations from './pages/patient/PatientConsultations';
 import PatientSubsidy from './pages/patient/PatientSubsidy';
 import HeatmapView from './pages/patient/HeatmapView';
+import PatientRequests from './pages/patient/PatientRequests';
+import TeleconsultationRoom from './pages/shared/TeleconsultationRoom';
 import AdminOutbreakPanel from './pages/admin/AdminOutbreakPanel';
 
 // Main layout wrapper that includes sidebar and navbar for authenticated users
@@ -139,6 +141,17 @@ export const App = () => {
                                 />
 
                                 <Route
+                                    path="/doctor/consultation/:id/room"
+                                    element={
+                                        <ProtectedRoute allowedRoles={['doctor']}>
+                                            <AppLayout>
+                                                <TeleconsultationRoom />
+                                            </AppLayout>
+                                        </ProtectedRoute>
+                                    }
+                                />
+
+                                <Route
                                     path="/patient/dashboard"
                                     element={
                                         <ProtectedRoute allowedRoles={['patient']}>
@@ -183,6 +196,17 @@ export const App = () => {
                                 />
 
                                 <Route
+                                    path="/patient/requests"
+                                    element={
+                                        <ProtectedRoute allowedRoles={['patient']}>
+                                            <AppLayout>
+                                                <PatientRequests />
+                                            </AppLayout>
+                                        </ProtectedRoute>
+                                    }
+                                />
+
+                                <Route
                                     path="/patient/subsidy"
                                     element={
                                         <ProtectedRoute allowedRoles={['patient']}>
@@ -199,6 +223,17 @@ export const App = () => {
                                         <ProtectedRoute allowedRoles={['patient']}>
                                             <AppLayout>
                                                 <HeatmapView />
+                                            </AppLayout>
+                                        </ProtectedRoute>
+                                    }
+                                />
+
+                                <Route
+                                    path="/patient/consultation/:id/room"
+                                    element={
+                                        <ProtectedRoute allowedRoles={['patient']}>
+                                            <AppLayout>
+                                                <TeleconsultationRoom />
                                             </AppLayout>
                                         </ProtectedRoute>
                                     }

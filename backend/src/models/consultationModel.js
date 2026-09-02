@@ -7,6 +7,7 @@ const CONSULTATION_STATUS = Object.freeze({
     IN_PROGRESS: 'in_progress',
     COMPLETED: 'completed',
     CANCELLED: 'cancelled',
+    DISCONNECTED: 'disconnected',
 });
 
 const Consultation = sequelize.define(
@@ -16,6 +17,21 @@ const Consultation = sequelize.define(
             type: DataTypes.UUID,
             defaultValue: DataTypes.UUIDV4,
             primaryKey: true,
+        },
+        roomId: {
+            type: DataTypes.UUID,
+            allowNull: true,
+            comment: 'WebRTC room ID',
+        },
+        webrtcStatus: {
+            type: DataTypes.ENUM('scheduled', 'waiting', 'in_progress', 'completed', 'missed', 'disconnected'),
+            allowNull: true,
+            defaultValue: 'scheduled',
+        },
+        notes: {
+            type: DataTypes.TEXT,
+            allowNull: true,
+            comment: 'Live plain text notes taken by doctor during the call',
         },
         patientId: {
             type: DataTypes.UUID,
