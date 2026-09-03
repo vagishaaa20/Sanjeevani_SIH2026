@@ -20,10 +20,12 @@ import BookAppointment from './pages/patient/BookAppointment';
 import AiTriage from './pages/patient/AiTriage';
 import PatientConsultations from './pages/patient/PatientConsultations';
 import PatientSubsidy from './pages/patient/PatientSubsidy';
+import MedicineAvailability from './pages/patient/MedicineAvailability';
 import HeatmapView from './pages/patient/HeatmapView';
 import PatientRequests from './pages/patient/PatientRequests';
 import TeleconsultationRoom from './pages/shared/TeleconsultationRoom';
 import AdminOutbreakPanel from './pages/admin/AdminOutbreakPanel';
+import MedicineInventory from './pages/clinic/MedicineInventory';
 
 // Main layout wrapper that includes sidebar and navbar for authenticated users
 const AppLayout = ({ children }) => {
@@ -130,6 +132,27 @@ export const App = () => {
                                             </ProtectedRoute>
                                         }
                                     />
+                                <Route
+                                    path="/clinic/medicine-inventory"
+                                    element={
+                                        <ProtectedRoute allowedRoles={['clinic_admin']}>
+                                            <AppLayout>
+                                                <MedicineInventory />
+                                            </AppLayout>
+                                        </ProtectedRoute>
+                                    }
+                                />
+
+                                <Route
+                                    path="/doctor/dashboard"
+                                    element={
+                                        <ProtectedRoute allowedRoles={['doctor']}>
+                                            <AppLayout>
+                                                <DoctorDashboard />
+                                            </AppLayout>
+                                        </ProtectedRoute>
+                                    }
+                                />
 
                                     <Route
                                         path="/doctor/documents"
@@ -229,6 +252,27 @@ export const App = () => {
                                             </ProtectedRoute>
                                         }
                                     />
+                                <Route
+                                    path="/patient/medicine-availability"
+                                    element={
+                                        <ProtectedRoute allowedRoles={['patient']}>
+                                            <AppLayout>
+                                                <MedicineAvailability />
+                                            </AppLayout>
+                                        </ProtectedRoute>
+                                    }
+                                />
+
+                                <Route
+                                    path="/patient/heatmap"
+                                    element={
+                                        <ProtectedRoute allowedRoles={['patient']}>
+                                            <AppLayout>
+                                                <HeatmapView />
+                                            </AppLayout>
+                                        </ProtectedRoute>
+                                    }
+                                />
 
                                     <Route
                                         path="/patient/consultation/:id/room"

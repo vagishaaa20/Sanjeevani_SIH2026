@@ -15,6 +15,7 @@ export const Sidebar = () => {
         clinic_admin: [
             { path: '/clinic/profile', label: 'Clinic Setup' },
             { path: '/clinic/departments', label: 'OPD Departments' },
+            { path: '/clinic/medicine-inventory', label: 'Medicine Inventory' },
         ],
         doctor: [
             { path: '/doctor/dashboard', label: '🩺 Doctor Schedule' },
@@ -22,6 +23,7 @@ export const Sidebar = () => {
         ],
         patient: [
             { path: '/patient/dashboard', label: 'My Patient Care' },
+            { path: '/patient/medicine-availability', label: 'Find Medicine' },
         ],
     };
 
