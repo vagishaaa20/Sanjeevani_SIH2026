@@ -127,13 +127,6 @@ const MedicineInventory = () => {
                     <h2 className="text-3xl font-black text-ink-black">Medicine Inventory</h2>
                     <p className="text-sm font-semibold text-ink-charcoal">Manage clinic medicines and stock levels</p>
                 </div>
-                <button
-                    type="button"
-                    onClick={() => resetForm()}
-                    className="px-5 py-3 rounded-xl border-2 border-ink-black bg-ink-black text-white font-bold text-sm hover:bg-white hover:text-ink-black transition-all cursor-pointer"
-                >
-                    + Add Medicine
-                </button>
             </div>
 
             <div className="bg-white border-2 border-ink-black rounded-2xl p-6 shadow-sm">
@@ -199,8 +192,9 @@ const MedicineInventory = () => {
                             onChange={handleChange}
                             className="w-full border-2 border-zinc-200 rounded-xl p-2.5 text-sm focus:outline-none focus:border-cerulean"
                         />
+                        <p className="mt-1 text-[11px] text-ink-muted">Flag as low when stock is at or below this number.</p>
                     </div>
-                    <div className="md:col-span-6 flex justify-end gap-2">
+                    <div className="col-span-full flex flex-wrap justify-end gap-2 pt-2 border-t border-zinc-200">
                         {editingId && (
                             <button
                                 type="button"
@@ -213,7 +207,7 @@ const MedicineInventory = () => {
                         <button
                             type="submit"
                             disabled={saving}
-                            className="px-5 py-2.5 rounded-xl border-2 border-ink-black bg-ink-black text-white font-bold text-sm hover:bg-white hover:text-ink-black transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                            className="inline-flex items-center justify-center px-5 py-2.5 rounded-xl border-2 border-black bg-black text-white font-bold text-sm hover:bg-white hover:text-black transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                         >
                             {saving ? 'Saving...' : editingId ? 'Update Medicine' : 'Add Medicine'}
                         </button>

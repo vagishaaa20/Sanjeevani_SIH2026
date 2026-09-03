@@ -1,4 +1,5 @@
 const User = require('./userModel');
+const AdminProfile = require('./AdminProfile');
 const PatientProfile = require('./patientModel');
 const DoctorProfile = require('./doctorModel');
 const ClinicProfile = require('./clinicModel');
@@ -89,6 +90,7 @@ DoctorProfile.hasMany(Queue, { foreignKey: 'doctorId', as: 'queues' });
 
 module.exports = {
   User,
+  AdminProfile,
   PatientProfile,
   DoctorProfile,
   ClinicProfile,

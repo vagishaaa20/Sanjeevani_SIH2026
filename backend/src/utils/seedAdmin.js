@@ -9,6 +9,9 @@ async function seedAdmin() {
 
   console.log(`Seeding admin account: ${email}...`);
 
+  await sequelize.authenticateDatabase();
+  await sequelize.sync();
+
   const t = await sequelize.transaction();
   try {
     const existing = await User.findOne({ where: { email } });
