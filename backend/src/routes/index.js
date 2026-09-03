@@ -19,6 +19,7 @@ const whatsappRoutes = require('./whatsappRoutes');
 const medicationReminderRoutes = require('./medicationReminderRoutes');
 const outbreakRoutes = require('./outbreakRoutes');
 const triageRoutes = require('./triageRoutes');
+const translateRoutes = require('./translateRoutes');
 const doctorQueueRoutes = require('./doctorQueueRoutes');
 const consultationDocumentRoutes = require('./consultationDocumentRoutes');
 
@@ -44,6 +45,7 @@ router.use('/whatsapp', whatsappRoutes);
 router.use('/medication-reminders', medicationReminderRoutes);
 router.use('/outbreaks', outbreakRoutes);
 router.use('/triage', triageRoutes);
+router.use('/translate', translateRoutes);
 router.use('/consultations', consultationDocumentRoutes);
 
 module.exports = router;

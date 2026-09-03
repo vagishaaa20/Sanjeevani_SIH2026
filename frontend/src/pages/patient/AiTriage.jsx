@@ -1,5 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import useAuth from '../../hooks/useAuth';
+import { useLanguage } from '../../hooks/LanguageContext';
 
 // ⚠️ SECURITY NOTE: This calls the Gemini API directly from the browser.
 // VITE_GEMINI_API_KEY is exposed in the client bundle.
@@ -41,13 +44,107 @@ const RESULT_CONFIG = {
 
 const AiTriage = () => {
     const navigate = useNavigate();
+    const { token } = useAuth();
+    const { currentLang } = useLanguage();
 
+    // Core triage state
     const [symptoms, setSymptoms] = useState('');
     const [duration, setDuration] = useState('');
     const [severity, setSeverity] = useState('');
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState(null); // { recommendation, reason }
     const [error, setError] = useState('');
+
+    // Voice triage state
+    const [isRecording, setIsRecording] = useState(false);
+    const [recordingTime, setRecordingTime] = useState(0);
+    const [transcribing, setTranscribing] = useState(false);
+
+    const mediaRecorderRef = useRef(null);
+    const audioChunksRef = useRef([]);
+    const timerIntervalRef = useRef(null);
+
+    // Cleanup interval on unmount
+    useEffect(() => {
+        return () => clearInterval(timerIntervalRef.current);
+    }, []);
+
+    // Stop recording automatically if it hits 60 seconds
+    useEffect(() => {
+        if (isRecording && recordingTime >= 60) {
+            stopRecording();
+        }
+    }, [recordingTime, isRecording]);
+
+    const startRecording = async () => {
+        setError('');
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const mediaRecorder = new MediaRecorder(stream);
+            mediaRecorderRef.current = mediaRecorder;
+            audioChunksRef.current = [];
+
+            mediaRecorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    audioChunksRef.current.push(event.data);
+                }
+            };
+
+            mediaRecorder.onstop = handleRecordingStop;
+
+            mediaRecorder.start();
+            setIsRecording(true);
+            setRecordingTime(0);
+
+            timerIntervalRef.current = setInterval(() => {
+                setRecordingTime((prev) => prev + 1);
+            }, 1000);
+
+        } catch (err) {
+            console.error('Microphone error:', err);
+            setError('Microphone access denied. Please type your symptoms instead.');
+        }
+    };
+
+    const stopRecording = () => {
+        if (mediaRecorderRef.current && isRecording) {
+            mediaRecorderRef.current.stop();
+            setIsRecording(false);
+            clearInterval(timerIntervalRef.current);
+            // Stop all tracks on the stream to drop the browser's red recording dot natively
+            mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
+        }
+    };
+
+    const handleRecordingStop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+
+        // Prepare FormData
+        const formData = new FormData();
+        formData.append('audio_file', audioBlob, 'triage_voice.webm');
+
+        setTranscribing(true);
+        setError('');
+
+        try {
+            const res = await axios.post(`${import.meta.env.VITE_API_URL}/triage/voice`, formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data',
+                }
+            });
+
+            if (res.data?.transcript) {
+                // Append or set the transcript directly to the textarea
+                setSymptoms((prev) => prev ? prev + ' ' + res.data.transcript : res.data.transcript);
+            }
+        } catch (err) {
+            console.error('Transcription error:', err);
+            setError('Voice transcription failed. Please fall back to typing your symptoms.');
+        } finally {
+            setTranscribing(false);
+        }
+    };
 
     const buildPrompt = () =>
         `You are a medical triage assistant for Sanjeevani, a rural India health platform.
@@ -75,43 +172,28 @@ Respond with ONLY a valid JSON object in this exact format (no markdown, no extr
             return;
         }
 
-        if (!GEMINI_API_KEY) {
-            setError('AI Triage is not configured (missing VITE_GEMINI_API_KEY). Please contact support.');
-            return;
-        }
-
         setLoading(true);
         try {
-            const response = await fetch(GEMINI_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: buildPrompt() }] }],
-                    generationConfig: { temperature: 0.1, maxOutputTokens: 256 },
-                }),
+            const response = await axios.post(`${import.meta.env.VITE_API_URL}/triage`, {
+                symptoms,
+                duration,
+                severity,
+                targetLang: currentLang
+            }, {
+                headers: { Authorization: `Bearer ${token}` }
             });
 
-            if (!response.ok) {
-                const errData = await response.json();
-                throw new Error(errData.error?.message || `Gemini API error ${response.status}`);
+            if (response.data?.recommendation) {
+                setResult({
+                    recommendation: response.data.recommendation,
+                    reason: response.data.reason
+                });
+            } else {
+                setError('Received unknown response format from API.');
             }
-
-            const data = await response.json();
-            const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-            if (!rawText) throw new Error('Empty response from AI');
-
-            // Parse JSON — strip any accidental markdown fencing
-            const cleaned = rawText.replace(/```json|```/g, '').trim();
-            const parsed = JSON.parse(cleaned);
-
-            const validRecs = ['emergency', 'teleconsultation', 'doctor_visit'];
-            if (!validRecs.includes(parsed.recommendation)) {
-                throw new Error('Unexpected recommendation from AI: ' + parsed.recommendation);
-            }
-
-            setResult(parsed);
         } catch (err) {
-            setError('Could not get an AI response. Please try again. (' + err.message + ')');
+            console.error('Triage Error:', err);
+            setError('Failed to analyze symptoms. Please try again. (' + err.message + ')');
         } finally {
             setLoading(false);
         }
@@ -150,10 +232,32 @@ Respond with ONLY a valid JSON object in this exact format (no markdown, no extr
                 </div>
 
                 <form onSubmit={handleCheck} className="flex flex-col gap-4">
-                    {/* Symptoms textarea */}
+                    {/* Symptoms textarea + Voice Record Container */}
                     <div className="flex flex-col gap-1">
-                        <label className="text-xs font-semibold text-ink-charcoal uppercase tracking-wider">
-                            Describe your symptoms <span className="text-red-500">*</span>
+                        <label className="text-xs font-semibold text-ink-charcoal uppercase tracking-wider flex justify-between items-end">
+                            <span>Describe your symptoms <span className="text-red-500">*</span></span>
+
+                            {/* Voice Button */}
+                            <button
+                                type="button"
+                                onClick={isRecording ? stopRecording : startRecording}
+                                disabled={transcribing}
+                                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border-2 text-xs font-bold transition-all ${isRecording
+                                    ? 'border-red-500 bg-red-50 text-red-600 animate-pulse'
+                                    : 'border-ink-black bg-white text-ink-black hover:bg-ink-black hover:text-white'
+                                    } disabled:opacity-50`}
+                            >
+                                {isRecording ? (
+                                    <>
+                                        <span className="w-2 h-2 rounded-full bg-red-600"></span>
+                                        Stop ({60 - recordingTime}s)
+                                    </>
+                                ) : transcribing ? (
+                                    'Listening...'
+                                ) : (
+                                    '🎤 Speak Symptoms'
+                                )}
+                            </button>
                         </label>
                         <textarea
                             value={symptoms}
@@ -161,7 +265,8 @@ Respond with ONLY a valid JSON object in this exact format (no markdown, no extr
                             placeholder="e.g. fever since 2 days, severe headache, body aches, no appetite..."
                             rows={4}
                             required
-                            className="w-full px-4 py-3 rounded-xl border-2 border-ink-black bg-white text-sm resize-none focus:outline-none focus:ring-2 focus:ring-cerulean"
+                            disabled={isRecording || transcribing}
+                            className={`w-full px-4 py-3 rounded-xl border-2 border-ink-black bg-white text-sm resize-none focus:outline-none focus:ring-2 focus:ring-cerulean ${(isRecording || transcribing) ? 'opacity-60 bg-cream-bg' : ''}`}
                         />
                     </div>
 

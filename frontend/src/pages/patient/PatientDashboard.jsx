@@ -13,6 +13,8 @@ import ActiveQueueBanner from '../../components/patient/ActiveQueueBanner';
 import { SocketContext } from '../../context/SocketContext';
 import { useContext } from 'react';
 import ngeohash from 'ngeohash';
+import useTranslatedText from '../../hooks/useTranslatedText';
+import TranslatedText from '../../components/common/TranslatedText';
 
 // Feature grid card definitions
 const FEATURE_CARDS = [
@@ -76,6 +78,10 @@ export const PatientDashboard = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
     const { coords, permissionDenied, loading: geoLoading } = useGeolocation();
+
+    // Dynamic Translation Strings via Bhashini
+    const welcomeText = useTranslatedText("Welcome back,");
+    const quickActionsText = useTranslatedText("Quick Actions");
 
     const [clinics, setClinics] = useState([]);
     const [clinicsLoading, setClinicsLoading] = useState(false);
@@ -187,21 +193,20 @@ export const PatientDashboard = () => {
                     >
                         <span className="text-3xl">{card.icon}</span>
                         <div>
-                            <h3 className="text-base font-black text-ink-black group-hover:text-inherit transition-colors">
-                                {card.title}
+                            <h3 className="text-lg font-bold text-ink-black group-hover:text-white transition-colors duration-200">
+                                <TranslatedText text={card.title} />
                             </h3>
-                            <p className="text-xs font-medium text-ink-muted mt-0.5">
-                                {card.subtitle}
+                            <p className="text-xs font-semibold text-ink-charcoal group-hover:text-ink-muted transition-colors duration-200 mt-1">
+                                <TranslatedText text={card.subtitle} />
                             </p>
                         </div>
-                        {card.enabled && (
-                            <span className="text-xs font-bold text-cerulean-dark group-hover:text-inherit transition-colors">
-                                Get started →
+                        {card.enabled ? (
+                            <span className="text-xs font-bold uppercase tracking-wider text-cerulean flex items-center gap-1 group-hover:text-white transition-colors duration-200">
+                                <TranslatedText text="Get started" /> &rarr;
                             </span>
-                        )}
-                        {!card.enabled && (
+                        ) : (
                             <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wide">
-                                Coming Soon
+                                <TranslatedText text="Coming Soon" />
                             </span>
                         )}
                     </button>

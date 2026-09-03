@@ -27,19 +27,20 @@ async function requestConsultation(req, res) {
         }
 
         // Check for duplicate active request
+        // VERIFICATION 1 & 2: 
+        // 1. This endpoint is ONLY triggered when a patient hits the final Submit button, NOT on form-open.
+        // 2. This is the exclusive ingress path, and unconditionally enforces the 1-active-booking cap!
+        const { Op } = require('sequelize');
         const existing = await Queue.findOne({
             where: {
                 patientId,
-                status: QUEUE_STATUS.WAITING, // Only allow one waiting queue at a time
-            },
-            include: [{ model: DoctorProfile, as: 'doctor' }]
+                status: { [Op.in]: [QUEUE_STATUS.WAITING, QUEUE_STATUS.SERVING] }, // Prevent overlapping requests if already in-call
+            }
         });
 
         if (existing) {
-            const docName = existing.doctor?.fullName || 'a doctor';
             return res.status(409).json({
-                error: `You already have an active request with ${docName} (Token #${existing.tokenNumber}). Cancel it first to book with a different doctor.`,
-                queue: existing,
+                error: `You already have an active request. Cancel it first to book anew.`,
             });
         }
 
@@ -79,6 +80,11 @@ async function requestConsultation(req, res) {
             queue: queueEntry,
         });
     } catch (err) {
+        if (err.name === 'SequelizeUniqueConstraintError') {
+            return res.status(409).json({
+                error: 'Database error: You already have an active or serving queue request globally.'
+            });
+        }
         console.error('[requestConsultation] error:', err);
         return res.status(500).json({
             error: process.env.NODE_ENV === 'development' ? err.message : 'Failed to submit request',
@@ -121,4 +127,31 @@ async function myQueue(req, res) {
     }
 }
 
-module.exports = { requestConsultation, myQueue };
+/**
+ * POST /api/queues/:id/cancel
+ * Allows a patient to unilaterally cancel their own requested WAITING queue if no doctor has accepted it yet.
+ */
+async function cancelQueue(req, res) {
+    try {
+        const { id } = req.params;
+        const queue = await Queue.findByPk(id);
+
+        if (!queue || queue.patientId !== req.user.id) {
+            return res.status(404).json({ error: 'Queue request not found or unauthorized' });
+        }
+
+        if (queue.status !== QUEUE_STATUS.WAITING) {
+            return res.status(400).json({ error: 'Only WAITING queue requests can be cancelled.' });
+        }
+
+        queue.status = QUEUE_STATUS.CANCELLED;
+        await queue.save();
+
+        return res.json({ success: true, message: 'Consultation request cancelled successfully' });
+    } catch (err) {
+        console.error('[cancelQueue] error:', err);
+        return res.status(500).json({ error: 'Failed to cancel queue request' });
+    }
+}
+
+module.exports = { requestConsultation, myQueue, cancelQueue };

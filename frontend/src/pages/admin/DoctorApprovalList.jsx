@@ -44,6 +44,7 @@ const DocumentsSection = ({ userId, expanded }) => {
     const [documents, setDocuments] = useState([]);
     const [loading, setLoading] = useState(false);
     const [actioning, setActioning] = useState(null); // docId being acted upon
+    const [viewingDocId, setViewingDocId] = useState(null); // docId being viewed
     const [msg, setMsg] = useState({ type: '', text: '' });
 
     const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
@@ -70,6 +71,28 @@ const DocumentsSection = ({ userId, expanded }) => {
             setMsg({ type: 'error', text: err.response?.data?.error || 'Action failed' });
         } finally {
             setActioning(null);
+        }
+    };
+
+    const handleViewDocument = async (docId) => {
+        setViewingDocId(docId);
+        setMsg({ type: '', text: '' });
+        try {
+            const response = await api.get(`/admin/documents/${docId}/file`, {
+                responseType: 'blob'
+            });
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('target', '_blank');
+            document.body.appendChild(link);
+            link.click();
+            link.parentNode.removeChild(link);
+            setTimeout(() => window.URL.revokeObjectURL(url), 10000);
+        } catch (err) {
+            setMsg({ type: 'error', text: 'Failed to access document file securely.' });
+        } finally {
+            setViewingDocId(null);
         }
     };
 
@@ -116,15 +139,15 @@ const DocumentsSection = ({ userId, expanded }) => {
                                 </div>
 
                                 <div className="flex items-center gap-1.5 flex-wrap">
-                                    {/* View file in new tab */}
-                                    <a
-                                        href={`${BASE_URL}/admin/documents/${doc.id}/file`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-2xs font-bold px-3 py-1.5 rounded-lg border border-ink-black/20 text-ink-charcoal hover:bg-white transition"
+                                    {/* View file securely via authenticated fetch */}
+                                    <button
+                                        type="button"
+                                        onClick={() => handleViewDocument(doc.id)}
+                                        disabled={viewingDocId === doc.id || isActioning}
+                                        className="text-2xs font-bold px-3 py-1.5 rounded-lg border border-ink-black/20 text-ink-charcoal hover:bg-white transition disabled:opacity-50"
                                     >
-                                        👁 View
-                                    </a>
+                                        {viewingDocId === doc.id ? 'Loading...' : '👁 View'}
+                                    </button>
 
                                     {doc.status !== 'ACCEPTED' && (
                                         <button
