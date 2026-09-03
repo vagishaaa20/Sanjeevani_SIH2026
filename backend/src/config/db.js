@@ -1,17 +1,19 @@
 const { Sequelize } = require('sequelize');
 const env = require('./env');
 
+const useSsl = !['false', '0', 'no'].includes((process.env.DB_SSL || 'true').toLowerCase());
+
 const sequelize = new Sequelize(env.db.name, env.db.user, env.db.password, {
   host: env.db.host,
   port: env.db.port,
   dialect: 'postgres',
   logging: env.nodeEnv === 'development' ? (msg) => console.log('[SQL]', msg) : false,
-  dialectOptions: {
+  dialectOptions: useSsl ? {
     ssl: {
       require: true,
       rejectUnauthorized: false, // required for Supabase / hosted PG providers
     },
-  },
+  } : {},
 });
 
 async function authenticateDatabase() {

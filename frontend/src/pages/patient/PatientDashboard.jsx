@@ -53,6 +53,15 @@ const FEATURE_CARDS = [
         colors: 'border-ink-black hover:bg-ink-black hover:text-white',
     },
     {
+        id: 'medicine',
+        icon: '💊',
+        title: 'Find Medicine',
+        subtitle: 'Search nearby clinics for stock availability',
+        route: '/patient/medicine-availability',
+        enabled: true,
+        colors: 'border-ink-black hover:bg-ink-black hover:text-white',
+    },
+    {
         id: 'outbreaks',
         icon: '🗺️',
         title: 'Epidemic Heatmap',

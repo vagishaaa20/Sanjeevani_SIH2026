@@ -21,6 +21,8 @@ const outbreakRoutes = require('./outbreakRoutes');
 const triageRoutes = require('./triageRoutes');
 const doctorQueueRoutes = require('./doctorQueueRoutes');
 const consultationDocumentRoutes = require('./consultationDocumentRoutes');
+const medicineInventoryRoutes = require('./medicineInventoryRoutes');
+const medicineRoutes = require('./medicineRoutes');
 
 router.use('/auth', authRoutes);
 router.use('/patients', patientRoutes);
@@ -45,5 +47,7 @@ router.use('/medication-reminders', medicationReminderRoutes);
 router.use('/outbreaks', outbreakRoutes);
 router.use('/triage', triageRoutes);
 router.use('/consultations', consultationDocumentRoutes);
+router.use('/medicine-inventory', medicineInventoryRoutes);
+router.use('/medicines', medicineRoutes);
 
 module.exports = router;
