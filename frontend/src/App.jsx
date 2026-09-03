@@ -19,10 +19,12 @@ import BookAppointment from './pages/patient/BookAppointment';
 import AiTriage from './pages/patient/AiTriage';
 import PatientConsultations from './pages/patient/PatientConsultations';
 import PatientSubsidy from './pages/patient/PatientSubsidy';
+import MedicineAvailability from './pages/patient/MedicineAvailability';
 import HeatmapView from './pages/patient/HeatmapView';
 import PatientRequests from './pages/patient/PatientRequests';
 import TeleconsultationRoom from './pages/shared/TeleconsultationRoom';
 import AdminOutbreakPanel from './pages/admin/AdminOutbreakPanel';
+import MedicineInventory from './pages/clinic/MedicineInventory';
 
 // Main layout wrapper that includes sidebar and navbar for authenticated users
 const AppLayout = ({ children }) => {
@@ -113,6 +115,17 @@ export const App = () => {
                                         <ProtectedRoute allowedRoles={['clinic_admin']}>
                                             <AppLayout>
                                                 <DepartmentManager />
+                                            </AppLayout>
+                                        </ProtectedRoute>
+                                    }
+                                />
+
+                                <Route
+                                    path="/clinic/medicine-inventory"
+                                    element={
+                                        <ProtectedRoute allowedRoles={['clinic_admin']}>
+                                            <AppLayout>
+                                                <MedicineInventory />
                                             </AppLayout>
                                         </ProtectedRoute>
                                     }
@@ -212,6 +225,17 @@ export const App = () => {
                                         <ProtectedRoute allowedRoles={['patient']}>
                                             <AppLayout>
                                                 <PatientSubsidy />
+                                            </AppLayout>
+                                        </ProtectedRoute>
+                                    }
+                                />
+
+                                <Route
+                                    path="/patient/medicine-availability"
+                                    element={
+                                        <ProtectedRoute allowedRoles={['patient']}>
+                                            <AppLayout>
+                                                <MedicineAvailability />
                                             </AppLayout>
                                         </ProtectedRoute>
                                     }

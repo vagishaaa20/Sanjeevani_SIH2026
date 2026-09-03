@@ -1,6 +1,11 @@
 const request = require('supertest');
 const app = require('../src/app');
 
+afterAll(async () => {
+  await require('../src/config/redis').quit();
+  await require('../src/config/db').close();
+});
+
 describe('API health', () => {
   test('GET /api/health reports a running API', async () => {
     const response = await request(app).get('/api/health');
