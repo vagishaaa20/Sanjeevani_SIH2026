@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { SocketProvider } from './context/SocketContext';
 import { NotificationProvider } from './context/NotificationContext';
+import { LanguageProvider } from './hooks/LanguageContext';
 import Navbar from './components/layout/Navbar';
 import Sidebar from './components/layout/Sidebar';
 import ProtectedRoute from './components/layout/ProtectedRoute';
@@ -50,76 +51,87 @@ export const App = () => {
                 <SocketProvider>
                     <NotificationProvider>
                         <div className="app-container min-h-screen bg-cream-bg flex flex-col">
-                            <Routes>
-                                {/* Public Auth Routes */}
-                                <Route path="/login" element={
-                                    <>
-                                        <Navbar />
-                                        <Login />
-                                    </>
-                                } />
-                                <Route path="/register" element={
-                                    <>
-                                        <Navbar />
-                                        <Register />
-                                    </>
-                                } />
+                            <LanguageProvider>
+                                <Routes>
+                                    {/* Public Auth Routes */}
+                                    <Route path="/login" element={
+                                        <>
+                                            <Navbar />
+                                            <Login />
+                                        </>
+                                    } />
+                                    <Route path="/register" element={
+                                        <>
+                                            <Navbar />
+                                            <Register />
+                                        </>
+                                    } />
 
-                                {/* Dashboard Guards */}
-                                <Route
-                                    path="/admin/clinics"
-                                    element={
-                                        <ProtectedRoute allowedRoles={['admin']}>
-                                            <AppLayout>
-                                                <ClinicApprovalList />
-                                            </AppLayout>
-                                        </ProtectedRoute>
-                                    }
-                                />
+                                    {/* Dashboard Guards */}
+                                    <Route
+                                        path="/admin/clinics"
+                                        element={
+                                            <ProtectedRoute allowedRoles={['admin']}>
+                                                <AppLayout>
+                                                    <ClinicApprovalList />
+                                                </AppLayout>
+                                            </ProtectedRoute>
+                                        }
+                                    />
 
-                                <Route
-                                    path="/admin/doctors"
-                                    element={
-                                        <ProtectedRoute allowedRoles={['admin']}>
-                                            <AppLayout>
-                                                <DoctorApprovalList />
-                                            </AppLayout>
-                                        </ProtectedRoute>
-                                    }
-                                />
+                                    <Route
+                                        path="/admin/doctors"
+                                        element={
+                                            <ProtectedRoute allowedRoles={['admin']}>
+                                                <AppLayout>
+                                                    <DoctorApprovalList />
+                                                </AppLayout>
+                                            </ProtectedRoute>
+                                        }
+                                    />
 
-                                <Route
-                                    path="/admin/outbreaks"
-                                    element={
-                                        <ProtectedRoute allowedRoles={['admin']}>
-                                            <AppLayout>
-                                                <AdminOutbreakPanel />
-                                            </AppLayout>
-                                        </ProtectedRoute>
-                                    }
-                                />
+                                    <Route
+                                        path="/admin/outbreaks"
+                                        element={
+                                            <ProtectedRoute allowedRoles={['admin']}>
+                                                <AppLayout>
+                                                    <AdminOutbreakPanel />
+                                                </AppLayout>
+                                            </ProtectedRoute>
+                                        }
+                                    />
 
-                                <Route
-                                    path="/clinic/profile"
-                                    element={
-                                        <ProtectedRoute allowedRoles={['clinic_admin']}>
-                                            <AppLayout>
-                                                <ClinicProfile />
-                                            </AppLayout>
-                                        </ProtectedRoute>
-                                    }
-                                />
-                                <Route
-                                    path="/clinic/departments"
-                                    element={
-                                        <ProtectedRoute allowedRoles={['clinic_admin']}>
-                                            <AppLayout>
-                                                <DepartmentManager />
-                                            </AppLayout>
-                                        </ProtectedRoute>
-                                    }
-                                />
+                                    <Route
+                                        path="/clinic/profile"
+                                        element={
+                                            <ProtectedRoute allowedRoles={['clinic_admin']}>
+                                                <AppLayout>
+                                                    <ClinicProfile />
+                                                </AppLayout>
+                                            </ProtectedRoute>
+                                        }
+                                    />
+                                    <Route
+                                        path="/clinic/departments"
+                                        element={
+                                            <ProtectedRoute allowedRoles={['clinic_admin']}>
+                                                <AppLayout>
+                                                    <DepartmentManager />
+                                                </AppLayout>
+                                            </ProtectedRoute>
+                                        }
+                                    />
 
+                                    <Route
+                                        path="/doctor/dashboard"
+                                        element={
+                                            <ProtectedRoute allowedRoles={['doctor']}>
+                                                <AppLayout>
+                                                    <DoctorDashboard />
+                                                </AppLayout>
+                                            </ProtectedRoute>
+                                        }
+                                    />
                                 <Route
                                     path="/clinic/medicine-inventory"
                                     element={
@@ -142,94 +154,104 @@ export const App = () => {
                                     }
                                 />
 
-                                <Route
-                                    path="/doctor/documents"
-                                    element={
-                                        <ProtectedRoute allowedRoles={['doctor']}>
-                                            <AppLayout>
-                                                <DocumentUpload />
-                                            </AppLayout>
-                                        </ProtectedRoute>
-                                    }
-                                />
+                                    <Route
+                                        path="/doctor/documents"
+                                        element={
+                                            <ProtectedRoute allowedRoles={['doctor']}>
+                                                <AppLayout>
+                                                    <DocumentUpload />
+                                                </AppLayout>
+                                            </ProtectedRoute>
+                                        }
+                                    />
 
-                                <Route
-                                    path="/doctor/consultation/:id/room"
-                                    element={
-                                        <ProtectedRoute allowedRoles={['doctor']}>
-                                            <AppLayout>
-                                                <TeleconsultationRoom />
-                                            </AppLayout>
-                                        </ProtectedRoute>
-                                    }
-                                />
+                                    <Route
+                                        path="/doctor/consultation/:id/room"
+                                        element={
+                                            <ProtectedRoute allowedRoles={['doctor']}>
+                                                <AppLayout>
+                                                    <TeleconsultationRoom />
+                                                </AppLayout>
+                                            </ProtectedRoute>
+                                        }
+                                    />
 
-                                <Route
-                                    path="/patient/dashboard"
-                                    element={
-                                        <ProtectedRoute allowedRoles={['patient']}>
-                                            <AppLayout>
-                                                <PatientDashboard />
-                                            </AppLayout>
-                                        </ProtectedRoute>
-                                    }
-                                />
+                                    <Route
+                                        path="/patient/dashboard"
+                                        element={
+                                            <ProtectedRoute allowedRoles={['patient']}>
+                                                <AppLayout>
+                                                    <PatientDashboard />
+                                                </AppLayout>
+                                            </ProtectedRoute>
+                                        }
+                                    />
 
-                                <Route
-                                    path="/patient/book-appointment"
-                                    element={
-                                        <ProtectedRoute allowedRoles={['patient']}>
-                                            <AppLayout>
-                                                <BookAppointment />
-                                            </AppLayout>
-                                        </ProtectedRoute>
-                                    }
-                                />
+                                    <Route
+                                        path="/patient/book-appointment"
+                                        element={
+                                            <ProtectedRoute allowedRoles={['patient']}>
+                                                <AppLayout>
+                                                    <BookAppointment />
+                                                </AppLayout>
+                                            </ProtectedRoute>
+                                        }
+                                    />
 
-                                <Route
-                                    path="/patient/ai-triage"
-                                    element={
-                                        <ProtectedRoute allowedRoles={['patient']}>
-                                            <AppLayout>
-                                                <AiTriage />
-                                            </AppLayout>
-                                        </ProtectedRoute>
-                                    }
-                                />
+                                    <Route
+                                        path="/patient/ai-triage"
+                                        element={
+                                            <ProtectedRoute allowedRoles={['patient']}>
+                                                <AppLayout>
+                                                    <AiTriage />
+                                                </AppLayout>
+                                            </ProtectedRoute>
+                                        }
+                                    />
 
-                                <Route
-                                    path="/patient/consultations"
-                                    element={
-                                        <ProtectedRoute allowedRoles={['patient']}>
-                                            <AppLayout>
-                                                <PatientConsultations />
-                                            </AppLayout>
-                                        </ProtectedRoute>
-                                    }
-                                />
+                                    <Route
+                                        path="/patient/consultations"
+                                        element={
+                                            <ProtectedRoute allowedRoles={['patient']}>
+                                                <AppLayout>
+                                                    <PatientConsultations />
+                                                </AppLayout>
+                                            </ProtectedRoute>
+                                        }
+                                    />
 
-                                <Route
-                                    path="/patient/requests"
-                                    element={
-                                        <ProtectedRoute allowedRoles={['patient']}>
-                                            <AppLayout>
-                                                <PatientRequests />
-                                            </AppLayout>
-                                        </ProtectedRoute>
-                                    }
-                                />
+                                    <Route
+                                        path="/patient/requests"
+                                        element={
+                                            <ProtectedRoute allowedRoles={['patient']}>
+                                                <AppLayout>
+                                                    <PatientRequests />
+                                                </AppLayout>
+                                            </ProtectedRoute>
+                                        }
+                                    />
 
-                                <Route
-                                    path="/patient/subsidy"
-                                    element={
-                                        <ProtectedRoute allowedRoles={['patient']}>
-                                            <AppLayout>
-                                                <PatientSubsidy />
-                                            </AppLayout>
-                                        </ProtectedRoute>
-                                    }
-                                />
+                                    <Route
+                                        path="/patient/subsidy"
+                                        element={
+                                            <ProtectedRoute allowedRoles={['patient']}>
+                                                <AppLayout>
+                                                    <PatientSubsidy />
+                                                </AppLayout>
+                                            </ProtectedRoute>
+                                        }
+                                    />
 
+                                    <Route
+                                        path="/patient/heatmap"
+                                        element={
+                                            <ProtectedRoute allowedRoles={['patient']}>
+                                                <AppLayout>
+                                                    <HeatmapView />
+                                                </AppLayout>
+                                            </ProtectedRoute>
+                                        }
+                                    />
                                 <Route
                                     path="/patient/medicine-availability"
                                     element={
@@ -252,20 +274,21 @@ export const App = () => {
                                     }
                                 />
 
-                                <Route
-                                    path="/patient/consultation/:id/room"
-                                    element={
-                                        <ProtectedRoute allowedRoles={['patient']}>
-                                            <AppLayout>
-                                                <TeleconsultationRoom />
-                                            </AppLayout>
-                                        </ProtectedRoute>
-                                    }
-                                />
+                                    <Route
+                                        path="/patient/consultation/:id/room"
+                                        element={
+                                            <ProtectedRoute allowedRoles={['patient']}>
+                                                <AppLayout>
+                                                    <TeleconsultationRoom />
+                                                </AppLayout>
+                                            </ProtectedRoute>
+                                        }
+                                    />
 
-                                {/* Catch-all navigation */}
-                                <Route path="*" element={<Navigate to="/login" replace />} />
-                            </Routes>
+                                    {/* Catch-all navigation */}
+                                    <Route path="*" element={<Navigate to="/login" replace />} />
+                                </Routes>
+                            </LanguageProvider>
                         </div>
                     </NotificationProvider>
                 </SocketProvider>

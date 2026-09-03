@@ -18,4 +18,7 @@ router.get('/:id/rejoin', ...auth, consultationController.rejoinCall);
 // Generate (or return cached) AI plain-language summary for a completed consultation
 router.post('/:id/summary', ...auth, consultationController.generateAiSummary);
 
+// Patient explicitly ends a call to release their queue
+router.post('/:id/end', ...auth, consultationController.endCallByPatient);
+
 module.exports = router;

@@ -18,20 +18,38 @@ export default function TeleconsultationRoom() {
     const isDoctor = user.role === 'doctor';
 
     const handleCallError = (error) => {
-        alert(error.message);
+        if (error.isRemoteCompletion) {
+            addNotification(error.message, 'info', 7000);
+        } else if (error.isRemoteDrop) {
+            addNotification(error.message, 'warning', 7000);
+        } else {
+            addNotification(error.message, 'error', 7000);
+        }
         if (isDoctor) navigate('/doctor/dashboard');
         else navigate('/patient/dashboard');
     };
 
-    // Use our new WebRTC abstraction
     const {
         remoteUsers,
         quality,
         chat,
         localStream,
         remoteStream,
-        sendMessage
+        mediaMode,
+        sendMessage,
+        switchToAudioMode,
+        switchToVideoMode
     } = useWebRTC(consultationId, user, handleCallError);
+
+    const [showQualityBanner, setShowQualityBanner] = useState(false);
+
+    useEffect(() => {
+        if (quality === 'poor' && mediaMode === 'video') {
+            setShowQualityBanner(true);
+        } else if (mediaMode === 'audio-only') {
+            setShowQualityBanner(false);
+        }
+    }, [quality, mediaMode]);
 
     // Refs for binding the streams to <video> tags
     const localVideoRef = useRef(null);
@@ -63,16 +81,21 @@ export default function TeleconsultationRoom() {
 
     const handleCompleteCall = async () => {
         try {
+            setSavingNotes(true);
             if (isDoctor) {
                 await api.post(`/doctors/queue/${consultationId}/complete`);
                 addNotification('Call ended — consultation marked complete.', 'success', 5000);
                 navigate('/doctor/dashboard');
             } else {
+                // If patient ends the call, let's also close it fully.
+                await api.post(`/consultations/${consultationId}/end`);
+                addNotification('Call ended successfully.', 'success', 5000);
                 navigate('/patient/dashboard');
             }
         } catch (e) {
             console.error('Failed to complete', e);
             addNotification('Failed to end call. Please try again.', 'error');
+            setSavingNotes(false);
         }
     };
 
@@ -99,6 +122,51 @@ export default function TeleconsultationRoom() {
                     </button>
                 </div>
 
+                {/* Quality Warning Banner */}
+                {showQualityBanner && mediaMode === 'video' && (
+                    <div className="absolute top-16 left-4 right-4 bg-red-600 border-2 border-red-900 rounded-lg p-3 z-30 flex items-center justify-between text-white shadow-xl">
+                        <div>
+                            <p className="font-bold uppercase text-sm">Poor Connection Detected</p>
+                            <p className="text-xs font-medium opacity-90">Switch to audio-only to stabilize the call.</p>
+                        </div>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => {
+                                    switchToAudioMode();
+                                    setShowQualityBanner(false);
+                                }}
+                                className="bg-white text-red-700 hover:bg-red-50 font-bold px-3 py-1.5 rounded text-xs transition-colors border border-transparent"
+                            >
+                                Switch to Audio
+                            </button>
+                            <button
+                                onClick={() => setShowQualityBanner(false)}
+                                className="hover:bg-red-700 px-2 py-1.5 rounded font-bold text-xs"
+                            >
+                                Dismiss
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {/* Persistent Audio Notice */}
+                {mediaMode === 'audio-only' && (
+                    <div className="absolute inset-0 bg-ink-charcoal z-20 flex flex-col items-center justify-center gap-4">
+                        <div className="w-24 h-24 rounded-full bg-sky-900/50 flex items-center justify-center animate-pulse border-4 border-sky-500">
+                            <span className="text-4xl text-sky-400 font-bold">🎙</span>
+                        </div>
+                        <h2 className="text-white font-bold text-2xl uppercase tracking-widest">Audio-Only</h2>
+                        <div className="flex gap-4 mt-4">
+                            <button
+                                onClick={switchToVideoMode}
+                                className="bg-white text-sky-900 border-2 border-sky-200 hover:bg-sky-50 font-bold px-6 py-3 rounded-xl shadow-lg transition-transform hover:scale-105 active:scale-95"
+                            >
+                                Switch Back to Video
+                            </button>
+                        </div>
+                    </div>
+                )}
+
                 {/* Remote Video Base */}
                 <video
                     ref={remoteVideoRef}
@@ -108,15 +176,17 @@ export default function TeleconsultationRoom() {
                 />
 
                 {/* Picture in Picture Local Video */}
-                <div className="absolute bottom-4 right-4 w-1/4 max-w-[200px] border-2 border-ink-black rounded-lg overflow-hidden shadow-lg bg-black z-20">
-                    <video
-                        ref={localVideoRef}
-                        autoPlay
-                        playsInline
-                        muted
-                        className="w-full h-full object-cover transform -scale-x-100"
-                    />
-                </div>
+                {mediaMode === 'video' && (
+                    <div className="absolute bottom-4 right-4 w-1/4 max-w-[200px] border-2 border-ink-black rounded-lg overflow-hidden shadow-lg bg-black z-20">
+                        <video
+                            ref={localVideoRef}
+                            autoPlay
+                            playsInline
+                            muted
+                            className="w-full h-full object-cover transform -scale-x-100"
+                        />
+                    </div>
+                )}
             </div>
 
             {/* Sidebar View (Chat + Notes) */}
