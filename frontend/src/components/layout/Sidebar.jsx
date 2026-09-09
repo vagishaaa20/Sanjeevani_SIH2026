@@ -17,6 +17,7 @@ export const Sidebar = () => {
             { path: '/clinic/profile', label: 'Clinic Setup' },
             { path: '/clinic/departments', label: 'OPD Departments' },
             { path: '/clinic/medicine-inventory', label: 'Medicine Inventory' },
+            { path: '/clinic/referrals', label: 'Incoming Referrals' },
         ],
         doctor: [
             { path: '/doctor/dashboard', label: '🩺 Doctor Schedule' },

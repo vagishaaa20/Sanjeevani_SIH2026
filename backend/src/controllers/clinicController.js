@@ -112,10 +112,82 @@ async function listClinics(req, res, next) {
 
 // Add `listClinics` to the module.exports object at the bottom of clinicController.js
 
+const { HealthWorkerReferral, User, PatientProfile, HealthWorkerProfile } = require('../models');
+
+async function getIncomingReferrals(req, res, next) {
+    try {
+        const referrals = await HealthWorkerReferral.findAll({
+            where: { toClinicId: req.user.id },
+            include: [
+                {
+                    model: User,
+                    as: 'patient',
+                    attributes: ['id', 'phone'],
+                    include: [{ model: PatientProfile, as: 'patientProfile', attributes: ['fullName', 'region'] }]
+                },
+                {
+                    model: User,
+                    as: 'referringHealthWorker',
+                    attributes: ['id', 'phone'],
+                    include: [{ model: HealthWorkerProfile, as: 'healthWorkerProfile', attributes: ['name'] }]
+                }
+            ],
+            order: [['createdAt', 'DESC']]
+        });
+        return res.json({ count: referrals.length, referrals });
+    } catch (err) {
+        console.error('[getIncomingReferrals error]', err);
+        next(err);
+    }
+}
+
+async function updateIncomingReferral(req, res, next) {
+    const { id } = req.params;
+    const { status, outcome } = req.body;
+    try {
+        const referral = await HealthWorkerReferral.findOne({ where: { id, toClinicId: req.user.id } });
+        if (!referral) return res.status(404).json({ error: 'Referral not found or unauthorized' });
+
+        const VALID_TRANSITIONS = {
+            'SENT': ['ACCEPTED', 'REJECTED'],
+            'ACCEPTED': ['ATTENDED'],
+            'ATTENDED': ['OUTCOME_RECORDED'],
+            'OUTCOME_RECORDED': ['CLOSED']
+        };
+
+        if (!VALID_TRANSITIONS[referral.status]?.includes(status)) {
+            return res.status(400).json({ error: `Invalid transition from ${referral.status} to ${status}` });
+        }
+
+        if (status === 'OUTCOME_RECORDED') {
+            if (!outcome || !String(outcome).trim()) return res.status(400).json({ error: 'Outcome text is required to record outcome' });
+            referral.outcome = String(outcome).trim();
+            referral.outcomeRecordedAt = new Date();
+        }
+
+        if (status === 'ACCEPTED') referral.acceptedAt = new Date();
+        if (status === 'ATTENDED') referral.attendedAt = new Date();
+        if (status === 'CLOSED' || status === 'REJECTED') {
+            referral.closedAt = new Date();
+            referral.completedAt = new Date();
+        }
+
+        referral.status = status;
+        await referral.save();
+
+        return res.json({ message: 'Referral status updated', referral });
+    } catch (err) {
+        console.error('[updateIncomingReferral error]', err);
+        next(err);
+    }
+}
+
 module.exports = {
     getPendingClinics,
     verifyClinic,
     registerClinic,
     getNearbyClinics,
-    listClinics
+    listClinics,
+    getIncomingReferrals,
+    updateIncomingReferral
 };

@@ -26,6 +26,7 @@ import HeatmapView from './pages/patient/HeatmapView';
 import PatientRequests from './pages/patient/PatientRequests';
 import TeleconsultationRoom from './pages/shared/TeleconsultationRoom';
 import AdminOutbreakPanel from './pages/admin/AdminOutbreakPanel';
+import ClinicReferrals from './pages/clinic/ClinicReferrals';
 import MedicineInventory from './pages/clinic/MedicineInventory';
 import HealthWorkerDashboard from './pages/health-worker/HealthWorkerDashboard';
 import AssignedPatients from './pages/health-worker/AssignedPatients';
@@ -150,6 +151,17 @@ export const App = () => {
                                             </ProtectedRoute>
                                         }
                                     />
+                                <Route
+                                    path="/clinic/referrals"
+                                    element={
+                                        <ProtectedRoute allowedRoles={['clinic_admin']}>
+                                            <AppLayout>
+                                                <ClinicReferrals />
+                                            </AppLayout>
+                                        </ProtectedRoute>
+                                    }
+                                />
+
                                 <Route
                                     path="/clinic/medicine-inventory"
                                     element={

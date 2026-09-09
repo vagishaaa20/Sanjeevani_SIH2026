@@ -102,9 +102,11 @@ HealthWorkerAssignment.belongsTo(User, { foreignKey: 'healthWorkerId', as: 'heal
 HealthWorkerFollowup.belongsTo(User, { foreignKey: 'patientId', as: 'patient' });
 HealthWorkerFollowup.belongsTo(User, { foreignKey: 'healthWorkerId', as: 'healthWorker' });
 HealthWorkerReferral.belongsTo(User, { foreignKey: 'patientId', as: 'patient' });
+HealthWorkerReferral.belongsTo(User, { foreignKey: 'referringHealthWorkerId', as: 'referringHealthWorker' });
 HealthWorkerReferral.belongsTo(User, { foreignKey: 'doctorId', as: 'doctor' });
 HealthWorkerReferral.belongsTo(User, { foreignKey: 'fromClinicId', as: 'fromClinic' });
 HealthWorkerReferral.belongsTo(User, { foreignKey: 'toClinicId', as: 'toClinic' });
+HealthWorkerReferral.belongsTo(User, { foreignKey: 'toDoctorId', as: 'toDoctor' });
 
 module.exports = {
   User,

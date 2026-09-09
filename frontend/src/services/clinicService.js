@@ -27,6 +27,16 @@ const clinicService = {
         });
         return response.data; // { count, clinics: [...] }
     },
+
+    getIncomingReferrals: async () => {
+        const response = await api.get('/clinics/referrals');
+        return response.data;
+    },
+
+    updateIncomingReferral: async (id, payload) => {
+        const response = await api.patch(`/clinics/referrals/${id}`, payload);
+        return response.data;
+    },
 };
 
 export default clinicService;
