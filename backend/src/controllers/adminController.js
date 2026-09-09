@@ -1,6 +1,7 @@
 const { Op } = require('sequelize');
 const path = require('path');
-const { User, DoctorProfile, ClinicProfile, ProfessionalDocument } = require('../models');
+const { User, DoctorProfile, ClinicProfile, HealthWorkerProfile, ProfessionalDocument, PatientProfile, HealthWorkerAssignment } = require('../models');
+const sequelize = require('../config/db');
 const { VERIFICATION_STATUS, ROLES, DOCUMENT_STATUS } = require('../constants/roles');
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -16,6 +17,7 @@ const ACTION_TO_STATUS = {
 const PROFILE_MODEL_BY_ROLE = {
   [ROLES.DOCTOR]: DoctorProfile,
   [ROLES.CLINIC_ADMIN]: ClinicProfile,
+  [ROLES.HEALTH_WORKER]: HealthWorkerProfile,
 };
 
 // ── GET /api/admin/pending ────────────────────────────────────────────────────
@@ -38,7 +40,12 @@ async function listPending(req, res) {
     }),
   ]);
 
-  return res.json({ doctors, clinics });
+  const healthWorkers = await HealthWorkerProfile.findAll({
+    where: { isVerified: false },
+    include: [{ model: User, as: 'user', attributes: ['id', 'email', 'phone', 'isVerified', 'createdAt'] }],
+    order: [['createdAt', 'ASC']],
+  });
+  return res.json({ doctors, clinics, healthWorkers });
 }
 
 // ── GET /api/admin/users ──────────────────────────────────────────────────────
@@ -102,7 +109,7 @@ async function verifyUser(req, res) {
 
   const profileModel = PROFILE_MODEL_BY_ROLE[targetUser.role];
   if (!profileModel) {
-    return res.status(400).json({ error: 'Verification is only applicable to doctor and clinic_admin accounts' });
+    return res.status(400).json({ error: 'Verification is only applicable to doctor, clinic_admin, and health_worker accounts' });
   }
 
   const profile = await profileModel.findOne({ where: { userId: targetUser.id } });
@@ -110,6 +117,58 @@ async function verifyUser(req, res) {
 
   const newStatus = ACTION_TO_STATUS[action];
   const isApproving = action === 'approve';
+
+  if (targetUser.role === ROLES.HEALTH_WORKER) {
+    if (!isApproving) {
+      await profile.update({ isVerified: false });
+      await targetUser.update({ isVerified: false });
+      return res.json({ message: `User ${action} action applied successfully`, userId: targetUser.id, verificationStatus: newStatus });
+    }
+
+    await sequelize.transaction(async (t) => {
+      await profile.update({ isVerified: true }, { transaction: t });
+      await targetUser.update({ isVerified: true }, { transaction: t });
+
+      const hwCity = profile.district;
+      if (hwCity && hwCity.trim() !== '') {
+        const eligiblePatients = await PatientProfile.findAll({
+          where: {
+            region: { [Op.iLike]: hwCity.trim() }
+          },
+          attributes: ['userId'],
+          transaction: t
+        });
+
+        const eligiblePatientIds = eligiblePatients.map(p => p.userId);
+
+        if (eligiblePatientIds.length > 0) {
+          const existingAssignments = await HealthWorkerAssignment.findAll({
+            where: {
+              patientId: { [Op.in]: eligiblePatientIds },
+              status: 'ACTIVE'
+            },
+            attributes: ['patientId'],
+            transaction: t
+          });
+
+          const assignedPatientIds = new Set(existingAssignments.map(a => a.patientId));
+          const unassignedPatientIds = eligiblePatientIds.filter(id => !assignedPatientIds.has(id));
+
+          if (unassignedPatientIds.length > 0) {
+            const assignmentsToCreate = unassignedPatientIds.map(patientId => ({
+              healthWorkerId: targetUser.id,
+              patientId,
+              assignedBy: req.user.id,
+              status: 'ACTIVE'
+            }));
+            await HealthWorkerAssignment.bulkCreate(assignmentsToCreate, { transaction: t });
+          }
+        }
+      }
+    });
+
+    return res.json({ message: `User ${action} action applied successfully`, userId: targetUser.id, verificationStatus: VERIFICATION_STATUS.VERIFIED });
+  }
 
   await profile.update({
     verificationStatus: newStatus,

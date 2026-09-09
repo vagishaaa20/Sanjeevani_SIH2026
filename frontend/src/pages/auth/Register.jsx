@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
 import ClinicRegisterForm from '../../components/clinic/ClinicRegisterForm';
 import clinicService from '../../services/clinicService';
+import healthWorkerAdminService from '../../services/healthWorkerAdminService';
 
 export const Register = () => {
-    const { registerPatient, registerDoctor } = useAuth();
+    const { registerPatient, registerDoctor, registerHealthWorker } = useAuth();
     const navigate = useNavigate();
     const [role, setRole] = useState(null); // 'patient', 'doctor', 'clinic'
     const [error, setError] = useState('');
@@ -21,12 +22,14 @@ export const Register = () => {
         sex: 'male',
         preferredLanguage: '',
         region: '',
+        districtId: '',
+        villageId: '',
+        areaId: '',
         abhaNumber: '',
     });
 
     // Patient validation / OTP verification trigger
     const [otpVerifyNeeded, setOtpVerifyNeeded] = useState(false);
-    const [otpUserId, setOtpUserId] = useState('');
     const [devOtp, setDevOtp] = useState('');
 
     // Doctor registration states
@@ -53,6 +56,22 @@ export const Register = () => {
     const [clinicsLoading, setClinicsLoading] = useState(false);
     const [medCertFile, setMedCertFile] = useState(null);
     const [qualificationFile, setQualificationFile] = useState(null);
+    const [geoOptions, setGeoOptions] = useState({ districts: [], villages: [], areas: [] });
+    const [workerGeoOptions, setWorkerGeoOptions] = useState({ states: [], districts: [], areas: [] });
+
+    const [healthWorkerData, setHealthWorkerData] = useState({
+        name: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+        phone: '',
+        area: '',
+        district: '',
+        stateId: '',
+        districtId: '',
+        areaId: '',
+        workerType: 'COMMUNITY_WORKER',
+    });
 
     const handlePatientChange = (e) => {
         const { name, value } = e.target;
@@ -64,7 +83,13 @@ export const Register = () => {
         setDoctorData((prev) => ({ ...prev, [name]: value }));
     };
 
+    const handleHealthWorkerChange = (e) => {
+        const { name, value } = e.target;
+        setHealthWorkerData((prev) => ({ ...prev, [name]: value }));
+    };
+
     // Fetch clinics once when doctor role is selected
+    /* eslint-disable react-hooks/set-state-in-effect */
     useEffect(() => {
         if (role === 'doctor') {
             setClinicsLoading(true);
@@ -77,6 +102,37 @@ export const Register = () => {
                 .finally(() => setClinicsLoading(false));
         }
     }, [role]);
+
+    useEffect(() => {
+        if (role !== 'patient') return;
+        healthWorkerAdminService.getGeography().then((data) => setGeoOptions((previous) => ({ ...previous, districts: data.districts || [] }))).catch(() => {});
+    }, [role]);
+
+    useEffect(() => {
+        if (role !== 'health_worker') return;
+        healthWorkerAdminService.getGeography().then((data) => setWorkerGeoOptions((previous) => ({ ...previous, states: data.states || [] }))).catch(() => {});
+    }, [role]);
+
+    useEffect(() => {
+        if (!healthWorkerData.stateId) return;
+        healthWorkerAdminService.getGeography({ stateId: healthWorkerData.stateId }).then((data) => setWorkerGeoOptions((previous) => ({ ...previous, districts: data.districts || [], areas: [] }))).catch(() => {});
+    }, [healthWorkerData.stateId]);
+
+    useEffect(() => {
+        if (!healthWorkerData.districtId) return;
+        healthWorkerAdminService.getGeography({ districtId: healthWorkerData.districtId }).then((data) => setWorkerGeoOptions((previous) => ({ ...previous, areas: data.areas || [] }))).catch(() => {});
+    }, [healthWorkerData.districtId]);
+
+    useEffect(() => {
+        if (!patientData.districtId) return;
+        healthWorkerAdminService.getGeography({ districtId: patientData.districtId }).then((data) => setGeoOptions((previous) => ({ ...previous, villages: data.villages || [], areas: [] }))).catch(() => {});
+    }, [patientData.districtId]);
+
+    useEffect(() => {
+        if (!patientData.villageId || !patientData.districtId) return;
+        healthWorkerAdminService.getGeography({ districtId: patientData.districtId, villageId: patientData.villageId }).then((data) => setGeoOptions((previous) => ({ ...previous, areas: data.areas || [] }))).catch(() => {});
+    }, [patientData.villageId, patientData.districtId]);
+    /* eslint-enable react-hooks/set-state-in-effect */
 
     // Filter clinics locally when search text changes
     useEffect(() => {
@@ -101,7 +157,6 @@ export const Register = () => {
 
         try {
             const data = await registerPatient(patientData);
-            setOtpUserId(data.user.id);
             setOtpVerifyNeeded(true);
             if (data.devOtp) {
                 setDevOtp(data.devOtp);
@@ -170,6 +225,32 @@ export const Register = () => {
         navigate('/login');
     };
 
+    const handleHealthWorkerSubmit = async (e) => {
+        e.preventDefault();
+        setError('');
+        if (healthWorkerData.password.length < 8) {
+            setError('Password must be at least 8 characters');
+            return;
+        }
+        if (healthWorkerData.password !== healthWorkerData.confirmPassword) {
+            setError('Passwords do not match');
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const payload = { ...healthWorkerData };
+            delete payload.confirmPassword;
+            await registerHealthWorker(payload);
+            alert('Health Worker registration submitted. An administrator must verify your account before field access is enabled.');
+            navigate('/login');
+        } catch (err) {
+            setError(err.response?.data?.error || 'Health Worker registration failed');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div className="w-full flex-grow flex items-center justify-center p-6 bg-cream-bg">
             <div className="w-full max-w-xl p-8 bg-white border-2 border-ink-black rounded-3xl shadow-md flex flex-col gap-6 animate-fade-in-up">
@@ -182,7 +263,7 @@ export const Register = () => {
                             <p className="text-sm font-semibold text-ink-charcoal mt-1">Select your profile type to register</p>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                             <button
                                 onClick={() => setRole('patient')}
                                 className="p-6 bg-cream-surface border-2 border-ink-black rounded-2xl flex flex-col items-center gap-2 hover:-translate-y-1 hover:bg-pastel-sky-soft hover:shadow cursor-pointer transition duration-200"
@@ -208,6 +289,15 @@ export const Register = () => {
                                 <span className="w-12 h-12 rounded-full bg-icy-mint flex items-center justify-center text-xl font-bold border border-ink-black">🏥</span>
                                 <span className="font-bold text-ink-black">Clinic / Lab</span>
                                 <span className="text-xs text-ink-muted">Onboard hospital & department</span>
+                            </button>
+
+                            <button
+                                onClick={() => setRole('health_worker')}
+                                className="p-6 bg-cream-surface border-2 border-ink-black rounded-2xl flex flex-col items-center gap-2 hover:-translate-y-1 hover:bg-icy-mint-soft hover:shadow cursor-pointer transition duration-200"
+                            >
+                                <span className="w-12 h-12 rounded-full bg-icy-mint flex items-center justify-center text-xl font-bold border border-ink-black">🧑‍⚕️</span>
+                                <span className="font-bold text-ink-black">Health Worker</span>
+                                <span className="text-xs text-ink-muted">Frontline care access</span>
                             </button>
                         </div>
 
@@ -243,6 +333,43 @@ export const Register = () => {
                             <div className="p-3 bg-red-100 border border-red-300 text-red-800 text-sm font-semibold rounded-xl">
                                 {error}
                             </div>
+                        )}
+
+                        {/* Health Worker Registration */}
+                        {role === 'health_worker' && (
+                            <form className="flex flex-col gap-4" onSubmit={handleHealthWorkerSubmit}>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <Input label="Full Name" id="worker-name" name="name" value={healthWorkerData.name} onChange={handleHealthWorkerChange} required />
+                                    <Input label="Phone Number" id="worker-phone" name="phone" type="tel" value={healthWorkerData.phone} onChange={handleHealthWorkerChange} />
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <Input label="Email Address" id="worker-email" name="email" type="email" value={healthWorkerData.email} onChange={handleHealthWorkerChange} required />
+                                    <Input label="City / Location" id="worker-city" name="district" value={healthWorkerData.district} onChange={handleHealthWorkerChange} placeholder="e.g. Jamshedpur" />
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <Input label="Password" id="worker-password" name="password" type="password" value={healthWorkerData.password} onChange={handleHealthWorkerChange} required />
+                                    <Input label="Confirm Password" id="worker-confirm-password" name="confirmPassword" type="password" value={healthWorkerData.confirmPassword} onChange={handleHealthWorkerChange} required />
+                                </div>
+                                <div className="grid grid-cols-1 gap-4">
+                                    <div className="flex flex-col gap-1 w-full text-left">
+                                        <label className="text-xs font-semibold text-ink-charcoal uppercase tracking-wider">Worker Type</label>
+                                        <select
+                                            name="workerType"
+                                            value={healthWorkerData.workerType}
+                                            onChange={handleHealthWorkerChange}
+                                            className="w-full px-4 py-2.5 rounded-xl border border-ink-black bg-white focus:ring-2 focus:ring-rose-mauve"
+                                        >
+                                            <option value="COMMUNITY_WORKER">Community Worker</option>
+                                            <option value="ASHA">ASHA</option>
+                                            <option value="ANM">ANM</option>
+                                            <option value="OTHER">Other</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <p className="text-xs text-ink-muted">Your account will be reviewed by an administrator before Health Worker access is enabled.</p>
+                                <Button type="submit" variant="primary" className="w-full" disabled={loading}>{loading ? 'Registering...' : 'Create Health Worker Account'}</Button>
+                            </form>
                         )}
 
                         {/* Patient Registration Flow */}
@@ -303,14 +430,15 @@ export const Register = () => {
                                             placeholder="e.g. Hindi, English"
                                         />
                                         <Input
-                                            label="Region / State"
+                                            label="City / Location"
                                             id="region"
                                             name="region"
                                             value={patientData.region}
                                             onChange={handlePatientChange}
-                                            placeholder="e.g. Jamshedpur, Jharkhand"
+                                            placeholder="e.g. Jamshedpur"
                                         />
                                     </div>
+
                                     <Input
                                         label="ABHA Health ID Number"
                                         id="abhaNumber"

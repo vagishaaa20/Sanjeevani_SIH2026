@@ -4,6 +4,7 @@ const ROLES = Object.freeze({
     PATIENT: 'patient',
     FLW: 'flw',
     CLINIC_ADMIN: 'clinic_admin',
+    HEALTH_WORKER: 'health_worker',
     HITL_REVIEWER: 'hitl_reviewer',
 });
 
@@ -11,6 +12,7 @@ const ROLE_PERMISSIONS = Object.freeze({
     patient: ['profile:read', 'profile:update'],
     doctor: ['profile:read', 'profile:update', 'patients:read'],
     clinic_admin: ['profile:read', 'profile:update', 'clinic:manage'],
+    health_worker: ['profile:read', 'patients:read', 'followups:manage', 'referrals:manage'],
     admin: ['profile:read', 'profile:update', 'users:manage', 'verification:manage'],
     flw: ['profile:read', 'profile:update', 'triage:manage'],
     hitl_reviewer: ['profile:read', 'profile:update', 'cases:review'],

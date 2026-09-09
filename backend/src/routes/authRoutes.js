@@ -17,6 +17,7 @@ router.post(
 );
 router.post('/register/clinic', controller.registerClinic);
 router.post('/register/hitl', controller.registerHitl);
+router.post('/register/health-worker', controller.registerHealthWorker);
 
 // ── Login (email/password — doctor, hitl_reviewer, admin) ────────────────────
 router.post('/login', controller.login);
