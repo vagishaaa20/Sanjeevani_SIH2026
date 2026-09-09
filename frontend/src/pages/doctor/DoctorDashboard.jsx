@@ -5,6 +5,7 @@ import DoctorOutbreakWidget from '../../components/doctor/DoctorOutbreakWidget';
 import DoctorQueueList from '../../components/doctor/DoctorQueueList';
 import DoctorReferralForm from './DoctorReferralForm';
 import DoctorActiveConsultations from '../../components/doctor/DoctorActiveConsultations';
+import DoctorIncomingReferrals from '../../components/doctor/DoctorIncomingReferrals';
 
 const STATUS_MESSAGES = {
     PENDING_VERIFICATION: {
@@ -203,6 +204,8 @@ const DoctorDashboard = () => {
                     <DoctorOutbreakWidget />
                 </div>
             </div>
+            
+            <DoctorIncomingReferrals />
 
             <DoctorReferralForm />
         </div>

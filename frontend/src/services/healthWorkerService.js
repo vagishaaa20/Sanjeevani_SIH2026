@@ -8,6 +8,7 @@ const healthWorkerService = {
     createFollowup: async (payload) => (await api.post('/health-worker/followups', payload)).data,
     getReferrals: async () => (await api.get('/health-worker/referrals')).data,
     updateReferral: async (referralId, status) => (await api.patch(`/health-worker/referrals/${referralId}`, { status })).data,
+    createReferral: async (payload) => (await api.post('/health-worker/referrals', payload)).data,
 
     updateProfile: async (payload) => (await api.patch('/health-worker/profile', payload)).data,
 };

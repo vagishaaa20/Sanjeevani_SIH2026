@@ -15,7 +15,7 @@ router.post('/followups', ...workerAuth, controller.createFollowup);
 router.get('/referrals', ...workerAuth, controller.listReferrals);
 router.patch('/referrals/:referralId', ...workerAuth, controller.updateReferral);
 router.post('/messages', ...workerAuth, controller.sendPatientMessage);
-router.post('/referrals', authenticate, requireRole(['doctor', 'admin', 'clinic_admin']), controller.createReferral);
+router.post('/referrals', authenticate, requireRole(['doctor', 'admin', 'clinic_admin', 'health_worker']), controller.createReferral);
 router.get('/directory', authenticate, requireRole(['admin', 'clinic_admin']), controller.listDirectory);
 router.patch('/profile', ...workerAuth, controller.updateWorkerProfile);
 
