@@ -25,6 +25,7 @@ const consultationDocumentRoutes = require('./consultationDocumentRoutes');
 const medicineInventoryRoutes = require('./medicineInventoryRoutes');
 const medicineRoutes = require('./medicineRoutes');
 const healthWorkerRoutes = require('./healthWorkerRoutes');
+const verifyRoutes = require('./verifyRoutes');
 
 router.use('/auth', authRoutes);
 router.use('/patients', patientRoutes);
@@ -53,5 +54,6 @@ router.use('/consultations', consultationDocumentRoutes);
 router.use('/medicine-inventory', medicineInventoryRoutes);
 router.use('/medicines', medicineRoutes);
 router.use('/health-worker', healthWorkerRoutes);
+router.use('/verify', verifyRoutes);
 
 module.exports = router;

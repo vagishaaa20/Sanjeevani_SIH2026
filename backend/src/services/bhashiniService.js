@@ -19,8 +19,8 @@ class BhashiniService {
     }
 
     async initializePipeline() {
-        if (!this.userId || !this.ulcaApiKey) {
-            console.warn('[Bhashini] BHASHINI_USER_ID or BHASHINI_API_KEY missing. Translation will gracefully fallback to English.');
+        if (!this.userId || !this.ulcaApiKey || this.userId === 'your_bhashini_user_id' || this.ulcaApiKey === 'your_bhashini_api_key') {
+            console.warn('[Bhashini] BHASHINI_USER_ID or BHASHINI_API_KEY missing/placeholder. Translation will gracefully fallback to English.');
             return;
         }
 

@@ -88,7 +88,7 @@ const HeatmapView = () => {
             const idx = prev.findIndex(a => a.geohash === payload.geohash && a.diseaseCategory === payload.diseaseCategory);
             if (idx >= 0) {
                 const next = [...prev];
-                next[idx] = { ...next[idx], riskLevel: payload.riskLevel, caseCount: payload.caseCount };
+                next[idx] = { ...next[idx], riskLevel: payload.riskLevel, reportedCount: payload.reportedCount, confirmedCount: payload.confirmedCount };
                 return next;
             } else {
                 return [{
@@ -96,7 +96,8 @@ const HeatmapView = () => {
                     geohash: payload.geohash,
                     diseaseCategory: payload.diseaseCategory,
                     riskLevel: payload.riskLevel,
-                    caseCount: payload.caseCount,
+                    reportedCount: payload.reportedCount,
+                    confirmedCount: payload.confirmedCount,
                     centerLat: payload.lat,
                     centerLng: payload.lng,
                     isActive: true,
@@ -184,7 +185,9 @@ const HeatmapView = () => {
                                     {a.riskLevel}
                                 </span>
                             </div>
-                            <span className="text-xs font-semibold text-ink-charcoal">{a.caseCount} recent cases</span>
+                            <span className="text-[10px] font-semibold text-ink-charcoal">
+                                {a.reportedCount || 0} reported (unconfirmed) &middot; {a.confirmedCount || 0} confirmed by doctors
+                            </span>
                         </div>
                     ))}
 

@@ -10,7 +10,7 @@ const DoctorOutbreakWidget = () => {
 
     useEffect(() => {
         outbreakService.getActiveAlerts().then(res => {
-            const sorted = res.alerts.sort((a, b) => b.caseCount - a.caseCount).slice(0, 3);
+            const sorted = res.alerts.sort((a, b) => (b.confirmedCount - a.confirmedCount) || (b.reportedCount - a.reportedCount)).slice(0, 3);
             setAlerts(sorted);
         }).catch(err => console.error(err));
     }, []);
@@ -22,11 +22,11 @@ const DoctorOutbreakWidget = () => {
                 const next = [...prev];
                 const idx = next.findIndex(a => a.id === payload.id);
                 if (idx >= 0) {
-                    next[idx] = { ...next[idx], riskLevel: payload.riskLevel, caseCount: payload.caseCount };
+                    next[idx] = { ...next[idx], riskLevel: payload.riskLevel, reportedCount: payload.reportedCount, confirmedCount: payload.confirmedCount };
                 } else if (next.length < 3) {
                     next.push(payload);
                 }
-                return next.sort((a, b) => b.caseCount - a.caseCount).slice(0, 3);
+                return next.sort((a, b) => (b.confirmedCount - a.confirmedCount) || (b.reportedCount - a.reportedCount)).slice(0, 3);
             });
         });
         socket.on('outbreak:resolved', (payload) => {
@@ -55,7 +55,7 @@ const DoctorOutbreakWidget = () => {
                                 ${a.riskLevel === 'severe' ? 'bg-red-500' : a.riskLevel === 'moderate' ? 'bg-orange-500' : 'bg-amber-400'}`}>
                                 {a.riskLevel}
                             </span>
-                            <span className="text-red-700 bg-red-200 px-1.5 py-0.5 rounded font-black">{a.caseCount} cases</span>
+                            <span className="text-red-700 bg-red-200 px-1.5 py-0.5 rounded font-black whitespace-nowrap text-[9px]">{a.confirmedCount || 0} conf. / {a.reportedCount || 0} rep.</span>
                         </div>
                     </div>
                 ))}

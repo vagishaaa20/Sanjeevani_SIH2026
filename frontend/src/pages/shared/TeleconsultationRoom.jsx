@@ -74,28 +74,61 @@ export default function TeleconsultationRoom() {
         setChatInput('');
     };
 
+    // Add new state variables for modal
+    const [showCompletionModal, setShowCompletionModal] = useState(false);
+    const [finalDiagnosis, setFinalDiagnosis] = useState('');
+    const [prescriptionText, setPrescriptionText] = useState('');
+    const [severityScore, setSeverityScore] = useState(2);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitError, setSubmitError] = useState('');
+
     const handleSaveNotes = async () => {
         setSavingNotes(true);
-        setTimeout(() => setSavingNotes(false), 500);
+        setTimeout(() => setSavingNotes(false), 500); // Visual indicator only
     };
 
-    const handleCompleteCall = async () => {
+    const handleCompleteCallClick = () => {
+        if (isDoctor) {
+            setShowCompletionModal(true);
+        } else {
+            completeAsPatient();
+        }
+    };
+
+    const completeAsPatient = async () => {
         try {
-            setSavingNotes(true);
-            if (isDoctor) {
-                await api.post(`/doctors/queue/${consultationId}/complete`);
-                addNotification('Call ended — consultation marked complete.', 'success', 5000);
-                navigate('/doctor/dashboard');
-            } else {
-                // If patient ends the call, let's also close it fully.
-                await api.post(`/consultations/${consultationId}/end`);
-                addNotification('Call ended successfully.', 'success', 5000);
-                navigate('/patient/dashboard');
-            }
+            await api.post(`/consultations/${consultationId}/end`);
+            addNotification('Call ended successfully.', 'success', 5000);
+            navigate('/patient/dashboard');
         } catch (e) {
-            console.error('Failed to complete', e);
+            console.error('Failed to end', e);
             addNotification('Failed to end call. Please try again.', 'error');
-            setSavingNotes(false);
+        }
+    };
+
+    const submitDoctorCompletion = async (e) => {
+        e.preventDefault();
+        setSubmitError('');
+
+        if (!notes.trim() && !finalDiagnosis.trim()) {
+            setSubmitError('Clinical notes or a diagnosis are required.');
+            return;
+        }
+
+        setIsSubmitting(true);
+        try {
+            await api.post(`/consultations/${consultationId}/complete`, {
+                notes,
+                finalDiagnosis,
+                prescriptionText,
+                severityScore
+            });
+            addNotification('Consultation marked complete successfully.', 'success', 5000);
+            navigate('/doctor/dashboard');
+        } catch (err) {
+            console.error('Completion error', err);
+            setSubmitError(err.response?.data?.error || 'Failed to submit consultation data.');
+            setIsSubmitting(false);
         }
     };
 
@@ -117,7 +150,7 @@ export default function TeleconsultationRoom() {
                             </span>
                         )}
                     </div>
-                    <button onClick={handleCompleteCall} className="bg-red-600 border-2 border-red-900 text-white font-bold px-4 py-2 rounded shadow-md hover:bg-red-500 transition-colors">
+                    <button onClick={handleCompleteCallClick} className="bg-red-600 border-2 border-red-900 text-white font-bold px-4 py-2 rounded shadow-md hover:bg-red-500 transition-colors">
                         END CALL
                     </button>
                 </div>
@@ -251,6 +284,96 @@ export default function TeleconsultationRoom() {
                     </form>
                 </div>
             </div>
+
+            {/* Doctor Completion Modal */}
+            {isDoctor && showCompletionModal && (
+                <div className="fixed inset-0 bg-ink-black/80 z-50 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto flex flex-col shadow-2xl border-2 border-ink-black animate-slide-up relative">
+                        <div className="p-6 border-b-2 border-ink-black bg-stone-50 rounded-t-3xl flex justify-between items-center sticky top-0 z-10">
+                            <div>
+                                <h2 className="text-xl font-black text-ink-black uppercase tracking-wider">Complete Consultation</h2>
+                                <p className="text-xs font-bold text-ink-muted">Finalize clinical documentation before closing</p>
+                            </div>
+                            <button
+                                onClick={() => setShowCompletionModal(false)}
+                                className="w-8 h-8 flex items-center justify-center rounded-full border-2 border-ink-black hover:bg-red-50 text-ink-black font-black"
+                            >
+                                ✕
+                            </button>
+                        </div>
+
+                        <form onSubmit={submitDoctorCompletion} className="p-6 flex flex-col gap-6">
+                            {submitError && (
+                                <div className="p-3 bg-red-100 border-2 border-red-300 text-red-900 text-xs font-bold rounded-xl animate-pulse">
+                                    {submitError}
+                                </div>
+                            )}
+
+                            <div>
+                                <label className="block text-sm font-black uppercase text-ink-black mb-2">Final Diagnosis / Impressions <span className="text-red-500">*</span></label>
+                                <input
+                                    type="text"
+                                    required
+                                    value={finalDiagnosis}
+                                    onChange={(e) => setFinalDiagnosis(e.target.value)}
+                                    className="w-full bg-white border-2 border-ink-black rounded-xl p-3 focus:outline-none focus:ring-4 focus:ring-emerald-200 transition font-medium"
+                                    placeholder="e.g. Upper Respiratory Tract Infection"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-black uppercase text-ink-black mb-2">Prescription & Orders</label>
+                                <textarea
+                                    value={prescriptionText}
+                                    onChange={(e) => setPrescriptionText(e.target.value)}
+                                    rows={4}
+                                    className="w-full bg-white border-2 border-ink-black rounded-xl p-3 focus:outline-none focus:ring-4 focus:ring-emerald-200 transition font-medium resize-none"
+                                    placeholder="e.g. Paracetamol 500mg SOS"
+                                />
+                                <p className="text-[10px] uppercase font-bold text-ink-muted mt-1">This will be processed by the Medication Reminders engine for the patient.</p>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-black uppercase text-ink-black mb-2">Outbreak Severity Assessment</label>
+                                <div className="flex gap-4">
+                                    {[1, 2, 3].map(score => (
+                                        <button
+                                            key={score}
+                                            type="button"
+                                            onClick={() => setSeverityScore(score)}
+                                            className={`flex-1 py-3 rounded-xl border-2 font-black transition-all ${severityScore === score
+                                                ? score === 1 ? 'bg-emerald-100 border-emerald-500 text-emerald-900' : score === 2 ? 'bg-amber-100 border-amber-500 text-amber-900' : 'bg-red-100 border-red-500 text-red-900'
+                                                : 'bg-stone-50 border-ink-black/20 text-ink-muted hover:border-ink-black'
+                                                }`}
+                                        >
+                                            {score === 1 && '1 - LOW'}
+                                            {score === 2 && '2 - MODERATE'}
+                                            {score === 3 && '3 - HIGH'}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="pt-4 border-t-2 border-ink-black/10 flex justify-end gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowCompletionModal(false)}
+                                    className="px-6 py-3 rounded-xl font-black text-ink-muted hover:bg-stone-100 transition"
+                                >
+                                    CANCEL
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={isSubmitting || (!finalDiagnosis.trim() && !notes.trim())}
+                                    className="px-6 py-3 rounded-xl bg-ink-black text-white font-black hover:bg-ink-charcoal transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-lg"
+                                >
+                                    {isSubmitting ? 'SAVING...' : 'FINALIZE & CLOSE'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

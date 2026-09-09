@@ -21,4 +21,13 @@ router.post('/:id/summary', ...auth, consultationController.generateAiSummary);
 // Patient explicitly ends a call to release their queue
 router.post('/:id/end', ...auth, consultationController.endCallByPatient);
 
+// Doctor explicitly fetches active/ongoing consultations
+router.get('/active', authenticate, requireRole('doctor'), consultationController.getActiveConsultations);
+
+// Doctor officially completes consultation with documentation 
+router.post('/:id/complete', authenticate, requireRole('doctor'), consultationController.completeConsultation);
+
+// Patient downloads prescription PDF info (URL + blockchain status)
+router.get('/:id/prescription', ...auth, consultationController.getPrescriptionPdf);
+
 module.exports = router;

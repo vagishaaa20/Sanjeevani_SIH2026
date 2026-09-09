@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import consultationService from '../../services/consultationService';
 import AiSummaryCard from '../../components/patient/AiSummaryCard';
 import SymptomTimeline from '../../components/patient/SymptomTimeline';
@@ -76,8 +77,37 @@ function ConsultationCard({ consultation, highlighted, cardRef }) {
     const [joining, setJoining] = useState(false);
     const [joinError, setJoinError] = useState(null);
     const [reviewed, setReviewed] = useState(false);
+    const [prescInfo, setPrescInfo] = useState(null);
+    const [prescLoading, setPrescLoading] = useState(false);
 
     const badge = STATUS_CONFIG[consultation.status] || STATUS_CONFIG.queued;
+
+    // Lazy-load prescription + blockchain info on first expand
+    const fetchPrescriptionStatus = useCallback(async () => {
+        if (prescInfo || prescLoading) return;
+        setPrescLoading(true);
+        try {
+            const API_BASE = import.meta.env.VITE_API_URL || '';
+            const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken') || '';
+            const res = await fetch(`${API_BASE}/consultations/${consultation.id}/prescription`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            if (res.ok) {
+                const data = await res.json();
+                setPrescInfo(data);
+            }
+        } catch (e) {
+            console.error('[PrescInfo] fetch error', e);
+        } finally {
+            setPrescLoading(false);
+        }
+    }, [consultation.id, prescInfo, prescLoading]);
+
+    // Auto-fetch when completed
+    useEffect(() => {
+        if (consultation.status === 'completed') fetchPrescriptionStatus();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [consultation.status]);
 
     const handleRejoin = async () => {
         setJoining(true);
@@ -146,30 +176,70 @@ function ConsultationCard({ consultation, highlighted, cardRef }) {
             {/* Completed: prescription + rating + AI summary + reminders */}
             {consultation.status === 'completed' && (
                 <div className="flex flex-col gap-2">
-                    {/* Prescription link */}
-                    {consultation.prescriptionUrl ? (
-                        <a
-                            href={consultation.prescriptionUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="self-start px-4 py-1.5 text-xs font-bold border-2 border-ink-black rounded-lg hover:bg-ink-black hover:text-white transition-colors"
-                        >
-                            📄 View Prescription
-                        </a>
-                    ) : (
-                        <div className="relative group self-start">
-                            <button
-                                type="button"
-                                disabled
-                                className="px-4 py-1.5 text-xs font-bold border-2 border-zinc-300 text-zinc-400 rounded-lg cursor-not-allowed"
+                    {/* ── Prescription download + blockchain badge ── */}
+                    <div className="flex flex-col gap-1.5">
+                        {prescLoading && (
+                            <p className="text-xs text-ink-muted animate-pulse">Loading prescription info…</p>
+                        )}
+
+                        {/* Download button */}
+                        {prescInfo?.prescriptionUrl ? (
+                            <a
+                                href={prescInfo.prescriptionUrl}
+                                download={`Prescription_${consultation.id}.pdf`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="self-start px-4 py-1.5 text-xs font-bold border-2 border-teal-600 text-teal-700 rounded-lg hover:bg-teal-600 hover:text-white transition-colors"
                             >
-                                📄 View Prescription
-                            </button>
-                            <div className="absolute left-0 top-full mt-1 z-10 hidden group-hover:block bg-ink-black text-white text-[10px] rounded px-2 py-1 whitespace-nowrap">
-                                Not available yet
+                                ⬇ Download Prescription (PDF)
+                            </a>
+                        ) : !prescLoading && (
+                            <div className="relative group self-start">
+                                <button
+                                    type="button"
+                                    disabled
+                                    className="px-4 py-1.5 text-xs font-bold border-2 border-zinc-300 text-zinc-400 rounded-lg cursor-not-allowed"
+                                >
+                                    ⬇ Download Prescription (PDF)
+                                </button>
+                                <div className="absolute left-0 top-full mt-1 z-10 hidden group-hover:block bg-ink-black text-white text-[10px] rounded px-2 py-1 whitespace-nowrap">
+                                    Generating… check back in a moment
+                                </div>
                             </div>
-                        </div>
-                    )}
+                        )}
+
+                        {/* Blockchain badge */}
+                        {prescInfo?.blockchainStatus === 'verified' && (
+                            <div className="flex items-center gap-1.5">
+                                <span className="text-[11px] font-bold text-teal-700 bg-teal-50 border border-teal-200 rounded-full px-2.5 py-0.5">
+                                    🔗 Blockchain Verified
+                                </span>
+                                <a
+                                    href={prescInfo.explorerUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-[10px] text-teal-600 underline"
+                                >
+                                    View Tx ↗
+                                </a>
+                            </div>
+                        )}
+                        {prescInfo?.blockchainStatus === 'pending' && (
+                            <span className="text-[11px] font-bold text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2.5 py-0.5 self-start">
+                                ⏳ Blockchain Anchoring…
+                            </span>
+                        )}
+
+                        {/* Verify link */}
+                        {prescInfo && (
+                            <Link
+                                to={`/verify/${consultation.id}`}
+                                className="text-[11px] text-cerulean underline self-start hover:opacity-70"
+                            >
+                                🔍 Verify Authenticity
+                            </Link>
+                        )}
+                    </div>
 
                     {/* AI Summary (lazy) */}
                     <AiSummaryCard
@@ -265,8 +335,8 @@ export default function PatientConsultations() {
                         type="button"
                         onClick={() => setActiveTab(tab.id)}
                         className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === tab.id
-                                ? 'bg-ink-black text-white'
-                                : 'text-ink-charcoal hover:bg-zinc-100'
+                            ? 'bg-ink-black text-white'
+                            : 'text-ink-charcoal hover:bg-zinc-100'
                             }`}
                     >
                         {tab.label}
