@@ -147,6 +147,122 @@ async function updateOwnProfile(req, res, next) {
     }
 }
 
-// Add `updateOwnProfile` to the module.exports object at the bottom of doctorController.js
+const getRecentPatients = async (req, res, next) => {
+    try {
+        const { Consultation, PatientProfile, User } = require('../models');
+        const consultations = await Consultation.findAll({
+            where: { doctorId: req.user.id },
+            include: [
+                {
+                    model: User,
+                    as: 'patient',
+                    attributes: ['id', 'email', 'phone'],
+                    include: [{ model: PatientProfile, as: 'patientProfile', attributes: ['fullName'] }]
+                }
+            ],
+            order: [['createdAt', 'DESC']],
+        });
 
-module.exports = { listPublicDoctors, getPublicDoctor , getNearbyDoctors , updateOwnProfile };
+        const patientsMap = new Map();
+        for (const c of consultations) {
+            if (c.patient && !patientsMap.has(c.patientId)) {
+                patientsMap.set(c.patientId, {
+                    id: c.patient.id,
+                    phone: c.patient.phone,
+                    fullName: c.patient.patientProfile?.fullName || 'Unknown Patient'
+                });
+            }
+        }
+        
+        return res.json({ patients: Array.from(patientsMap.values()) });
+    } catch (err) {
+        next(err);
+    }
+};
+
+const getIncomingReferrals = async (req, res, next) => {
+    try {
+        const { HealthWorkerReferral, User, PatientProfile, HealthWorkerProfile, ClinicProfile, DoctorProfile } = require('../models');
+        const referrals = await HealthWorkerReferral.findAll({
+            where: { toDoctorId: req.user.id },
+            include: [
+                {
+                    model: User,
+                    as: 'patient',
+                    attributes: ['id', 'phone'],
+                    include: [{ model: PatientProfile, as: 'patientProfile', attributes: ['fullName', 'region'] }]
+                },
+                {
+                    model: User,
+                    as: 'referringHealthWorker',
+                    attributes: ['id', 'phone'],
+                    include: [{ model: HealthWorkerProfile, as: 'healthWorkerProfile', attributes: ['name'] }]
+                },
+                {
+                    model: User,
+                    as: 'fromClinic',
+                    attributes: ['id'],
+                    include: [{ model: ClinicProfile, as: 'clinicProfile', attributes: ['clinicName'] }]
+                },
+                {
+                    model: User,
+                    as: 'doctor',
+                    attributes: ['id'],
+                    include: [{ model: DoctorProfile, as: 'doctorProfile', attributes: ['fullName'] }]
+                }
+            ],
+            order: [['createdAt', 'DESC']]
+        });
+        return res.json({ count: referrals.length, referrals });
+    } catch (err) {
+        next(err);
+    }
+};
+
+const updateIncomingReferral = async (req, res, next) => {
+    try {
+        const { HealthWorkerReferral } = require('../models');
+        const { id } = req.params;
+        const { status, outcome } = req.body;
+
+        const referral = await HealthWorkerReferral.findOne({
+            where: { id, toDoctorId: req.user.id }
+        });
+
+        if (!referral) {
+            return res.status(404).json({ error: 'Referral not found or not assigned to you' });
+        }
+
+        const VALID_TRANSITIONS = {
+            'SENT': ['ACCEPTED', 'REJECTED'],
+            'ACCEPTED': ['ATTENDED'],
+            'ATTENDED': ['OUTCOME_RECORDED'],
+            'OUTCOME_RECORDED': ['CLOSED']
+        };
+
+        if (!VALID_TRANSITIONS[referral.status]?.includes(status)) {
+            return res.status(400).json({ error: `Invalid transition from ${referral.status} to ${status}` });
+        }
+
+        const updates = { status };
+        
+        if (status === 'COMPLETED') {
+            updates.completedAt = new Date();
+        } else if (status === 'ATTENDED') {
+            updates.attendedAt = new Date();
+        } else if (status === 'OUTCOME_RECORDED') {
+            if (!outcome || !String(outcome).trim()) return res.status(400).json({ error: 'Outcome text is required to record outcome' });
+            updates.outcome = String(outcome).trim();
+            updates.outcomeRecordedAt = new Date();
+        } else if (status === 'CLOSED') {
+            updates.closedAt = new Date();
+        }
+
+        await referral.update(updates);
+        return res.json({ message: 'Referral updated successfully', referral });
+    } catch (err) {
+        next(err);
+    }
+};
+
+module.exports = { listPublicDoctors, getPublicDoctor, getNearbyDoctors, updateOwnProfile, getRecentPatients, getIncomingReferrals, updateIncomingReferral };

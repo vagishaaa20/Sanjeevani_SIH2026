@@ -7,6 +7,14 @@ const doctorService = {
         });
         return response.data; // { count, doctors: [...] }
     },
+    getIncomingReferrals: async () => {
+        const response = await api.get('/doctors/referrals');
+        return response.data;
+    },
+    updateIncomingReferral: async (referralId, data) => {
+        const response = await api.patch(`/doctors/referrals/${referralId}`, data);
+        return response.data;
+    },
 };
 
 export default doctorService;

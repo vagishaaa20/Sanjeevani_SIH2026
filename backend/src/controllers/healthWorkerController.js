@@ -3,6 +3,8 @@ const {
     User,
     PatientProfile,
     HealthWorkerProfile,
+    ClinicProfile,
+    DoctorProfile,
     HealthWorkerAssignment,
     HealthWorkerFollowup,
     HealthWorkerReferral,
@@ -174,12 +176,26 @@ async function listReferrals(req, res) {
         const assignments = await HealthWorkerAssignment.findAll({ where: { healthWorkerId: req.user.id, status: ACTIVE }, attributes: ['patientId'] });
         const referrals = await HealthWorkerReferral.findAll({ 
             where: { patientId: { [Op.in]: assignments.map((item) => item.patientId) } },
-            include: [{
-                model: User,
-                as: 'patient',
-                attributes: ['id', 'phone'],
-                include: [{ model: PatientProfile, as: 'patientProfile', attributes: ['fullName', 'region'] }]
-            }],
+            include: [
+                {
+                    model: User,
+                    as: 'patient',
+                    attributes: ['id', 'phone'],
+                    include: [{ model: PatientProfile, as: 'patientProfile', attributes: ['fullName', 'region'] }]
+                },
+                {
+                    model: User,
+                    as: 'toClinic',
+                    attributes: ['id'],
+                    include: [{ model: ClinicProfile, as: 'clinicProfile', attributes: ['clinicName'] }]
+                },
+                {
+                    model: User,
+                    as: 'toDoctor',
+                    attributes: ['id'],
+                    include: [{ model: DoctorProfile, as: 'doctorProfile', attributes: ['fullName'] }]
+                }
+            ],
             order: [['createdAt', 'DESC']] 
         });
         return res.json({ count: referrals.length, referrals });
@@ -203,8 +219,8 @@ async function updateReferral(req, res) {
     }
 }
 
-async function createReferral(req, res) {
-    const { patientId, reason, specialization, priority = 'NORMAL', toClinicId, appointmentDate } = req.body;
+const createReferral = async (req, res) => {
+    const { patientId, reason, specialization, priority = 'NORMAL', toClinicId, toDoctorId, appointmentDate } = req.body;
     if (!isValidUuid(patientId) || !String(reason || '').trim()) return res.status(400).json({ error: 'patientId and reason are required' });
     if (!['NORMAL', 'HIGH', 'URGENT'].includes(priority)) return res.status(400).json({ error: 'Invalid referral priority' });
     try {
@@ -214,10 +230,13 @@ async function createReferral(req, res) {
             patientId,
             doctorId: req.user.role === 'doctor' ? req.user.id : null,
             fromClinicId: req.user.role === 'clinic_admin' ? req.user.id : null,
+            referringHealthWorkerId: req.user.role === 'health_worker' ? req.user.id : null,
             toClinicId: isValidUuid(toClinicId) ? toClinicId : null,
+            toDoctorId: isValidUuid(toDoctorId) ? toDoctorId : null,
             specialization: specialization ? String(specialization).trim() : null,
             reason: String(reason).trim(),
             priority,
+            status: (isValidUuid(toClinicId) || isValidUuid(toDoctorId)) ? 'SENT' : 'PENDING',
             appointmentDate: appointmentDate || null,
         });
         return res.status(201).json({ message: 'Referral created', referral });
