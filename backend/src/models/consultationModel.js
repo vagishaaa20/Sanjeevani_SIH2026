@@ -96,12 +96,18 @@ const Consultation = sequelize.define(
             field: 'ai_summary_generated_at',
             comment: 'Timestamp of last summary generation — used to detect stale cache',
         },
-        // ── Symptom Timeline ──────────────────────────────────────────────────
+        // ── Symptom Timeline & Details ─────────────────────────────────────────
         reportedSymptoms: {
             type: DataTypes.TEXT,
             allowNull: true,
             field: 'reported_symptoms',
             comment: 'Patient-reported symptoms at time of booking',
+        },
+        finalDiagnosis: {
+            type: DataTypes.TEXT,
+            allowNull: true,
+            field: 'final_diagnosis',
+            comment: 'Doctor explicitly typed final diagnosis',
         },
         // ── Medication Extraction ─────────────────────────────────────────────
         prescriptionText: {
@@ -109,6 +115,25 @@ const Consultation = sequelize.define(
             allowNull: true,
             field: 'prescription_text',
             comment: 'Raw prescription text used for medication auto-extraction',
+        },
+        // ── Blockchain Prescription Verification ─────────────────────────────
+        prescriptionHash: {
+            type: DataTypes.STRING(66),
+            allowNull: true,
+            field: 'prescription_hash',
+            comment: 'SHA-256 of canonical consultation fields (0x-prefixed) — deterministic, verifiable',
+        },
+        blockchainTxHash: {
+            type: DataTypes.STRING(66),
+            allowNull: true,
+            field: 'blockchain_tx_hash',
+            comment: 'Polygon Amoy tx hash after prescriptionHash is anchored on PrescriptionAnchor contract',
+        },
+        contractAddress: {
+            type: DataTypes.STRING(42),
+            allowNull: true,
+            field: 'contract_address',
+            comment: 'Address of PrescriptionAnchor contract used for this consultation',
         },
     },
     {

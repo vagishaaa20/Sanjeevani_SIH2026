@@ -1,0 +1,49 @@
+{
+  "_format": "hh3-sol-build-info-1",
+  "id": "solc-0_8_34-372634c9329e36ee312f7cef87a1a4fe205b10e5",
+  "solcVersion": "0.8.34",
+  "solcLongVersion": "0.8.34+commit.80d5c536",
+  "compilerType": "solc",
+  "toolVersions": {
+    "hardhat": "3.16.0"
+  },
+  "userSourceNameMap": {
+    "contracts/PrescriptionAnchor.sol": "project/contracts/PrescriptionAnchor.sol"
+  },
+  "input": {
+    "language": "Solidity",
+    "settings": {
+      "evmVersion": "osaka",
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "outputSelection": {
+        "*": {
+          "": [
+            "ast"
+          ],
+          "*": [
+            "abi",
+            "evm.bytecode.linkReferences",
+            "evm.bytecode.object",
+            "evm.bytecode.opcodes",
+            "evm.bytecode.sourceMap",
+            "evm.deployedBytecode.immutableReferences",
+            "evm.deployedBytecode.linkReferences",
+            "evm.deployedBytecode.object",
+            "evm.deployedBytecode.opcodes",
+            "evm.deployedBytecode.sourceMap",
+            "evm.methodIdentifiers"
+          ]
+        }
+      },
+      "remappings": []
+    },
+    "sources": {
+      "project/contracts/PrescriptionAnchor.sol": {
+        "content": "// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.20;\r\n\r\ncontract PrescriptionAnchor {\r\n    struct Record {\r\n        bytes32 hash;\r\n        address anchoredBy;\r\n        uint256 timestamp;\r\n    }\r\n\r\n    mapping(bytes32 => Record) public records;\r\n\r\n    event PrescriptionAnchored(bytes32 indexed hash, address indexed anchoredBy, uint256 timestamp);\r\n\r\n    function anchor(bytes32 hash) external {\r\n        require(records[hash].timestamp == 0, \"Already anchored\");\r\n        records[hash] = Record(hash, msg.sender, block.timestamp);\r\n        emit PrescriptionAnchored(hash, msg.sender, block.timestamp);\r\n    }\r\n\r\n    function verify(bytes32 hash) external view returns (bool exists, address anchoredBy, uint256 timestamp) {\r\n        Record memory r = records[hash];\r\n        return (r.timestamp != 0, r.anchoredBy, r.timestamp);\r\n    }\r\n}\r\n"
+      }
+    }
+  }
+}

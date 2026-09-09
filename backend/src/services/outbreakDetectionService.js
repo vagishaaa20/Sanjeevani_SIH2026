@@ -4,33 +4,42 @@ const config = require('../config/outbreakThresholds');
 const ngeohash = require('ngeohash');
 
 /**
- * Calculates risk level purely based on counts.
+ * Calculates risk level based on two-tier counts (reported and confirmed).
  * Testable pure function.
- * @param {number} currentCount 
- * @param {number} previousCount 
- * @param {object} thresholds 
  * @returns {'severe'|'moderate'|'watch'|null}
  */
-function calculateRiskLevel(currentCount, previousCount, thresholds) {
-    if (currentCount === 0) return null;
+function calculateRiskLevel(currentConfirmed, currentReported, prevConfirmed, prevReported, thresholds) {
+    if (currentConfirmed === 0 && currentReported === 0) return null;
 
-    let growthPct = 0;
-    if (previousCount > 0) {
-        growthPct = ((currentCount - previousCount) / previousCount) * 100;
-    } else if (currentCount > 0) {
-        growthPct = 100; // Infinity mathematically, but cap for our logic
+    let confirmedGrowth = 0;
+    if (prevConfirmed > 0) {
+        confirmedGrowth = ((currentConfirmed - prevConfirmed) / prevConfirmed) * 100;
+    } else if (currentConfirmed > 0) {
+        confirmedGrowth = 100; // Infinity mathematically, but cap for our logic
     }
 
-    // Evaluate severe
-    if (currentCount >= thresholds.severe.minCases || growthPct >= thresholds.severe.growthPct) {
+    let reportedGrowth = 0;
+    if (prevReported > 0) {
+        reportedGrowth = ((currentReported - prevReported) / prevReported) * 100;
+    } else if (currentReported > 0) {
+        reportedGrowth = 100;
+    }
+
+    // Evaluate severe (driven strictly by confirmed diagnoses)
+    if (currentConfirmed >= thresholds.severe.minCases || confirmedGrowth >= thresholds.severe.growthPct) {
         return 'severe';
     }
-    // Evaluate moderate
-    if (currentCount >= thresholds.moderate.minCases || growthPct >= thresholds.moderate.growthPct) {
+    // Evaluate moderate (driven strictly by confirmed diagnoses)
+    if (currentConfirmed >= thresholds.moderate.minCases || confirmedGrowth >= thresholds.moderate.growthPct) {
         return 'moderate';
     }
-    // Evaluate watch
-    if (currentCount >= thresholds.watch.minCases) {
+    // Evaluate watch (driven by unconfirmed/reported signals OR early confirmed signals)
+    if (currentConfirmed >= thresholds.watch.minCases ||
+        currentReported >= thresholds.moderate.minCases ||
+        reportedGrowth >= thresholds.moderate.growthPct) {
+        return 'watch';
+    }
+    if (currentReported >= thresholds.watch.minCases) {
         return 'watch';
     }
 
@@ -38,7 +47,7 @@ function calculateRiskLevel(currentCount, previousCount, thresholds) {
 }
 
 /**
- * Aggregate counts and upsert into outbreak_alerts.
+ * Aggregate counts (reported vs confirmed) and upsert into outbreak_alerts.
  * @returns {Promise<Array>} List of updated or new alerts
  */
 async function runDetectionCycle(customConfig = null) {
@@ -51,46 +60,59 @@ async function runDetectionCycle(customConfig = null) {
 
     // Get current window counts
     const currentReports = await DiseaseReport.findAll({
-        attributes: ['geohash', 'diseaseCategory', [require('../config/db').fn('COUNT', '*'), 'count']],
+        attributes: ['geohash', 'diseaseCategory', 'confidenceLevel', [require('../config/db').fn('COUNT', '*'), 'count']],
         where: {
             reportedAt: {
                 [Op.gte]: windowStart
             }
         },
-        group: ['geohash', 'diseaseCategory'],
+        group: ['geohash', 'diseaseCategory', 'confidenceLevel'],
         raw: true
     });
 
+    // Get previous window counts
     const previousReports = await DiseaseReport.findAll({
-        attributes: ['geohash', 'diseaseCategory', [require('../config/db').fn('COUNT', '*'), 'count']],
+        attributes: ['geohash', 'diseaseCategory', 'confidenceLevel', [require('../config/db').fn('COUNT', '*'), 'count']],
         where: {
             reportedAt: {
                 [Op.gte]: previousWindowStart,
                 [Op.lt]: windowStart
             }
         },
-        group: ['geohash', 'diseaseCategory'],
+        group: ['geohash', 'diseaseCategory', 'confidenceLevel'],
         raw: true
     });
 
+    // Process previous reports into a map
     const prevCountMap = {};
     for (const row of previousReports) {
-        prevCountMap[`${row.geohash}_${row.diseaseCategory}`] = parseInt(row.count, 10);
+        const key = `${row.geohash}_${row.diseaseCategory}`;
+        if (!prevCountMap[key]) prevCountMap[key] = { reportedCount: 0, confirmedCount: 0 };
+        if (row.confidenceLevel === 'confirmed') prevCountMap[key].confirmedCount = parseInt(row.count, 10);
+        else prevCountMap[key].reportedCount = parseInt(row.count, 10);
+    }
+
+    // Process current reports into a map
+    const currentCountMap = {};
+    for (const row of currentReports) {
+        const key = `${row.geohash}_${row.diseaseCategory}`;
+        if (!currentCountMap[key]) currentCountMap[key] = { reportedCount: 0, confirmedCount: 0 };
+        if (row.confidenceLevel === 'confirmed') currentCountMap[key].confirmedCount = parseInt(row.count, 10);
+        else currentCountMap[key].reportedCount = parseInt(row.count, 10);
     }
 
     const updatedAlerts = [];
 
     // Process each grouping in the current window
-    for (const row of currentReports) {
-        const geohash = row.geohash;
-        const diseaseCategory = row.diseaseCategory;
-        const currentCount = parseInt(row.count, 10);
+    for (const key of Object.keys(currentCountMap)) {
+        const [geohash, diseaseCategory] = key.split('_');
+        const curr = currentCountMap[key];
 
         if (!geohash) continue;
 
-        const previousCount = prevCountMap[`${geohash}_${diseaseCategory}`] || 0;
+        const prev = prevCountMap[key] || { reportedCount: 0, confirmedCount: 0 };
 
-        const riskLevel = calculateRiskLevel(currentCount, previousCount, cfg.thresholds);
+        const riskLevel = calculateRiskLevel(curr.confirmedCount, curr.reportedCount, prev.confirmedCount, prev.reportedCount, cfg.thresholds);
 
         if (!riskLevel) continue; // Below watch threshold
 
@@ -102,7 +124,8 @@ async function runDetectionCycle(customConfig = null) {
         const [alert, created] = await OutbreakAlert.findOrCreate({
             where: { geohash, diseaseCategory },
             defaults: {
-                caseCount: currentCount,
+                reportedCount: curr.reportedCount,
+                confirmedCount: curr.confirmedCount,
                 riskLevel,
                 centerLat,
                 centerLng,
@@ -114,7 +137,10 @@ async function runDetectionCycle(customConfig = null) {
 
         if (!created) {
             let shouldUpdate = false;
-            let updates = { caseCount: currentCount };
+            let updates = {
+                reportedCount: curr.reportedCount,
+                confirmedCount: curr.confirmedCount
+            };
 
             // If it was inactive, reactivate it
             if (!alert.isActive) {
@@ -141,8 +167,7 @@ async function runDetectionCycle(customConfig = null) {
                 shouldUpdate = true;
             }
 
-            if (alert.caseCount !== currentCount) {
-                updates.caseCount = currentCount;
+            if (alert.reportedCount !== curr.reportedCount || alert.confirmedCount !== curr.confirmedCount) {
                 shouldUpdate = true;
             }
 

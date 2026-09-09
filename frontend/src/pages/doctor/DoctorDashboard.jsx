@@ -4,6 +4,7 @@ import useAuth from '../../hooks/useAuth';
 import DoctorOutbreakWidget from '../../components/doctor/DoctorOutbreakWidget';
 import DoctorQueueList from '../../components/doctor/DoctorQueueList';
 import DoctorReferralForm from './DoctorReferralForm';
+import DoctorActiveConsultations from '../../components/doctor/DoctorActiveConsultations';
 import DoctorIncomingReferrals from '../../components/doctor/DoctorIncomingReferrals';
 
 const STATUS_MESSAGES = {
@@ -196,6 +197,7 @@ const DoctorDashboard = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="md:col-span-2 flex flex-col gap-4">
+                    <DoctorActiveConsultations />
                     <DoctorQueueList />
                 </div>
                 <div>

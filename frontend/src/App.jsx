@@ -34,6 +34,8 @@ import HealthWorkerPatientDetails from './pages/health-worker/HealthWorkerPatien
 import HealthWorkerReferrals from './pages/health-worker/HealthWorkerReferrals';
 import HealthWorkerFollowups from './pages/health-worker/HealthWorkerFollowups';
 import HealthWorkerProfile from './pages/health-worker/HealthWorkerProfile';
+import VerifyPrescription from './pages/shared/VerifyPrescription';
+import VerifyPrescriptionUpload from './pages/shared/VerifyPrescriptionUpload';
 
 // Main layout wrapper that includes sidebar and navbar for authenticated users
 const AppLayout = ({ children }) => {
@@ -151,6 +153,16 @@ export const App = () => {
                                             </ProtectedRoute>
                                         }
                                     />
+                                    <Route
+                                        path="/clinic/medicine-inventory"
+                                        element={
+                                            <ProtectedRoute allowedRoles={['clinic_admin']}>
+                                                <AppLayout>
+                                                    <MedicineInventory />
+                                                </AppLayout>
+                                            </ProtectedRoute>
+                                        }
+                                    />
                                 <Route
                                     path="/clinic/referrals"
                                     element={
@@ -175,16 +187,16 @@ export const App = () => {
 
 
 
-                                <Route
-                                    path="/doctor/dashboard"
-                                    element={
-                                        <ProtectedRoute allowedRoles={['doctor']}>
-                                            <AppLayout>
-                                                <DoctorDashboard />
-                                            </AppLayout>
-                                        </ProtectedRoute>
-                                    }
-                                />
+                                    <Route
+                                        path="/doctor/dashboard"
+                                        element={
+                                            <ProtectedRoute allowedRoles={['doctor']}>
+                                                <AppLayout>
+                                                    <DoctorDashboard />
+                                                </AppLayout>
+                                            </ProtectedRoute>
+                                        }
+                                    />
 
                                     <Route path="/health-worker/dashboard" element={<ProtectedRoute allowedRoles={['health_worker']}><AppLayout><HealthWorkerDashboard /></AppLayout></ProtectedRoute>} />
                                     <Route path="/health-worker/patients" element={<ProtectedRoute allowedRoles={['health_worker']}><AppLayout><AssignedPatients /></AppLayout></ProtectedRoute>} />
@@ -291,27 +303,27 @@ export const App = () => {
                                             </ProtectedRoute>
                                         }
                                     />
-                                <Route
-                                    path="/patient/medicine-availability"
-                                    element={
-                                        <ProtectedRoute allowedRoles={['patient']}>
-                                            <AppLayout>
-                                                <MedicineAvailability />
-                                            </AppLayout>
-                                        </ProtectedRoute>
-                                    }
-                                />
+                                    <Route
+                                        path="/patient/medicine-availability"
+                                        element={
+                                            <ProtectedRoute allowedRoles={['patient']}>
+                                                <AppLayout>
+                                                    <MedicineAvailability />
+                                                </AppLayout>
+                                            </ProtectedRoute>
+                                        }
+                                    />
 
-                                <Route
-                                    path="/patient/heatmap"
-                                    element={
-                                        <ProtectedRoute allowedRoles={['patient']}>
-                                            <AppLayout>
-                                                <HeatmapView />
-                                            </AppLayout>
-                                        </ProtectedRoute>
-                                    }
-                                />
+                                    <Route
+                                        path="/patient/heatmap"
+                                        element={
+                                            <ProtectedRoute allowedRoles={['patient']}>
+                                                <AppLayout>
+                                                    <HeatmapView />
+                                                </AppLayout>
+                                            </ProtectedRoute>
+                                        }
+                                    />
 
                                     <Route
                                         path="/patient/consultation/:id/room"
@@ -323,6 +335,10 @@ export const App = () => {
                                             </ProtectedRoute>
                                         }
                                     />
+
+                                    {/* Public: Prescription Blockchain Verification (no auth needed) */}
+                                    <Route path="/verify/:consultationId" element={<VerifyPrescription />} />
+                                    <Route path="/verify" element={<VerifyPrescriptionUpload />} />
 
                                     {/* Catch-all navigation */}
                                     <Route path="*" element={<Navigate to="/login" replace />} />

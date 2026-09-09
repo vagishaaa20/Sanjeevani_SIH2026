@@ -113,6 +113,7 @@ export const Login = () => {
 
     const isPatientTab = activeTab === 'patient';
     const isStaffTab = activeTab === 'staff';
+    const isClinicTab = activeTab === 'clinic';
     const isAdminTab = activeTab === 'admin';
     const isHealthWorkerTab = activeTab === 'health_worker';
     const isDev = import.meta.env.DEV;
@@ -131,14 +132,15 @@ export const Login = () => {
                         { key: 'patient', label: 'Patient Care' },
                         { key: 'staff', label: 'Staff / Dr.' },
                         { key: 'health_worker', label: 'Health Worker' },
+                        { key: 'clinic', label: 'Registered Clinics' },
                         { key: 'admin', label: 'Admin HQ' },
                     ].map(({ key, label }) => (
                         <button
                             key={key}
                             onClick={() => switchTab(key)}
                             className={`py-2 text-xs font-bold rounded-lg cursor-pointer transition-all ${activeTab === key
-                                    ? 'bg-white border border-ink-black text-ink-black shadow-sm'
-                                    : 'text-ink-muted hover:text-ink-charcoal'
+                                ? 'bg-white border border-ink-black text-ink-black shadow-sm'
+                                : 'text-ink-muted hover:text-ink-charcoal'
                                 }`}
                         >
                             {label}
@@ -216,7 +218,33 @@ export const Login = () => {
                             required
                         />
                         <Button type="submit" variant="primary" className="mt-2 w-full" disabled={loading}>
-                            {loading ? 'Signing In…' : 'Sign In'}
+                            {loading ? 'Signing In…' : 'Sign In as Doctor'}
+                        </Button>
+                    </form>
+                )}
+
+                {/* ─── Clinic Admins ─── */}
+                {isClinicTab && (
+                    <form className="flex flex-col gap-4" onSubmit={handleCredentialsSubmit}>
+                        <Input
+                            label="Clinic Manager Email"
+                            id="email"
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                            placeholder="contact@sanjeevaniclinic.in"
+                        />
+                        <Input
+                            label="Password"
+                            id="password"
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                        />
+                        <Button type="submit" variant="primary" className="mt-2 w-full" disabled={loading}>
+                            {loading ? 'Signing In…' : 'Access Clinic Portal'}
                         </Button>
                     </form>
                 )}

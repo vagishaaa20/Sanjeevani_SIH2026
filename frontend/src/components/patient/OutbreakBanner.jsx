@@ -80,6 +80,7 @@ const OutbreakBanner = ({ userRegionGeohash }) => {
                             <div className="flex flex-col">
                                 <span className="font-black font-heading text-sm uppercase tracking-wider">
                                     {isSevere ? 'Severe Health Alert' : 'Health Advisory'} — {alert.diseaseCategory}
+                                    <br /><span className="text-[10px] text-current opacity-75 lowercase font-semibold">{alert.reportedCount || 0} reported (unconfirmed) &middot; {alert.confirmedCount || 0} confirmed by doctors</span>
                                 </span>
                                 <span className="text-xs font-semibold mt-1 opacity-90 leading-snug">
                                     There is an active outbreak in your region. <strong>Precaution:</strong> {tip}

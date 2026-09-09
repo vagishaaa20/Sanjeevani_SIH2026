@@ -18,11 +18,17 @@ const OutbreakAlert = sequelize.define(
             allowNull: false,
             field: 'disease_category',
         },
-        caseCount: {
+        reportedCount: {
             type: DataTypes.INTEGER,
             allowNull: false,
             defaultValue: 0,
-            field: 'case_count',
+            field: 'reported_count',
+        },
+        confirmedCount: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            defaultValue: 0,
+            field: 'confirmed_count',
         },
         thresholdBreachedAt: {
             type: DataTypes.DATE,

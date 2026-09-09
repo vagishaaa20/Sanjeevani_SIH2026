@@ -15,14 +15,69 @@ const VALID_RECOMMENDATIONS = ['emergency', 'teleconsultation', 'doctor_visit'];
  */
 function mapDiseaseCategory(reasonText = '', symptoms = '') {
     const text = (reasonText + ' ' + symptoms).toLowerCase();
-    if (text.match(/dengue|malaria|chikungunya|typhoid|fever/)) return 'Fever/Infectious';
-    if (text.match(/cough|cold|pneumonia|asthma|breath|chest|respiratory/)) return 'Respiratory';
-    if (text.match(/diarrhea|vomiting|stomach|pain|nausea|gastric|food poisoning/)) return 'Gastrointestinal';
-    if (text.match(/rash|skin|itch|allergy|measles/)) return 'Skin/Allergic';
-    if (text.match(/eye|vision|conjunctivitis/)) return 'Ophthalmological';
-    if (text.match(/headache|migraine|dizzy|faint|stroke/)) return 'Neurological';
-    if (text.match(/heart|cardiac|palpitation/)) return 'Cardiovascular';
-    return 'Other';
+
+    const categories = {
+        'Fever/Infectious': /\b(dengue|malaria|chikungunya|typhoid|fever|pyrexia|febrile|infx|sepsis|septic)\b/g,
+        'Respiratory': /\b(cough|cold|pneumonia|asthma|breath|respiratory|urti|lrti|copd|wheez(e|ing)?|sob|dyspnea)\b/g,
+        'Gastrointestinal': /\b(diarrhea|vomiting|stomach( ache)?|abdominal pain|nausea|gastric|food poisoning|n\/v(\/d)?|v\/d|gastroenteritis|gi|abd|bowel(s)?)\b/g,
+        'Skin/Allergic': /\b(rash|skin|itch(ing|y)?|allergy|allergic|measles|dermatitis|maculopapular|urticaria)\b/g,
+        'Ophthalmological': /\b(eye(s)?|vision|conjunctivitis|conjunctival|sclera|cornea)\b/g,
+        'Neurological': /\b(headache|migraine|dizzy|dizziness|faint|stroke|cephalgia|neuro|seizure|syncope)\b/g,
+        'Cardiovascular': /\b(heart|cardiac|palpitation(s)?|tachycardia|bradycardia|arrhythmia|chest pain)\b/g
+    };
+
+    const negationWords = /\b(denies|denied|no|not|negative|without|unremarkable|afebrile|non-tender|nil|absent|rules out|r\/o)\b/i;
+
+    let bestCategory = 'Other';
+    let maxHits = 0;
+
+    // Tie-resolution: the highest hit count wins. In the event of a tie, 
+    // deterministic array ordering takes precedent (Fever > Resp > GI > etc)
+    for (const [category, regex] of Object.entries(categories)) {
+        const matches = [...text.matchAll(regex)];
+        let validHits = 0;
+
+        for (const match of matches) {
+            // Scope limit of ~200 characters backward to support long enumerated lists
+            const prevContextOffset = Math.max(0, match.index - 200);
+            const prevContextStr = text.substring(prevContextOffset, match.index);
+
+            // Break at logical polarity flippers or hard sentence breaks (but explicitly NOT "and"/"or")
+            const clauseBoundaryRegex = /[\.;\n]|\b(but|however|admits|reports|pt has|patient has|c\/o|complains of|presents with|endorses|positive for|states|noted)\b/gi;
+            const boundaries = [...prevContextStr.matchAll(clauseBoundaryRegex)];
+
+            let relevantContext = prevContextStr;
+            let hasAnchoringBoundary = false;
+
+            if (boundaries.length > 0) {
+                hasAnchoringBoundary = true;
+                // Read from the last boundary to the keyword
+                const lastBoundary = boundaries[boundaries.length - 1].index;
+                relevantContext = prevContextStr.substring(lastBoundary + 1);
+            }
+
+            const isNegated = negationWords.test(relevantContext);
+
+            // Safety valve for public-health-signal: if an extracted symptom has absolutely no punctuation
+            // anchors and no clinical positive/negative verbs in its active window, log it for human audit
+            // rather than trusting the silent positive default blindly.
+            if (!hasAnchoringBoundary && !isNegated && prevContextStr.split(' ').length > 4) {
+                console.warn(`[OUTBREAK_REVIEW_QUEUE] Unanchored/Ambiguous symptom match detected: "${match[0]}". Routing to manual clinical audit.`);
+            }
+
+            // If there's a negation word within the active clause context, discard the hit!
+            if (!isNegated) {
+                validHits++;
+            }
+        }
+
+        if (validHits > maxHits) {
+            maxHits = validHits;
+            bestCategory = category;
+        }
+    }
+
+    return bestCategory;
 }
 
 /**
@@ -81,7 +136,8 @@ async function runTriage({ symptoms, duration, severity, patientId, targetLang =
                     symptomTags: [englishSymptoms],
                     geohash: gh,
                     source: 'triage',
-                    severityScore: sScore
+                    severityScore: sScore,
+                    confidenceLevel: 'reported'
                 });
 
                 // Asynchronously trigger detection
@@ -100,4 +156,4 @@ async function runTriage({ symptoms, duration, severity, patientId, targetLang =
     return { recommendation: parsed.recommendation, reason: finalReason };
 }
 
-module.exports = { runTriage };
+module.exports = { runTriage, mapDiseaseCategory };

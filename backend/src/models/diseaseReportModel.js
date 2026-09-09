@@ -14,6 +14,22 @@ const DiseaseReport = sequelize.define(
             allowNull: true, // null for anonymous/WhatsApp reports
             field: 'patient_id',
         },
+        consultationId: {
+            type: DataTypes.UUID,
+            allowNull: true,
+            field: 'consultation_id',
+        },
+        doctorId: {
+            type: DataTypes.UUID,
+            allowNull: true,
+            field: 'doctor_id',
+        },
+        confidenceLevel: {
+            type: DataTypes.ENUM('reported', 'confirmed'),
+            allowNull: false,
+            defaultValue: 'reported',
+            field: 'confidence_level',
+        },
         diseaseCategory: {
             type: DataTypes.STRING(100),
             allowNull: false,

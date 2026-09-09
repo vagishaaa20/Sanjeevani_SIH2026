@@ -36,7 +36,7 @@ const AdminOutbreakPanel = () => {
         setAlerts(prev => {
             const exists = prev.find(a => a.id === payload.id);
             if (exists) {
-                return prev.map(a => a.id === payload.id ? { ...a, riskLevel: payload.riskLevel, caseCount: payload.caseCount } : a);
+                return prev.map(a => a.id === payload.id ? { ...a, riskLevel: payload.riskLevel, reportedCount: payload.reportedCount, confirmedCount: payload.confirmedCount } : a);
             }
             return [{ ...payload, isActive: true }, ...prev];
         });
@@ -94,7 +94,7 @@ const AdminOutbreakPanel = () => {
                             <tr className="border-b-2 border-ink-black/20 uppercase tracking-widest text-xs text-ink-muted">
                                 <th className="pb-3 px-4">Risk Level</th>
                                 <th className="pb-3 px-4">Disease Category</th>
-                                <th className="pb-3 px-4">Cases (72h)</th>
+                                <th className="pb-3 px-4">Cases (Rep / Conf)</th>
                                 <th className="pb-3 px-4">Region (Geohash)</th>
                                 <th className="pb-3 px-4">Detected</th>
                                 <th className="pb-3 px-4 text-right">Actions</th>
@@ -114,13 +114,13 @@ const AdminOutbreakPanel = () => {
                                             </span>
                                         </td>
                                         <td className="py-4 px-4 font-black">{alert.diseaseCategory}</td>
-                                        <td className="py-4 px-4">{alert.caseCount || alert.case_count}</td>
+                                        <td className="py-4 px-4 text-xs font-bold">{alert.reportedCount || alert.reported_count || 0} / {alert.confirmedCount || alert.confirmed_count || 0}</td>
                                         <td className="py-4 px-4"><code className="bg-ink-black/10 px-1 py-0.5 rounded">{alert.geohash}</code></td>
                                         <td className="py-4 px-4">{new Date(alert.createdAt || alert.created_at).toLocaleDateString()}</td>
                                         <td className="py-4 px-4 text-right">
                                             <div className="flex justify-end gap-2">
                                                 <button
-                                                    onClick={() => handleBroadcast(alert.id, alert.diseaseCategory, alert.caseCount)}
+                                                    onClick={() => handleBroadcast(alert.id, alert.diseaseCategory, alert.confirmedCount)}
                                                     className="px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 transition"
                                                 >
                                                     📢 Broadcast
