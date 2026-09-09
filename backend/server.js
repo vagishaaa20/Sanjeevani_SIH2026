@@ -27,6 +27,8 @@ async function startServer() {
       'http://localhost:5173',
       'http://127.0.0.1:5173',
     ];
+    // Global WebRTC timeout tracker
+    const disconnectTimers = new Map();
     const io = new Server(server, {
       cors: {
         origin: ALLOWED_ORIGINS,
@@ -67,7 +69,7 @@ async function startServer() {
       }
 
       // ── WebRTC Teleconsultation signaling ──────────────────────────────────
-      const disconnectTimers = new Map();
+
 
       socket.on('join-room', async ({ roomId, userId }) => {
         socket.join(roomId);
@@ -119,8 +121,12 @@ async function startServer() {
         socket.to(data.roomId).emit('webrtc:chat-message', data);
       });
 
-      socket.on('webrtc:quality-fallback', ({ roomId, senderId }) => {
-        socket.to(roomId).emit('webrtc:quality-fallback', { senderId });
+      socket.on('webrtc:quality-fallback', (data) => {
+        socket.to(data.roomId).emit('webrtc:quality-fallback', data);
+      });
+
+      socket.on('webrtc:media-mode', (data) => {
+        socket.to(data.roomId).emit('webrtc:media-mode', data);
       });
 
       socket.on('disconnect', () => {
@@ -133,13 +139,10 @@ async function startServer() {
             const { Consultation, Queue } = require('./src/models');
             try {
               const consultation = await Consultation.findOne({ where: { roomId } });
-              if (consultation && consultation.status === 'in_progress') {
+              if (consultation && ['in_progress', 'assigned'].includes(consultation.status)) {
                 consultation.status = 'disconnected';
                 consultation.webrtcStatus = 'disconnected';
                 await consultation.save();
-
-                // Sync with Queue status so banner shows something distinct if necessary?
-                // Or just let UI parse consultation.status
               }
             } catch (e) {
               console.error('Timeout disconnect error', e);
@@ -154,8 +157,9 @@ async function startServer() {
     // Start background services
     startOutbreakCronWorker(io);
 
-    // Make io accessible across routes/controllers via app if needed
+    // Make io and timers accessible across routes/controllers via app if needed
     app.set('io', io);
+    app.set('disconnectTimers', disconnectTimers);
 
     // 3. Listen on the HTTP server instance, NOT app.listen()
     const PORT = env.port || 5000;

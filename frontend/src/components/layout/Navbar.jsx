@@ -1,9 +1,11 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
+import { useLanguage } from '../../hooks/LanguageContext';
 
 export const Navbar = () => {
     const { user, logout } = useAuth();
+    const { currentLang, setCurrentLang } = useLanguage();
     const navigate = useNavigate();
 
     const handleLogout = async () => {
@@ -26,6 +28,19 @@ export const Navbar = () => {
             </div>
 
             <div className="flex items-center gap-6">
+                {/* Global Language Selector (Patient-only for now, but visible everywhere safely, restricts hook logic later) */}
+                {(!user || user?.role === 'patient') && (
+                    <select
+                        value={currentLang}
+                        onChange={(e) => setCurrentLang(e.target.value)}
+                        className="bg-cream-surface border-2 border-ink-black rounded-lg px-2 py-1 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-cerulean cursor-pointer"
+                    >
+                        <option value="en">🇺🇸 English</option>
+                        <option value="hi">🇮🇳 हिन्दी</option>
+                        <option value="bn">🇮🇳 বাংলা</option>
+                    </select>
+                )}
+
                 {user ? (
                     <div className="flex items-center gap-4">
                         <span className="text-sm font-semibold text-ink-charcoal">

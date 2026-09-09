@@ -48,6 +48,18 @@ export default function ActiveQueueBanner({ onStateChange }) {
         }
     };
 
+    const handleCancelRequest = async () => {
+        if (!activeQueue) return;
+        try {
+            await api.post(`/queues/${activeQueue.id}/cancel`);
+            setActiveQueue(null);
+            if (onStateChange) onStateChange(null);
+        } catch (err) {
+            console.error('Failed to cancel queue request', err);
+            alert('Failed to cancel request. Please try again.');
+        }
+    };
+
     if (!activeQueue) return null;
 
     // Hide if specifically completed/missed by consultation state regardless of what the old Queue model says
@@ -86,9 +98,17 @@ export default function ActiveQueueBanner({ onStateChange }) {
                 </div>
 
                 {activeQueue.status === 'WAITING' && (
-                    <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
-                        <span className="text-xs font-bold text-amber-800 uppercase tracking-widest">Polling</span>
+                    <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
+                            <span className="text-xs font-bold text-amber-800 uppercase tracking-widest">Polling</span>
+                        </div>
+                        <button
+                            onClick={handleCancelRequest}
+                            className="px-4 py-2 text-rose-700 bg-rose-100 rounded-lg border border-rose-300 font-bold uppercase tracking-wide hover:bg-rose-200 transition-colors text-xs"
+                        >
+                            Cancel Request
+                        </button>
                     </div>
                 )}
 

@@ -137,6 +137,55 @@ async function generateAiSummary(req, res) {
 }
 
 /**
+ * POST /api/consultations/:id/end
+ * Allows a patient to manually hang up/terminate their active consultation.
+ * This explicitly closes the queue entry so it no longer loops on the dashboard.
+ */
+async function endCallByPatient(req, res) {
+    try {
+        const { id } = req.params;
+        const consultation = await Consultation.findByPk(id);
+
+        if (!consultation || consultation.patientId !== req.user.id) {
+            return res.status(404).json({ error: 'Consultation not found or unauthorized' });
+        }
+
+        // Only mark it completed if it's currently active in some form
+        if (['assigned', 'in_progress', 'disconnected'].includes(consultation.status)) {
+            consultation.status = 'completed';
+            consultation.webrtcStatus = 'completed';
+            await consultation.save();
+
+            // Clear the queue tracking row
+            const { Queue } = require('../models');
+            const queue = await Queue.findOne({ where: { patientId: consultation.patientId, doctorId: consultation.doctorId, status: 'SERVING' } });
+            if (queue) {
+                queue.status = 'COMPLETED';
+                await queue.save();
+            }
+
+            // Prune dangling socket disconnect timers
+            const timers = req.app.get('disconnectTimers');
+            if (timers && timers.has(consultation.roomId)) {
+                clearTimeout(timers.get(consultation.roomId));
+                timers.delete(consultation.roomId);
+            }
+
+            // Immediately notify the remote doctor directly so they are cleanly kicked out
+            const io = req.app.get('io');
+            if (io) {
+                io.to(`user:${consultation.doctorId}`).emit('consultation:completed', { consultationId: id });
+            }
+        }
+
+        return res.json({ success: true, message: 'Consultation ended successfully' });
+    } catch (err) {
+        console.error('[endCallByPatient] error:', err);
+        return res.status(500).json({ error: 'Failed to end call' });
+    }
+}
+
+/**
  * GET /api/consultations/timeline
  * Returns chronological symptom timeline for the logged-in patient.
  * Each entry includes: date, reportedSymptoms, doctor name/specialization, aiSummary if available.
@@ -186,4 +235,4 @@ async function getTimeline(req, res) {
     }
 }
 
-module.exports = { getMyConsultations, rejoinCall, generateAiSummary, getTimeline };
+module.exports = { getMyConsultations, rejoinCall, generateAiSummary, getTimeline, endCallByPatient };

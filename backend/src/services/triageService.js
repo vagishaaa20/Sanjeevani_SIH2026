@@ -1,4 +1,5 @@
 const axios = require('axios');
+const bhashiniService = require('./bhashiniService');
 const { buildTriagePrompt } = require('../prompts/triagePrompt');
 const { PatientProfile, DiseaseReport } = require('../models');
 const { runDetectionCycle } = require('./outbreakDetectionService');
@@ -31,12 +32,18 @@ function mapDiseaseCategory(reasonText = '', symptoms = '') {
  * @returns {Promise<{ recommendation: string, reason: string }>}
  * @throws {Error} if Gemini is unreachable, response is malformed, or key is missing
  */
-async function runTriage({ symptoms, duration, severity, patientId }) {
+async function runTriage({ symptoms, duration, severity, patientId, targetLang = 'en' }) {
     if (!GEMINI_API_KEY) {
         throw new Error('GEMINI_API_KEY is not set in environment');
     }
 
-    const prompt = buildTriagePrompt({ symptoms, duration, severity });
+    // 1. Sanitize local symptoms to pure English via Bhashini wrapper (critical for disease tagging logic)
+    let englishSymptoms = symptoms;
+    if (targetLang !== 'en') {
+        englishSymptoms = await bhashiniService.translateText(symptoms, targetLang, 'en');
+    }
+
+    const prompt = buildTriagePrompt({ symptoms: englishSymptoms, duration, severity });
 
     const response = await axios.post(
         GEMINI_URL,
@@ -61,7 +68,7 @@ async function runTriage({ symptoms, duration, severity, patientId }) {
     if (patientId) {
         PatientProfile.findByPk(patientId).then(async (patient) => {
             if (patient && patient.latitude && patient.longitude) {
-                const diseaseCategory = mapDiseaseCategory(parsed.reason, symptoms);
+                const diseaseCategory = mapDiseaseCategory(parsed.reason, englishSymptoms);
                 const gh = ngeohash.encode(patient.latitude, patient.longitude, 5); // precision 5 = ~5km
 
                 let sScore = 1;
@@ -71,9 +78,7 @@ async function runTriage({ symptoms, duration, severity, patientId }) {
                 await DiseaseReport.create({
                     patientId,
                     diseaseCategory,
-                    symptomTags: [symptoms],
-                    latitude: patient.latitude,
-                    longitude: patient.longitude,
+                    symptomTags: [englishSymptoms],
                     geohash: gh,
                     source: 'triage',
                     severityScore: sScore
@@ -85,7 +90,14 @@ async function runTriage({ symptoms, duration, severity, patientId }) {
         }).catch(err => console.error('[diseaseReport] Error fetching patient:', err.message));
     }
 
-    return { recommendation: parsed.recommendation, reason: parsed.reason };
+    // Translate the reason block natively back into the user's localized targetLang!
+    let finalReason = parsed.reason;
+    if (targetLang !== 'en') {
+        finalReason = await bhashiniService.translateText(finalReason, 'en', targetLang);
+    }
+
+    // Keep recommendation in English for downstream ENUM layout routing
+    return { recommendation: parsed.recommendation, reason: finalReason };
 }
 
 module.exports = { runTriage };

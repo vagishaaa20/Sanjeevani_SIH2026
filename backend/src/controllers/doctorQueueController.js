@@ -144,6 +144,13 @@ exports.completeRequest = async (req, res) => {
             await queue.save();
         }
 
+        // Prune dangling socket disconnect timers securely
+        const timers = req.app.get('disconnectTimers');
+        if (timers && timers.has(consultation.roomId)) {
+            clearTimeout(timers.get(consultation.roomId));
+            timers.delete(consultation.roomId);
+        }
+
         // Emit Socket.io completion to patient to immediately hide their banner
         const io = req.app.get('io');
         if (io) {

@@ -13,4 +13,7 @@ router.post('/request', authenticate, requireRole('patient'), queueController.re
 // Patient views their own queue entries
 router.get('/my', authenticate, requireRole('patient'), queueController.myQueue);
 
+// Patient explicitly cancels their own WAITING queue request
+router.post('/:id/cancel', authenticate, requireRole('patient'), queueController.cancelQueue);
+
 module.exports = router;

@@ -3,6 +3,7 @@ const QUEUE_STATUS = Object.freeze({
     SERVING: 'SERVING',
     COMPLETED: 'COMPLETED',
     SKIPPED: 'SKIPPED',
+    CANCELLED: 'CANCELLED',
 });
 
 module.exports = {

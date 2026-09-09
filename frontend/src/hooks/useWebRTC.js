@@ -18,6 +18,7 @@ export default function useWebRTC(roomId, user, onCallError) {
     const [remoteUsers, setRemoteUsers] = useState(0);
     const [quality, setQuality] = useState('good');
     const [chat, setChat] = useState([]);
+    const [mediaMode, setMediaMode] = useState('video');
 
     const [localStream, setLocalStream] = useState(null);
     const [remoteStream, setRemoteStream] = useState(null);
@@ -31,6 +32,9 @@ export default function useWebRTC(roomId, user, onCallError) {
     const userRef = useRef(user);
     const onCallErrorRef = useRef(onCallError);
     const lastFallbackEmit = useRef(0);
+    const consecutivePoorRef = useRef(0);
+    const mediaModeRef = useRef('video');
+    const hasEndedRef = useRef(false);
 
     useEffect(() => {
         userRef.current = user;
@@ -92,7 +96,7 @@ export default function useWebRTC(roomId, user, onCallError) {
                     }
                 };
 
-                // Track Quality Loop
+                // Track Quality Loop (~every 4s)
                 const checkConnectionQuality = async () => {
                     if (!peerConnection.current) return;
                     try {
@@ -103,19 +107,26 @@ export default function useWebRTC(roomId, user, onCallError) {
                             if (report.type === 'inbound-rtp' && report.kind === 'video') {
                                 const total = report.packetsLost + report.packetsReceived;
                                 const packetLoss = total ? report.packetsLost / total : 0;
-                                if (packetLoss > 0.05) hasPoorQuality = true;
+                                if (packetLoss > 0.08) hasPoorQuality = true; // >8% is poor
+                            }
+                            if (report.type === 'candidate-pair' && report.state === 'succeeded') {
+                                if (report.currentRoundTripTime > 0.400) hasPoorQuality = true; // >400ms RTT is poor
                             }
                         });
 
                         if (hasPoorQuality) {
-                            setQuality('poor');
-                            const now = Date.now();
-                            // Throttle fallback emits to once every 10 seconds
-                            if (now - lastFallbackEmit.current > 10000) {
-                                socket.emit('webrtc:quality-fallback', { roomId, senderId: userRef.current.id });
-                                lastFallbackEmit.current = now;
+                            consecutivePoorRef.current += 1;
+                            // Require 3 consecutive poor readings to avoid flapping
+                            if (consecutivePoorRef.current >= 3) {
+                                setQuality('poor');
+                                const now = Date.now();
+                                if (now - lastFallbackEmit.current > 10000) {
+                                    socket.emit('webrtc:quality-fallback', { roomId, senderId: userRef.current.id });
+                                    lastFallbackEmit.current = now;
+                                }
                             }
                         } else {
+                            consecutivePoorRef.current = 0;
                             setQuality('good');
                         }
                     } catch (e) {
@@ -123,7 +134,7 @@ export default function useWebRTC(roomId, user, onCallError) {
                     }
                 };
 
-                const intervalId = setInterval(checkConnectionQuality, 3000);
+                const intervalId = setInterval(checkConnectionQuality, 4000);
 
                 // Expose interval to cleanup
                 peerConnection.current.qualityInterval = intervalId;
@@ -181,25 +192,71 @@ export default function useWebRTC(roomId, user, onCallError) {
             }
         };
 
+        const handleMediaMode = async ({ mode, initiatedBy }) => {
+            if (initiatedBy === userRef.current.id) return; // avoid acting on own broadcast
+
+            if (mode === 'audio-only') {
+                setMediaMode('audio-only');
+                mediaModeRef.current = 'audio-only';
+                // Drop local video to mirror the mode
+                if (localStreamRef.current) {
+                    const videoTrack = localStreamRef.current.getVideoTracks()[0];
+                    if (videoTrack) {
+                        videoTrack.stop();
+                        localStreamRef.current.removeTrack(videoTrack);
+                        const sender = peerConnection.current?.getSenders().find(s => s.track?.kind === 'video');
+                        if (sender && peerConnection.current) {
+                            peerConnection.current.removeTrack(sender);
+                        }
+                    }
+                }
+            } else if (mode === 'video') {
+                setMediaMode('video');
+                mediaModeRef.current = 'video';
+                // Wait for peer to renegotiate the video track they re-added.
+            }
+        };
+
         const handleError = ({ message }) => {
+            if (hasEndedRef.current) return;
             if (onCallErrorRef.current) onCallErrorRef.current({ message });
         };
 
+        const handleUserLeft = () => {
+            if (hasEndedRef.current) return;
+            hasEndedRef.current = true;
+            if (onCallErrorRef.current) onCallErrorRef.current({ message: 'The other party dropped the connection.', isRemoteDrop: true });
+        };
+
+        const handleConsultationCompleted = () => {
+            if (hasEndedRef.current) return;
+            hasEndedRef.current = true; // Block subsequent user-left echoes when the remote tab closes
+            // The remote side explicitly used their End Call button
+            if (onCallErrorRef.current) onCallErrorRef.current({ message: 'The other party explicitly ended the call.', isRemoteCompletion: true });
+        };
+
         socket.on('user-joined', handleUserJoined);
+        socket.on('user-left', handleUserLeft);
         socket.on('webrtc:offer', handleOffer);
         socket.on('webrtc:answer', handleAnswer);
         socket.on('webrtc:ice-candidate', handleIceCandidate);
         socket.on('webrtc:chat-message', handleChatMessage);
         socket.on('webrtc:quality-fallback', handleQualityFallback);
+        socket.on('webrtc:media-mode', handleMediaMode);
+        socket.on('consultation:completed', handleConsultationCompleted);
         socket.on('webrtc:error', handleError);
 
         return () => {
             initDone.current = false;
             socket.off('user-joined');
+            socket.off('user-left');
             socket.off('webrtc:offer');
             socket.off('webrtc:answer');
             socket.off('webrtc:ice-candidate');
             socket.off('webrtc:chat-message');
+            socket.off('webrtc:quality-fallback');
+            socket.off('webrtc:media-mode');
+            socket.off('consultation:completed');
             socket.off('webrtc:error');
             socket.emit('leave-room', { roomId, userId: userRef.current.id });
 
@@ -237,12 +294,70 @@ export default function useWebRTC(roomId, user, onCallError) {
         setChat(prev => [...prev, msgInfo]);
     };
 
+    const switchToAudioMode = async () => {
+        if (!peerConnection.current || !localStreamRef.current) return;
+        setMediaMode('audio-only');
+        mediaModeRef.current = 'audio-only';
+
+        const videoTrack = localStreamRef.current.getVideoTracks()[0];
+        if (videoTrack) {
+            videoTrack.stop();
+            localStreamRef.current.removeTrack(videoTrack);
+
+            const sender = peerConnection.current.getSenders().find(s => s.track?.kind === 'video');
+            if (sender) {
+                peerConnection.current.removeTrack(sender);
+            }
+        }
+
+        // Renegotiate
+        const offer = await peerConnection.current.createOffer();
+        await peerConnection.current.setLocalDescription(offer);
+        socket.emit('webrtc:offer', { roomId, offer, senderId: userRef.current.id });
+
+        socket.emit('webrtc:media-mode', { roomId, mode: 'audio-only', initiatedBy: userRef.current.id });
+    };
+
+    const switchToVideoMode = async () => {
+        if (!peerConnection.current) return;
+        try {
+            const tempStream = await navigator.mediaDevices.getUserMedia({
+                video: { width: { ideal: 640 }, height: { ideal: 480 }, frameRate: { ideal: 20, max: 24 } }
+            });
+            const videoTrack = tempStream.getVideoTracks()[0];
+
+            if (localStreamRef.current && videoTrack) {
+                localStreamRef.current.addTrack(videoTrack);
+                peerConnection.current.addTrack(videoTrack, localStreamRef.current);
+                // Trigger re-render to bind new track to UI
+                setLocalStream(new MediaStream(localStreamRef.current.getTracks()));
+
+                setMediaMode('video');
+                mediaModeRef.current = 'video';
+
+                // Renegotiate
+                const offer = await peerConnection.current.createOffer();
+                await peerConnection.current.setLocalDescription(offer);
+                socket.emit('webrtc:offer', { roomId, offer, senderId: userRef.current.id });
+
+                socket.emit('webrtc:media-mode', { roomId, mode: 'video', initiatedBy: userRef.current.id });
+            }
+        } catch (err) {
+            console.error('Failed to switch back to video mode', err);
+            // Handle without breaking the call
+            if (onCallErrorRef.current) onCallErrorRef.current({ message: 'Could not access camera to restore video.' });
+        }
+    };
+
     return {
         remoteUsers,
         quality,
         chat,
         localStream,
         remoteStream,
+        mediaMode,
         sendMessage,
+        switchToAudioMode,
+        switchToVideoMode
     };
 }

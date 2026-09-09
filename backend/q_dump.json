@@ -1,0 +1,47 @@
+{
+  "queues": [
+    {
+      "id": "2e6bec5f-c312-4cc2-abb8-7a265276cb1f",
+      "clinicId": "2a7a13d9-5630-4eda-8bb5-f788d72fb230",
+      "doctorId": "62b58e97-b396-4235-a8ce-5e3781fdfee6",
+      "patientId": "10d8da17-9367-431a-aa00-f55413998924",
+      "tokenNumber": 1,
+      "status": "WAITING",
+      "createdAt": "2026-09-02T15:34:17.773Z",
+      "updatedAt": "2026-09-02T15:34:17.773Z"
+    },
+    {
+      "id": "3237fac0-f483-492a-a78b-fe713bdb77eb",
+      "clinicId": "2a7a13d9-5630-4eda-8bb5-f788d72fb230",
+      "doctorId": "33db22e1-e20d-43aa-b48b-f01e14519dca",
+      "patientId": "10d8da17-9367-431a-aa00-f55413998924",
+      "tokenNumber": 1,
+      "status": "SERVING",
+      "createdAt": "2026-09-02T15:24:00.828Z",
+      "updatedAt": "2026-09-02T16:37:49.707Z"
+    }
+  ],
+  "consultations": [
+    {
+      "id": "6df184ea-2e3a-4f3f-945b-d89ce47bd07d",
+      "roomId": "30284b9b-31f0-4551-aa17-d4c502d9205b",
+      "webrtcStatus": "waiting",
+      "notes": null,
+      "patientId": "10d8da17-9367-431a-aa00-f55413998924",
+      "doctorId": "33db22e1-e20d-43aa-b48b-f01e14519dca",
+      "clinicId": "2a7a13d9-5630-4eda-8bb5-f788d72fb230",
+      "status": "assigned",
+      "scheduledAt": null,
+      "prescriptionUrl": null,
+      "subsidyApplied": false,
+      "subsidyAmount": null,
+      "fullFee": null,
+      "aiSummary": null,
+      "aiSummaryGeneratedAt": null,
+      "reportedSymptoms": null,
+      "prescriptionText": null,
+      "createdAt": "2026-09-02T16:37:49.456Z",
+      "updatedAt": "2026-09-02T16:37:49.456Z"
+    }
+  ]
+}
