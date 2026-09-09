@@ -34,6 +34,8 @@ export const Login = () => {
             navigate('/doctor/dashboard');
         } else if (role === 'patient') {
             navigate('/patient/dashboard');
+        } else if (role === 'health_worker') {
+            navigate('/health-worker/dashboard');
         } else {
             navigate('/');
         }
@@ -112,6 +114,7 @@ export const Login = () => {
     const isPatientTab = activeTab === 'patient';
     const isStaffTab = activeTab === 'staff';
     const isAdminTab = activeTab === 'admin';
+    const isHealthWorkerTab = activeTab === 'health_worker';
     const isDev = import.meta.env.DEV;
 
     return (
@@ -123,10 +126,11 @@ export const Login = () => {
                 </div>
 
                 {/* Tabs */}
-                <div className="grid grid-cols-3 p-1 bg-cream-surface border border-ink-black rounded-xl gap-1">
+                <div className="grid grid-cols-2 sm:grid-cols-4 p-1 bg-cream-surface border border-ink-black rounded-xl gap-1">
                     {[
                         { key: 'patient', label: 'Patient Care' },
                         { key: 'staff', label: 'Staff / Dr.' },
+                        { key: 'health_worker', label: 'Health Worker' },
                         { key: 'admin', label: 'Admin HQ' },
                     ].map(({ key, label }) => (
                         <button
@@ -213,6 +217,32 @@ export const Login = () => {
                         />
                         <Button type="submit" variant="primary" className="mt-2 w-full" disabled={loading}>
                             {loading ? 'Signing In…' : 'Sign In'}
+                        </Button>
+                    </form>
+                )}
+
+                {/* ─── Health Worker ─── */}
+                {isHealthWorkerTab && (
+                    <form className="flex flex-col gap-4" onSubmit={handleCredentialsSubmit}>
+                        <Input
+                            label="Health Worker Email"
+                            id="health-worker-email"
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                            placeholder="worker@sanjeevani.gov.in"
+                        />
+                        <Input
+                            label="Password"
+                            id="health-worker-password"
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                        />
+                        <Button type="submit" variant="primary" className="mt-2 w-full" disabled={loading}>
+                            {loading ? 'Signing In…' : 'Sign In as Health Worker'}
                         </Button>
                     </form>
                 )}

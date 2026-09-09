@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
 import DoctorOutbreakWidget from '../../components/doctor/DoctorOutbreakWidget';
 import DoctorQueueList from '../../components/doctor/DoctorQueueList';
+import DoctorReferralForm from './DoctorReferralForm';
 
 const STATUS_MESSAGES = {
     PENDING_VERIFICATION: {
@@ -200,6 +201,8 @@ const DoctorDashboard = () => {
                     <DoctorOutbreakWidget />
                 </div>
             </div>
+
+            <DoctorReferralForm />
         </div>
     );
 };

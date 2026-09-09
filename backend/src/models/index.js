@@ -20,15 +20,23 @@ const OutbreakAlert = require('./outbreakAlertModel');
 const ConsultationDocument = require('./consultationDocumentModel');
 const QueueSkipped = require('./queueSkippedModel');
 const MedicineInventory = require('./medicineInventoryModel');
+const HealthWorkerProfile = require('./healthWorkerProfileModel');
+const HealthWorkerAssignment = require('./healthWorkerAssignmentModel');
+const HealthWorkerFollowup = require('./healthWorkerFollowupModel');
+const HealthWorkerReferral = require('./healthWorkerReferralModel');
+
 
 // ── User → profile associations (1:1, cascade delete) ────────────────────────
 User.hasOne(PatientProfile, { foreignKey: 'userId', as: 'patientProfile', onDelete: 'CASCADE' });
 User.hasOne(DoctorProfile, { foreignKey: 'userId', as: 'doctorProfile', onDelete: 'CASCADE' });
 User.hasOne(ClinicProfile, { foreignKey: 'userId', as: 'clinicProfile', onDelete: 'CASCADE' });
+User.hasOne(HealthWorkerProfile, { foreignKey: 'userId', as: 'healthWorkerProfile', onDelete: 'CASCADE' });
 
 PatientProfile.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 DoctorProfile.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 ClinicProfile.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+HealthWorkerProfile.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+
 
 // ── User → documents (1:many, cascade delete) ────────────────────────────────
 User.hasMany(ProfessionalDocument, { foreignKey: 'ownerId', as: 'documents', onDelete: 'CASCADE' });
@@ -88,6 +96,16 @@ PatientProfile.hasMany(Queue, { foreignKey: 'patientId', as: 'queues' });
 Queue.belongsTo(DoctorProfile, { foreignKey: 'doctorId', as: 'doctor' });
 DoctorProfile.hasMany(Queue, { foreignKey: 'doctorId', as: 'queues' });
 
+// ── Health Worker associations ───────────────────────────────────────────
+HealthWorkerAssignment.belongsTo(User, { foreignKey: 'patientId', as: 'patient' });
+HealthWorkerAssignment.belongsTo(User, { foreignKey: 'healthWorkerId', as: 'healthWorker' });
+HealthWorkerFollowup.belongsTo(User, { foreignKey: 'patientId', as: 'patient' });
+HealthWorkerFollowup.belongsTo(User, { foreignKey: 'healthWorkerId', as: 'healthWorker' });
+HealthWorkerReferral.belongsTo(User, { foreignKey: 'patientId', as: 'patient' });
+HealthWorkerReferral.belongsTo(User, { foreignKey: 'doctorId', as: 'doctor' });
+HealthWorkerReferral.belongsTo(User, { foreignKey: 'fromClinicId', as: 'fromClinic' });
+HealthWorkerReferral.belongsTo(User, { foreignKey: 'toClinicId', as: 'toClinic' });
+
 module.exports = {
   User,
   AdminProfile,
@@ -111,4 +129,8 @@ module.exports = {
   ConsultationDocument,
   QueueSkipped,
   MedicineInventory,
+  HealthWorkerProfile,
+  HealthWorkerAssignment,
+  HealthWorkerFollowup,
+  HealthWorkerReferral
 };

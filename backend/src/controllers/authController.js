@@ -1,6 +1,6 @@
 const sequelize = require('../config/db');
 const fs = require('fs');
-const { User, PatientProfile, DoctorProfile, ClinicProfile, ReviewerProfile, ProfessionalDocument } = require('../models');
+const { User, PatientProfile, DoctorProfile, ClinicProfile, ReviewerProfile, ProfessionalDocument, HealthWorkerProfile } = require('../models');
 const { hashPassword, comparePassword } = require('../utils/hash');
 const { generateAccessToken, generateRefreshToken, verifyRefreshToken } = require('../utils/jwt');
 const { generateOtp, getOtpExpiry, isOtpValid } = require('../utils/otp');
@@ -56,6 +56,8 @@ async function registerPatient(req, res) {
   if (!fullName || !dateOfBirth || !sex)
     return res.status(400).json({ error: 'fullName, dateOfBirth, and sex are required' });
 
+
+
   const t = await sequelize.transaction();
   try {
     // Placeholder hash — patient accounts are not password-protected; login uses OTP.
@@ -74,6 +76,7 @@ async function registerPatient(req, res) {
         sex,
         preferredLanguage: preferredLanguage || null,
         region: region || null,
+
         abhaNumber: abhaNumber || null,
         accountStatus: PATIENT_STATUS.REGISTERED,
       },
@@ -357,6 +360,57 @@ async function registerClinic(req, res) {
   }
 }
 
+// ── Health Worker registration ──────────────────────────────────────────────
+
+/**
+ * POST /api/auth/register/health-worker
+ * Body: { name*, email*, password*, phone, area, district, village, workerType }
+ */
+async function registerHealthWorker(req, res) {
+  const { name, email, password, phone, area, district, village, workerType } = req.body;
+
+  if (!name || !email || !password) return res.status(400).json({ error: 'Name, email, and password are required' });
+  if (password.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters' });
+
+  const allowedWorkerTypes = ['ASHA', 'ANM', 'COMMUNITY_WORKER', 'OTHER'];
+  if (workerType && !allowedWorkerTypes.includes(workerType)) return res.status(400).json({ error: 'Invalid worker type' });
+
+
+
+  const t = await sequelize.transaction();
+  try {
+    const user = await User.create({
+      email,
+      phone: phone || null,
+      passwordHash: await hashPassword(password),
+      role: ROLES.HEALTH_WORKER,
+      isVerified: false,
+    }, { transaction: t });
+
+    await HealthWorkerProfile.create({
+      userId: user.id,
+      name: String(name).trim(),
+      area: area ? String(area).trim() : null,
+      district: district ? String(district).trim() : null,
+      village: village ? String(village).trim() : null,
+
+      workerType: workerType || 'COMMUNITY_WORKER',
+      isVerified: false,
+    }, { transaction: t });
+
+    await t.commit();
+    return res.status(201).json({
+      message: 'Health Worker registration submitted for verification.',
+      user: safeUser(user),
+    });
+  } catch (err) {
+    await t.rollback();
+    if (err.name === 'SequelizeUniqueConstraintError') return res.status(409).json({ error: 'A user with this email or phone already exists' });
+    console.error('[registerHealthWorker] error:', err.message);
+    return res.status(500).json({ error: 'Health Worker registration failed' });
+  }
+}
+
 
 // ── Login (all roles) ─────────────────────────────────────────────────────────
 
@@ -374,6 +428,8 @@ async function login(req, res) {
   const user = await User.findOne({ where: email ? { email } : { phone } });
   if (!user || !(await comparePassword(password || '', user.passwordHash)))
     return res.status(401).json({ error: 'Invalid credentials' });
+  if (user.role === ROLES.HEALTH_WORKER && !user.isVerified)
+    return res.status(403).json({ error: 'Health Worker account is pending administrator verification' });
 
   return res.json({ user: safeUser(user), ...tokensFor(user) });
 }
@@ -466,6 +522,7 @@ module.exports = {
   registerDoctor,
   registerHitl,
   registerClinic,
+  registerHealthWorker,
   login,
   sendOtp,
   verifyOtp,

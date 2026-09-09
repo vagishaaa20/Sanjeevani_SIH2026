@@ -12,6 +12,7 @@ import ClinicProfile from './pages/clinic/ClinicProfile';
 import DepartmentManager from './pages/clinic/DepartmentManager';
 import ClinicApprovalList from './pages/admin/ClinicApprovalList';
 import DoctorApprovalList from './pages/admin/DoctorApprovalList';
+import HealthWorkerApprovalList from './pages/admin/HealthWorkerApprovalList';
 import DoctorDashboard from './pages/doctor/DoctorDashboard';
 import DocumentUpload from './pages/doctor/DocumentUpload';
 import PatientDashboard from './pages/patient/PatientDashboard';
@@ -25,6 +26,12 @@ import PatientRequests from './pages/patient/PatientRequests';
 import TeleconsultationRoom from './pages/shared/TeleconsultationRoom';
 import AdminOutbreakPanel from './pages/admin/AdminOutbreakPanel';
 import MedicineInventory from './pages/clinic/MedicineInventory';
+import HealthWorkerDashboard from './pages/health-worker/HealthWorkerDashboard';
+import AssignedPatients from './pages/health-worker/AssignedPatients';
+import HealthWorkerPatientDetails from './pages/health-worker/HealthWorkerPatientDetails';
+import HealthWorkerReferrals from './pages/health-worker/HealthWorkerReferrals';
+import HealthWorkerFollowups from './pages/health-worker/HealthWorkerFollowups';
+import HealthWorkerProfile from './pages/health-worker/HealthWorkerProfile';
 
 // Main layout wrapper that includes sidebar and navbar for authenticated users
 const AppLayout = ({ children }) => {
@@ -89,6 +96,17 @@ export const App = () => {
                                 />
 
                                 <Route
+                                    path="/admin/health-workers"
+                                    element={
+                                        <ProtectedRoute allowedRoles={['admin']}>
+                                            <AppLayout>
+                                                <HealthWorkerApprovalList />
+                                            </AppLayout>
+                                        </ProtectedRoute>
+                                    }
+                                />
+
+                                <Route
                                     path="/admin/outbreaks"
                                     element={
                                         <ProtectedRoute allowedRoles={['admin']}>
@@ -131,6 +149,8 @@ export const App = () => {
                                     }
                                 />
 
+
+
                                 <Route
                                     path="/doctor/dashboard"
                                     element={
@@ -141,6 +161,13 @@ export const App = () => {
                                         </ProtectedRoute>
                                     }
                                 />
+
+                                <Route path="/health-worker/dashboard" element={<ProtectedRoute allowedRoles={['health_worker']}><AppLayout><HealthWorkerDashboard /></AppLayout></ProtectedRoute>} />
+                                <Route path="/health-worker/patients" element={<ProtectedRoute allowedRoles={['health_worker']}><AppLayout><AssignedPatients /></AppLayout></ProtectedRoute>} />
+                                <Route path="/health-worker/patients/:patientId" element={<ProtectedRoute allowedRoles={['health_worker']}><AppLayout><HealthWorkerPatientDetails /></AppLayout></ProtectedRoute>} />
+                                <Route path="/health-worker/referrals" element={<ProtectedRoute allowedRoles={['health_worker']}><AppLayout><HealthWorkerReferrals /></AppLayout></ProtectedRoute>} />
+                                <Route path="/health-worker/followups" element={<ProtectedRoute allowedRoles={['health_worker']}><AppLayout><HealthWorkerFollowups /></AppLayout></ProtectedRoute>} />
+                                <Route path="/health-worker/profile" element={<ProtectedRoute allowedRoles={['health_worker']}><AppLayout><HealthWorkerProfile /></AppLayout></ProtectedRoute>} />
 
                                 <Route
                                     path="/doctor/documents"

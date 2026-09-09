@@ -132,6 +132,11 @@ export const AuthProvider = ({ children }) => {
         return response.data;
     };
 
+    const registerHealthWorker = async (data) => {
+        const response = await api.post('/auth/register/health-worker', data);
+        return response.data;
+    };
+
     const updateProfile = async (role, data) => {
         // role: 'patient' | 'doctor' | 'clinic' | 'reviewer'
         const endpoint = `/profile/${role}`;
@@ -170,6 +175,7 @@ export const AuthProvider = ({ children }) => {
                 verifyPatientOtp,
                 registerDoctor,
                 registerClinic,
+                registerHealthWorker,
                 updateProfile,
                 logout,
                 refreshProfile: fetchCurrentUser,

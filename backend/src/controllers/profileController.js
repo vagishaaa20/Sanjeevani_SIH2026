@@ -1,4 +1,4 @@
-const { User, PatientProfile, DoctorProfile, ReviewerProfile, AdminProfile, ClinicProfile } = require('../models');
+const { User, PatientProfile, DoctorProfile, ReviewerProfile, AdminProfile, ClinicProfile, HealthWorkerProfile } = require('../models');
 const { ROLES, PATIENT_STATUS } = require('../config/roles');
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -20,6 +20,8 @@ async function fetchProfile(user) {
         return await AdminProfile.findOne({ where: { userId: user.id } });
       case ROLES.CLINIC_ADMIN:
         return await ClinicProfile.findOne({ where: { userId: user.id } });
+      case ROLES.HEALTH_WORKER:
+        return await HealthWorkerProfile.findOne({ where: { userId: user.id } });
       default:
         return null;
     }

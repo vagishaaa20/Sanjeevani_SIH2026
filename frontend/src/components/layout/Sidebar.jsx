@@ -11,6 +11,7 @@ export const Sidebar = () => {
         admin: [
             { path: '/admin/clinics', label: '🏥 Clinic Approvals' },
             { path: '/admin/doctors', label: '🩺 Doctor Approvals' },
+            { path: '/admin/health-workers', label: '🧑‍⚕️ Health Worker Approvals' },
         ],
         clinic_admin: [
             { path: '/clinic/profile', label: 'Clinic Setup' },
@@ -24,6 +25,13 @@ export const Sidebar = () => {
         patient: [
             { path: '/patient/dashboard', label: 'My Patient Care' },
             { path: '/patient/medicine-availability', label: 'Find Medicine' },
+        ],
+        health_worker: [
+            { path: '/health-worker/dashboard', label: 'Dashboard' },
+            { path: '/health-worker/profile', label: 'My Profile' },
+            { path: '/health-worker/patients', label: 'My Patients' },
+            { path: '/health-worker/referrals', label: 'Referrals' },
+            { path: '/health-worker/followups', label: 'Follow-ups' },
         ],
     };
 
