@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { Heart, Lock, Mail, Phone, Sparkles } from 'lucide-react';
 import useAuth from '../../hooks/useAuth';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
@@ -13,12 +14,10 @@ export const Login = () => {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
-    // Active tab: 'patient', 'staff', 'admin'
     const [activeTab, setActiveTab] = useState('patient');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    // States for OTP flow (Patient)
     const [phone, setPhone] = useState('');
     const [otpSent, setOtpSent] = useState(false);
     const [otp, setOtp] = useState('');
@@ -55,7 +54,6 @@ export const Login = () => {
         }
     };
 
-    // Quick login uses hardcoded dev credentials - login() manages its own loading state
     const handleQuickAdminLogin = async () => {
         setError('');
         setLoading(true);
@@ -119,29 +117,40 @@ export const Login = () => {
     const isDev = import.meta.env.DEV;
 
     return (
-        <div className="w-full flex-grow flex items-center justify-center p-6 bg-cream-bg">
-            <div className="w-full max-w-xl p-8 bg-white border-2 border-ink-black rounded-3xl shadow-md flex flex-col gap-6">
-                <div className="text-center flex flex-col gap-1">
-                    <h2 className="text-3xl font-black tracking-tight text-ink-black">Welcome Back</h2>
-                    <p className="text-sm font-semibold text-ink-charcoal">Access your Sanjeevani health desk</p>
+        <div className="w-full max-w-md mx-auto py-8 px-4 flex flex-col items-center animate-fade-in-up">
+            {/* Header Brand */}
+            <div className="flex flex-col items-center gap-2 mb-6 text-center">
+                <div className="w-12 h-12 rounded-full bg-[#ffe6ee] border border-[#f8c8d8] flex items-center justify-center text-[#e13b68] shadow-xs">
+                    <Heart className="w-6 h-6 fill-[#e13b68]" />
                 </div>
+                <h1 className="text-3xl font-black text-[#2d2329] tracking-tight font-heading">
+                    Sanjeevani
+                </h1>
+                <p className="text-xs font-semibold text-[#7d6974]">
+                    AI-Assisted Telemedicine & Care Infrastructure
+                </p>
+            </div>
 
-                {/* Tabs */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 p-1 bg-cream-surface border border-ink-black rounded-xl gap-1">
+            {/* Login Card Container */}
+            <div className="w-full bg-white border border-[#f5e4ec] rounded-3xl p-6 md:p-8 shadow-sm flex flex-col gap-6 text-left">
+                {/* Role Tabs */}
+                <div className="grid grid-cols-3 sm:grid-cols-5 gap-1.5 p-1.5 bg-[#fdf0f4] border border-[#f5e4ec] rounded-2xl">
                     {[
-                        { key: 'patient', label: 'Patient Care' },
-                        { key: 'staff', label: 'Staff / Dr.' },
+                        { key: 'patient', label: 'Patient' },
+                        { key: 'staff', label: 'Doctor' },
                         { key: 'health_worker', label: 'Health Worker' },
-                        { key: 'clinic', label: 'Registered Clinics' },
-                        { key: 'admin', label: 'Admin HQ' },
+                        { key: 'clinic', label: 'Clinic' },
+                        { key: 'admin', label: 'Admin' },
                     ].map(({ key, label }) => (
                         <button
                             key={key}
+                            type="button"
                             onClick={() => switchTab(key)}
-                            className={`py-2 text-xs font-bold rounded-lg cursor-pointer transition-all ${activeTab === key
-                                ? 'bg-white border border-ink-black text-ink-black shadow-sm'
-                                : 'text-ink-muted hover:text-ink-charcoal'
-                                }`}
+                            className={`py-2 text-[11px] font-bold rounded-xl cursor-pointer transition-all ${
+                                activeTab === key
+                                    ? 'bg-white text-[#e13b68] shadow-xs font-black'
+                                    : 'text-[#7d6974] hover:text-[#2d2329]'
+                            }`}
                         >
                             {label}
                         </button>
@@ -149,12 +158,12 @@ export const Login = () => {
                 </div>
 
                 {error && (
-                    <div className="p-3 bg-red-100 border border-red-300 text-red-800 text-sm font-semibold rounded-xl">
+                    <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold rounded-2xl">
                         {error}
                     </div>
                 )}
 
-                {/* ─── Patient OTP ─── */}
+                {/* Patient OTP */}
                 {isPatientTab && (
                     !otpSent ? (
                         <form className="flex flex-col gap-4" onSubmit={handleSendOtp}>
@@ -162,10 +171,11 @@ export const Login = () => {
                                 label="Registered Mobile Number"
                                 id="phone"
                                 type="tel"
+                                icon={Phone}
                                 value={phone}
                                 onChange={(e) => setPhone(e.target.value)}
                                 required
-                                placeholder="e.g. 9876543210"
+                                placeholder="e.g. 8888888888"
                             />
                             <Button type="submit" variant="primary" className="mt-2 w-full" disabled={loading}>
                                 {loading ? 'Sending…' : 'Send OTP'}
@@ -174,7 +184,7 @@ export const Login = () => {
                     ) : (
                         <form className="flex flex-col gap-4" onSubmit={handleVerifyOtp}>
                             {devOtpMsg && (
-                                <div className="p-2.5 bg-blue-50 border border-blue-200 text-blue-800 text-xs font-semibold rounded-lg">
+                                <div className="p-2.5 bg-sky-50 border border-sky-200 text-sky-800 text-xs font-bold rounded-xl">
                                     {devOtpMsg}
                                 </div>
                             )}
@@ -182,6 +192,7 @@ export const Login = () => {
                                 label="One-Time Password"
                                 id="otp"
                                 type="text"
+                                icon={Lock}
                                 value={otp}
                                 onChange={(e) => setOtp(e.target.value)}
                                 required
@@ -190,29 +201,31 @@ export const Login = () => {
                             <Button type="submit" variant="primary" className="mt-2 w-full" disabled={loading}>
                                 {loading ? 'Verifying…' : 'Verify & Login'}
                             </Button>
-                            <button type="button" className="text-xs font-bold text-ink-muted hover:text-ink-black text-center cursor-pointer" onClick={() => setOtpSent(false)}>
+                            <button type="button" className="text-xs font-bold text-[#7d6974] hover:text-[#e13b68] text-center cursor-pointer" onClick={() => setOtpSent(false)}>
                                 ← Back to Mobile input
                             </button>
                         </form>
                     )
                 )}
 
-                {/* ─── Staff / Doctor ─── */}
+                {/* Doctor Staff */}
                 {isStaffTab && (
                     <form className="flex flex-col gap-4" onSubmit={handleCredentialsSubmit}>
                         <Input
-                            label="Email Address"
+                            label="Doctor Email Address"
                             id="email"
                             type="email"
+                            icon={Mail}
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
-                            placeholder="doctor@sanjeevani.in"
+                            placeholder="testdoctor@gmail.com"
                         />
                         <Input
                             label="Password"
                             id="password"
                             type="password"
+                            icon={Lock}
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
@@ -223,13 +236,14 @@ export const Login = () => {
                     </form>
                 )}
 
-                {/* ─── Clinic Admins ─── */}
+                {/* Clinic Admin */}
                 {isClinicTab && (
                     <form className="flex flex-col gap-4" onSubmit={handleCredentialsSubmit}>
                         <Input
                             label="Clinic Manager Email"
                             id="email"
                             type="email"
+                            icon={Mail}
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
@@ -239,6 +253,7 @@ export const Login = () => {
                             label="Password"
                             id="password"
                             type="password"
+                            icon={Lock}
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
@@ -249,13 +264,14 @@ export const Login = () => {
                     </form>
                 )}
 
-                {/* ─── Health Worker ─── */}
+                {/* Health Worker */}
                 {isHealthWorkerTab && (
                     <form className="flex flex-col gap-4" onSubmit={handleCredentialsSubmit}>
                         <Input
                             label="Health Worker Email"
                             id="health-worker-email"
                             type="email"
+                            icon={Mail}
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
@@ -265,6 +281,7 @@ export const Login = () => {
                             label="Password"
                             id="health-worker-password"
                             type="password"
+                            icon={Lock}
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
@@ -275,7 +292,7 @@ export const Login = () => {
                     </form>
                 )}
 
-                {/* ─── Administrator ─── */}
+                {/* Administrator */}
                 {isAdminTab && (
                     <div className="flex flex-col gap-4">
                         <form className="flex flex-col gap-4" onSubmit={handleCredentialsSubmit}>
@@ -283,6 +300,7 @@ export const Login = () => {
                                 label="Admin Email"
                                 id="email"
                                 type="email"
+                                icon={Mail}
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
@@ -292,6 +310,7 @@ export const Login = () => {
                                 label="Password"
                                 id="password"
                                 type="password"
+                                icon={Lock}
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
@@ -301,13 +320,14 @@ export const Login = () => {
                             </Button>
                         </form>
 
-                        {/* Dev-only quick login */}
+                        {/* Dev Sandbox Quick Login */}
                         {isDev && (
-                            <div className="p-4 border border-dashed border-amber-300 bg-amber-50 rounded-2xl flex flex-col gap-3">
-                                <div className="flex items-center gap-2">
-                                    <span className="text-amber-600 text-xs font-bold uppercase tracking-wider">⚠ Dev Sandbox</span>
+                            <div className="p-4 border border-dashed border-[#f8c8d8] bg-[#ffeff3] rounded-2xl flex flex-col gap-3">
+                                <div className="flex items-center gap-1.5 text-[#e13b68]">
+                                    <Sparkles className="w-4 h-4" />
+                                    <span className="text-xs font-black uppercase tracking-wider">Dev Sandbox</span>
                                 </div>
-                                <div className="text-xs text-amber-800 font-mono bg-amber-100 px-3 py-2 rounded-lg space-y-0.5">
+                                <div className="text-xs text-[#4a3c45] font-mono bg-white p-2.5 rounded-xl border border-[#f5e4ec] space-y-0.5">
                                     <p><span className="font-bold">Email:</span> {DEV_ADMIN_EMAIL}</p>
                                     <p><span className="font-bold">Password:</span> {DEV_ADMIN_PASSWORD}</p>
                                 </div>
@@ -315,7 +335,7 @@ export const Login = () => {
                                     type="button"
                                     onClick={handleQuickAdminLogin}
                                     disabled={loading}
-                                    className="w-full py-2.5 text-sm font-bold bg-amber-400 hover:bg-amber-500 border border-amber-600 text-amber-900 rounded-xl cursor-pointer transition disabled:opacity-50"
+                                    className="w-full py-2.5 text-xs font-black bg-[#e13b68] hover:bg-[#c92a55] text-white rounded-full cursor-pointer transition shadow-xs disabled:opacity-50"
                                 >
                                     {loading ? 'Logging in…' : '⚡ Quick Login as Administrator'}
                                 </button>
@@ -324,10 +344,10 @@ export const Login = () => {
                     </div>
                 )}
 
-                <div className="text-center pt-2 border-t border-cream-surface">
-                    <p className="text-xs text-ink-charcoal font-semibold">
+                <div className="text-center pt-2 border-t border-[#f5e4ec]">
+                    <p className="text-xs text-[#7d6974] font-semibold">
                         First time using Sanjeevani?{' '}
-                        <Link to="/register" className="text-pastel-pink-action hover:underline font-bold">
+                        <Link to="/register" className="text-[#e13b68] hover:underline font-bold">
                             Create an Account
                         </Link>
                     </p>

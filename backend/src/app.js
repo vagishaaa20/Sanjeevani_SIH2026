@@ -6,15 +6,16 @@ const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 const CORS_ALLOWED_ORIGINS = [
-    process.env.FRONTEND_URL || 'http://localhost:5173',
+    process.env.FRONTEND_URL,
     'http://localhost:5173',
+    'http://localhost:5174',
     'http://127.0.0.1:5173',
-];
+    'http://127.0.0.1:5174',
+].filter(Boolean);
 
 app.use(cors({
     origin: (origin, callback) => {
-        // Allow requests with no origin (e.g. curl, mobile apps, server-to-server)
-        if (!origin || CORS_ALLOWED_ORIGINS.includes(origin)) {
+        if (!origin || /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin) || CORS_ALLOWED_ORIGINS.includes(origin)) {
             callback(null, true);
         } else {
             callback(new Error(`CORS blocked for origin: ${origin}`));

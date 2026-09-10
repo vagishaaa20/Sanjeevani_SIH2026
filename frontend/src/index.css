@@ -5,43 +5,50 @@
 
 @import "tailwindcss";
 
-
 /* ─────────────────────────────────────────
-   CSS Custom Properties — Crystal Pastel & Editorial Palette
+   CSS Custom Properties — Soft Blush Healthcare Palette
 ──────────────────────────────────────────*/
 :root {
-  /* Crystal Pastel Palette */
-  --rose-mauve: #cf82a6;
-  --rose-mauve-dark: #b86b90;
-  --pastel-pink: #f4a6c1;
-  --pastel-pink-soft: #fde8ee;
-  --pastel-pink-action: #de8294;
-  --pastel-pink-action-hover: #cf7487;
+  /* Primary Soft Pink & Rose Palette */
+  --rose-primary: #e13b68;
+  --rose-primary-hover: #c92a55;
+  --rose-light: #fdf0f4;
+  --rose-soft-bg: #fdf5f7;
+  --rose-active-pill: #fce4ec;
+  --rose-card-border: #f5e4ec;
+
+  /* Pastel Chip Colors */
+  --pastel-pink-bg: #ffe6ee;
+  --pastel-pink-text: #e13b68;
   
-  --cerulean: #1e7ab8;
-  --cerulean-dark: #166092;
-  --pastel-sky: #9bcde4;
-  --pastel-sky-soft: #e8f4fa;
+  --pastel-mint-bg: #e6f9f0;
+  --pastel-mint-text: #10b981;
   
-  --icy-mint: #baf5f7;
-  --icy-mint-soft: #e8faf8;
+  --pastel-peach-bg: #fff0e6;
+  --pastel-peach-text: #e07a38;
   
-  /* Creamy editorial canvas */
-  --cream-bg: #faf7f2;
+  --pastel-lavender-bg: #f3e8ff;
+  --pastel-lavender-text: #7c3aed;
+
+  --pastel-sky-bg: #e8f4fa;
+  --pastel-sky-text: #1e7ab8;
+
+  /* Creamy soft canvas */
+  --cream-bg: #fdf5f7;
   --cream-card: #ffffff;
-  --cream-surface: #f4efe6;
-  
-  /* High-contrast ink */
-  --ink-black: #121212;
-  --ink-charcoal: #2c2c2c;
-  --ink-muted: #5a5a5a;
+  --cream-surface: #fdf0f4;
+
+  /* Warm High-contrast Ink */
+  --ink-black: #2d2329;
+  --ink-charcoal: #4a3c45;
+  --ink-muted: #7d6974;
 
   --sans: "Inter", system-ui, sans-serif;
   --heading: "DM Sans", system-ui, sans-serif;
 }
 
 /* ─────────────────────────────────────────
-   Reset
+   Reset & Body
 ──────────────────────────────────────────*/
 *, *::before, *::after {
   box-sizing: border-box;
@@ -73,33 +80,23 @@ h1, h2, h3, h4, h5, h6 {
   font-family: var(--heading);
   margin: 0;
   font-weight: 700;
-  line-height: 1.1;
+  line-height: 1.15;
   letter-spacing: -0.02em;
   color: var(--ink-black);
 }
 
 p {
   margin: 0;
-  line-height: 1.65;
+  line-height: 1.6;
 }
 
 /* ─────────────────────────────────────────
-   DNA Helix Animation Keyframes
+   Keyframe Animations
 ──────────────────────────────────────────*/
-@keyframes dnaFloat {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-18px); }
-}
-
-@keyframes dnaRotate {
-  from { transform: rotateY(0deg); }
-  to { transform: rotateY(360deg); }
-}
-
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(16px);
   }
   to {
     opacity: 1;
@@ -107,109 +104,66 @@ p {
   }
 }
 
-@keyframes slideInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-40px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes floatCard {
-  0%, 100% { transform: translateY(0px) rotate(-0.5deg); }
-  50% { transform: translateY(-8px) rotate(-0.5deg); }
-}
-
-@keyframes floatCard2 {
-  0%, 100% { transform: translateY(0px) rotate(0.8deg); }
-  50% { transform: translateY(-10px) rotate(0.8deg); }
-}
-
-@keyframes orbFloat1 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(25px, -30px) scale(1.05); }
-  66% { transform: translate(-15px, 15px) scale(0.97); }
-}
-
-@keyframes orbFloat2 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(-20px, 25px) scale(1.03); }
-  66% { transform: translate(30px, -10px) scale(0.98); }
+@keyframes pulseSoft {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.03); opacity: 0.9; }
 }
 
 /* ─────────────────────────────────────────
-   Utility Classes
+   Utility Classes & Components
 ──────────────────────────────────────────*/
 .animate-fade-in-up {
-  animation: fadeInUp 0.7s ease both;
+  animation: fadeInUp 0.4s ease-out both;
 }
 
-.animate-slide-in-left {
-  animation: slideInLeft 0.7s ease both;
-}
-
-.animate-float-card {
-  animation: floatCard 5s ease-in-out infinite;
-}
-
-.animate-float-card-2 {
-  animation: floatCard2 6s ease-in-out infinite;
-}
-
-.animate-orb-1 {
-  animation: orbFloat1 12s ease-in-out infinite;
-}
-
-.animate-orb-2 {
-  animation: orbFloat2 15s ease-in-out infinite;
-}
-
-.editorial-card {
+.inspo-card {
   background: #ffffff;
-  border: 1.5px solid #121212;
-  border-radius: 16px;
-  box-shadow: 2px 2px 0px 0px rgba(18, 18, 18, 0.08);
-}
-
-.editorial-btn-primary {
-  background: var(--pastel-pink-action);
-  color: #ffffff;
-  border: 1.5px solid #121212;
-  border-radius: 9999px;
-  font-weight: 600;
+  border: 1px solid var(--rose-card-border);
+  border-radius: 20px;
+  box-shadow: 0 4px 16px -2px rgba(225, 59, 104, 0.05);
   transition: all 0.2s ease;
 }
 
-.editorial-btn-primary:hover {
-  background: var(--pastel-pink-action-hover);
-  transform: translateY(-1px);
-  box-shadow: 2px 2px 0px 0px #121212;
+.inspo-card:hover {
+  box-shadow: 0 8px 24px -4px rgba(225, 59, 104, 0.1);
 }
 
-.editorial-btn-secondary {
-  background: #ffffff;
-  color: #121212;
-  border: 1.5px solid #121212;
+.inspo-btn-primary {
+  background: var(--rose-primary);
+  color: #ffffff;
+  border: none;
   border-radius: 9999px;
-  font-weight: 600;
+  font-weight: 700;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(225, 59, 104, 0.25);
+}
+
+.inspo-btn-primary:hover {
+  background: var(--rose-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(225, 59, 104, 0.35);
+}
+
+.inspo-btn-secondary {
+  background: #ffffff;
+  color: var(--ink-black);
+  border: 1px solid var(--rose-card-border);
+  border-radius: 9999px;
+  font-weight: 700;
   transition: all 0.2s ease;
 }
 
-.editorial-btn-secondary:hover {
-  background: #121212;
-  color: #ffffff;
-  transform: translateY(-1px);
+.inspo-btn-secondary:hover {
+  background: var(--rose-light);
+  color: var(--rose-primary);
 }
 
 .section-padding {
-  padding: 96px 24px;
+  padding: 48px 24px;
 }
 
 @media (max-width: 768px) {
   .section-padding {
-    padding: 64px 20px;
+    padding: 32px 16px;
   }
 }

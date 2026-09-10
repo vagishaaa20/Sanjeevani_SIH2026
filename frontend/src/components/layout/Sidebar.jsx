@@ -1,5 +1,24 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+import {
+    LayoutDashboard,
+    Users,
+    Calendar,
+    HeartPulse,
+    Search,
+    CheckCircle,
+    Bell,
+    BarChart3,
+    HelpCircle,
+    Settings,
+    Heart,
+    ChevronDown,
+    Building,
+    Stethoscope,
+    ClipboardList,
+    Pill,
+    FileText,
+} from 'lucide-react';
 import useAuth from '../../hooks/useAuth';
 
 export const Sidebar = () => {
@@ -9,56 +28,96 @@ export const Sidebar = () => {
 
     const linksByRole = {
         admin: [
-            { path: '/admin/clinics', label: '🏥 Clinic Approvals' },
-            { path: '/admin/doctors', label: '🩺 Doctor Approvals' },
-            { path: '/admin/health-workers', label: '🧑‍⚕️ Health Worker Approvals' },
+            { path: '/admin/clinics', label: 'Clinic Approvals', icon: Building },
+            { path: '/admin/doctors', label: 'Doctor Approvals', icon: Stethoscope },
+            { path: '/admin/health-workers', label: 'Health Worker Approvals', icon: Users },
         ],
         clinic_admin: [
-            { path: '/clinic/profile', label: 'Clinic Setup' },
-            { path: '/clinic/departments', label: 'OPD Departments' },
-            { path: '/clinic/medicine-inventory', label: 'Medicine Inventory' },
-            { path: '/clinic/referrals', label: 'Incoming Referrals' },
+            { path: '/clinic/profile', label: 'Clinic Setup', icon: Building },
+            { path: '/clinic/departments', label: 'OPD Departments', icon: ClipboardList },
+            { path: '/clinic/medicine-inventory', label: 'Medicine Inventory', icon: Pill },
+            { path: '/clinic/referrals', label: 'Incoming Referrals', icon: HeartPulse },
         ],
         doctor: [
-            { path: '/doctor/dashboard', label: '🩺 Doctor Schedule' },
-            { path: '/doctor/documents', label: '📄 My Documents' },
+            { path: '/doctor/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+            { path: '/doctor/documents', label: 'My Documents', icon: FileText },
         ],
         patient: [
-            { path: '/patient/dashboard', label: 'My Patient Care' },
-            { path: '/patient/medicine-availability', label: 'Find Medicine' },
+            { path: '/patient/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+            { path: '/patient/medicine-availability', label: 'Medicine Availability', icon: Search },
+            { path: '/patient/consultations', label: 'Appointments', icon: Calendar },
+            { path: '/patient/subsidy', label: 'Subsidy & Assistance', icon: HeartPulse },
         ],
         health_worker: [
-            { path: '/health-worker/dashboard', label: 'Dashboard' },
-            { path: '/health-worker/profile', label: 'My Profile' },
-            { path: '/health-worker/patients', label: 'My Patients' },
-            { path: '/health-worker/referrals', label: 'Referrals' },
-            { path: '/health-worker/followups', label: 'Follow-ups' },
+            { path: '/health-worker/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+            { path: '/health-worker/patients', label: 'My Patients', icon: Users },
+            { path: '/health-worker/followups', label: 'Follow-ups', icon: CheckCircle },
+            { path: '/health-worker/referrals', label: 'Referrals', icon: HeartPulse },
+            { path: '/health-worker/profile', label: 'Settings', icon: Settings },
         ],
     };
 
     const currentLinks = linksByRole[user.role] || [];
+    const profile = user.profile || {};
+    const userName = profile.fullName || user.email?.split('@')[0] || user.phone || 'User';
 
     return (
-        <aside className="w-full md:w-64 bg-white border-b md:border-b-0 md:border-r-2 border-ink-black p-6 flex flex-col gap-4">
-            <div className="mb-2 hidden md:block">
-                <h4 className="text-xs font-semibold text-ink-muted uppercase tracking-wider">Navigation</h4>
+        <aside className="w-full md:w-64 bg-[#fdf0f4] border-b md:border-b-0 md:border-r border-[#f3dce5] p-5 flex flex-col justify-between min-h-[calc(100vh-61px)]">
+            <div className="flex flex-col gap-6">
+                {/* Brand Logo in Sidebar (Desktop) */}
+                <div className="hidden md:flex flex-col items-start gap-1 pb-4 border-b border-[#f3dce5]">
+                    <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-[#ffe6ee] border border-[#f8c8d8] flex items-center justify-center text-[#e13b68] shadow-xs">
+                            <Heart className="w-4 h-4 fill-[#e13b68]" />
+                        </div>
+                        <span className="text-xl font-black text-[#2d2329] font-heading tracking-tight">
+                            Sanjeevani
+                        </span>
+                    </div>
+                    <span className="text-[11px] font-bold text-[#7d6974] pl-10 -mt-1">
+                        Health for All
+                    </span>
+                </div>
+
+                {/* Navigation Menu */}
+                <nav className="flex flex-row md:flex-col gap-1.5 overflow-x-auto md:overflow-x-visible pb-2 md:pb-0">
+                    {currentLinks.map((link) => {
+                        const IconComponent = link.icon;
+                        return (
+                            <NavLink
+                                key={link.path}
+                                to={link.path}
+                                className={({ isActive }) =>
+                                    `whitespace-nowrap px-4 py-3 rounded-2xl text-xs md:text-sm font-bold transition-all duration-150 flex items-center gap-3 flex-shrink-0 ${
+                                        isActive
+                                            ? 'bg-[#ffe6ee] text-[#e13b68] shadow-xs font-black'
+                                            : 'text-[#4a3c45] hover:text-[#e13b68] hover:bg-white/60'
+                                    }`
+                                }
+                            >
+                                {IconComponent && <IconComponent className="w-4 h-4 flex-shrink-0" />}
+                                <span>{link.label}</span>
+                            </NavLink>
+                        );
+                    })}
+                </nav>
             </div>
-            <nav className="flex flex-row md:flex-col gap-2 overflow-x-auto md:overflow-x-visible">
-                {currentLinks.map((link) => (
-                    <NavLink
-                        key={link.path}
-                        to={link.path}
-                        className={({ isActive }) =>
-                            `whitespace-nowrap px-4 py-2.5 rounded-xl border border-transparent font-semibold transition-all duration-150 flex-shrink-0 ${isActive
-                                ? 'bg-cream-surface border-ink-black text-ink-black shadow-sm'
-                                : 'text-ink-muted hover:text-ink-black hover:bg-cream-bg'
-                            }`
-                        }
-                    >
-                        {link.label}
-                    </NavLink>
-                ))}
-            </nav>
+
+            {/* Bottom User Profile Card */}
+            <div className="hidden md:flex items-center justify-between p-3 rounded-2xl bg-white border border-[#f5e4ec] shadow-xs mt-6">
+                <div className="flex items-center gap-2.5 overflow-hidden">
+                    <div className="w-9 h-9 rounded-full bg-[#ffe6ee] border border-[#f8c8d8] flex items-center justify-center text-xs font-black text-[#e13b68] flex-shrink-0">
+                        {(userName || 'U').charAt(0)}
+                    </div>
+                    <div className="flex flex-col text-left overflow-hidden">
+                        <span className="text-xs font-black text-[#2d2329] truncate">{userName}</span>
+                        <span className="text-[10px] font-bold text-[#7d6974] capitalize truncate">
+                            {user.role?.replace('_', ' ')}
+                        </span>
+                    </div>
+                </div>
+                <ChevronDown className="w-4 h-4 text-[#7d6974] flex-shrink-0" />
+            </div>
         </aside>
     );
 };

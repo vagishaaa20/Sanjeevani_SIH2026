@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Calendar, Bot, Stethoscope, HeartPulse, Pill, Map, Hourglass, ArrowRight, PhoneCall, Building2 } from 'lucide-react';
 import useAuth from '../../hooks/useAuth';
 import useGeolocation from '../../hooks/useGeolocation';
 import clinicService from '../../services/clinicService';
@@ -10,76 +11,77 @@ import TodaysMedicationsWidget from '../../components/patient/TodaysMedicationsW
 import OutbreakBanner from '../../components/patient/OutbreakBanner';
 import PreCallDocumentSubmit from '../../components/patient/PreCallDocumentSubmit';
 import ActiveQueueBanner from '../../components/patient/ActiveQueueBanner';
+import CareHeroBanner from '../../components/common/CareHeroBanner';
+import StatCard from '../../components/common/StatCard';
+import Badge from '../../components/common/Badge';
 import { SocketContext } from '../../context/SocketContext';
-import { useContext } from 'react';
 import ngeohash from 'ngeohash';
 import useTranslatedText from '../../hooks/useTranslatedText';
 import TranslatedText from '../../components/common/TranslatedText';
 
-// Feature grid card definitions
 const FEATURE_CARDS = [
     {
         id: 'book',
-        icon: '📅',
+        icon: Calendar,
         title: 'Book an Appointment',
         subtitle: 'Find and book a doctor near you',
         route: '/patient/book-appointment',
         enabled: true,
-        colors: 'border-ink-black hover:bg-ink-black hover:text-white',
+        variant: 'pink',
     },
     {
         id: 'ai-triage',
-        icon: '🤖',
+        icon: Bot,
         title: 'AI Symptom Checker',
         subtitle: 'Not sure what you need? Get instant guidance',
         route: '/patient/ai-triage',
         enabled: true,
-        colors: 'border-ink-black hover:bg-ink-black hover:text-white',
+        variant: 'mint',
     },
     {
         id: 'consultations',
-        icon: '🩺',
+        icon: Stethoscope,
         title: 'My Consultations',
         subtitle: 'View your appointment history and records',
         route: '/patient/consultations',
         enabled: true,
-        colors: 'border-ink-black hover:bg-ink-black hover:text-white',
+        variant: 'lavender',
     },
     {
         id: 'subsidy',
-        icon: '💰',
+        icon: HeartPulse,
         title: 'Subsidy & Assistance',
         subtitle: 'Check your eligibility and savings',
         route: '/patient/subsidy',
         enabled: true,
-        colors: 'border-ink-black hover:bg-ink-black hover:text-white',
+        variant: 'peach',
     },
     {
         id: 'medicine',
-        icon: '💊',
+        icon: Pill,
         title: 'Find Medicine',
         subtitle: 'Search nearby clinics for stock availability',
         route: '/patient/medicine-availability',
         enabled: true,
-        colors: 'border-ink-black hover:bg-ink-black hover:text-white',
+        variant: 'pink',
     },
     {
         id: 'outbreaks',
-        icon: '🗺️',
+        icon: Map,
         title: 'Epidemic Heatmap',
         subtitle: 'View live outbreak alerts in your area',
         route: '/patient/heatmap',
         enabled: true,
-        colors: 'border-ink-black hover:bg-ink-black hover:text-white',
+        variant: 'sky',
     },
     {
         id: 'requests',
-        icon: '⏳',
+        icon: Hourglass,
         title: 'My Active Queue',
         subtitle: 'Check your waitlist position in real-time',
         route: '/patient/requests',
         enabled: true,
-        colors: 'border-ink-black hover:bg-ink-black hover:text-white',
+        variant: 'mint',
     },
 ];
 
@@ -87,10 +89,6 @@ export const PatientDashboard = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
     const { coords, permissionDenied, loading: geoLoading } = useGeolocation();
-
-    // Dynamic Translation Strings via Bhashini
-    const welcomeText = useTranslatedText("Welcome back,");
-    const quickActionsText = useTranslatedText("Quick Actions");
 
     const [clinics, setClinics] = useState([]);
     const [clinicsLoading, setClinicsLoading] = useState(false);
@@ -106,7 +104,6 @@ export const PatientDashboard = () => {
     useEffect(() => {
         if (!socket) return;
         const handleAccepted = (data) => {
-            console.log('Doctor accepted!', data);
             setAcceptedConsultationId(data.consultationId);
         };
         const handleCompleted = () => {
@@ -139,103 +136,134 @@ export const PatientDashboard = () => {
 
     if (!user || user.role !== 'patient') {
         return (
-            <div className="p-6 text-center font-bold text-red-500">
+            <div className="p-6 text-center font-bold text-rose-600">
                 Access Denied. Only Patient Role authorized.
             </div>
         );
     }
 
     const profile = user.profile || {};
-
     const userRegionGeohash = coords && coords.lat && coords.lng
         ? ngeohash.encode(coords.lat, coords.lng, 5)
         : null;
 
     return (
-        <div className="w-full flex flex-col gap-6 text-left relative">
+        <div className="w-full flex flex-col gap-6 text-left relative animate-fade-in-up">
             {acceptedConsultationId && <PreCallDocumentSubmit consultationId={acceptedConsultationId} />}
 
-            {/* Sticky Queue Banner */}
+            {/* Banners */}
             <ActiveQueueBanner />
-
-            {/* Outbreak Alert Banner */}
             {userRegionGeohash && <OutbreakBanner userRegionGeohash={userRegionGeohash} />}
 
-            {/* Patient profile header */}
-            <div className="bg-white border-2 border-ink-black rounded-3xl p-8 flex flex-col md:flex-row md:justify-between md:items-center gap-6 shadow-sm">
+            {/* Care Hero Banner */}
+            <CareHeroBanner
+                headline="Care. Connect. Heal."
+                tagline="You are making a difference in someone's life today."
+            />
+
+            {/* Patient Header Card */}
+            <div className="bg-white border border-[#f5e4ec] rounded-3xl p-6 md:p-8 flex flex-col md:flex-row md:justify-between md:items-center gap-6 shadow-xs">
                 <div className="flex flex-col gap-2">
                     <div className="flex flex-wrap items-center gap-3">
-                        <h2 className="text-3xl font-black text-ink-black">{profile.fullName || 'Patient Name'}</h2>
-                        <span className="px-3 py-1 text-xs font-semibold rounded-full border border-cerulean bg-pastel-sky-soft text-cerulean-dark uppercase">
+                        <h2 className="text-2xl md:text-3xl font-black text-[#2d2329] font-heading">
+                            {profile.fullName || 'Patient Name'}
+                        </h2>
+                        <Badge variant="pink" dot pulse>
                             {profile.accountStatus || 'REGISTERED'}
-                        </span>
+                        </Badge>
                     </div>
-                    <p className="text-sm font-semibold text-ink-charcoal">Phone: {user.phone}</p>
+                    <p className="text-xs font-semibold text-[#7d6974]">Phone: {user.phone}</p>
                 </div>
-                {/* WhatsApp connect button */}
+
                 <button
                     type="button"
                     onClick={() => setWaModalOpen(true)}
-                    title="Connect on WhatsApp"
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 font-bold text-sm cursor-pointer transition-all hover:opacity-90 active:scale-95"
-                    style={{ borderColor: '#25D366', backgroundColor: '#25D366', color: '#fff' }}
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-full border-none font-bold text-xs md:text-sm cursor-pointer transition-all hover:opacity-90 shadow-xs"
+                    style={{ backgroundColor: '#25D366', color: '#fff' }}
                 >
                     <span className="text-base" aria-hidden="true">💬</span>
-                    <span>WhatsApp</span>
+                    <span>WhatsApp Health Desk</span>
                 </button>
             </div>
 
             <WhatsAppModal isOpen={waModalOpen} onClose={() => setWaModalOpen(false)} />
 
-            {/* ── Today's Medications Widget ── */}
+            {/* Today's Medications Widget */}
             <TodaysMedicationsWidget />
 
-            {/* ── 4-Block Feature Grid ── */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {FEATURE_CARDS.map((card) => (
-                    <button
-                        key={card.id}
-                        type="button"
-                        disabled={!card.enabled}
-                        onClick={() => card.enabled && navigate(card.route)}
-                        className={`group bg-white border-2 rounded-2xl p-6 text-left flex flex-col gap-3 transition-all duration-200 ${card.colors} ${card.enabled ? 'cursor-pointer shadow-sm hover:shadow-md' : ''}`}
-                    >
-                        <span className="text-3xl">{card.icon}</span>
-                        <div>
-                            <h3 className="text-lg font-bold text-ink-black group-hover:text-white transition-colors duration-200">
-                                <TranslatedText text={card.title} />
-                            </h3>
-                            <p className="text-xs font-semibold text-ink-charcoal group-hover:text-ink-muted transition-colors duration-200 mt-1">
-                                <TranslatedText text={card.subtitle} />
-                            </p>
-                        </div>
-                        {card.enabled ? (
-                            <span className="text-xs font-bold uppercase tracking-wider text-cerulean flex items-center gap-1 group-hover:text-white transition-colors duration-200">
-                                <TranslatedText text="Get started" /> &rarr;
-                            </span>
-                        ) : (
-                            <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wide">
-                                <TranslatedText text="Coming Soon" />
-                            </span>
-                        )}
-                    </button>
-                ))}
+            {/* Quick KPI Stat Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <StatCard
+                    title="Nearby Verified Clinics"
+                    value={clinics.length}
+                    icon={Building2}
+                    variant="pink"
+                    description="Operational in your area"
+                />
+                <StatCard
+                    title="Recommended Doctors"
+                    value={doctors.length}
+                    icon={Stethoscope}
+                    variant="mint"
+                    description="Available for consult"
+                />
+                <StatCard
+                    title="Health ABHA Status"
+                    value={profile.abhaNumber ? 'Linked' : 'Pending'}
+                    icon={HeartPulse}
+                    variant="lavender"
+                    description={profile.abhaNumber || 'Connect ABHA Digital ID'}
+                />
             </div>
 
-            {/* ── Nearby Clinics ── */}
-            <div className="bg-white border-2 border-ink-black rounded-2xl p-6 flex flex-col gap-4">
-                <h3 className="text-lg font-bold text-ink-black">Nearby Clinics</h3>
+            {/* Quick Action Feature Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {FEATURE_CARDS.map((card) => {
+                    const IconComp = card.icon;
+                    return (
+                        <button
+                            key={card.id}
+                            type="button"
+                            disabled={!card.enabled}
+                            onClick={() => card.enabled && navigate(card.route)}
+                            className="group bg-white border border-[#f5e4ec] hover:border-[#f8c8d8] rounded-3xl p-6 text-left flex flex-col justify-between gap-4 transition-all duration-200 shadow-xs hover:shadow-md cursor-pointer"
+                        >
+                            <div className="flex items-start justify-between">
+                                <div className="w-12 h-12 rounded-2xl bg-[#ffe6ee] flex items-center justify-center text-[#e13b68] group-hover:scale-105 transition-transform">
+                                    <IconComp className="w-6 h-6" />
+                                </div>
+                                <span className="text-xs font-bold text-[#e13b68] flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                                    <TranslatedText text="Start" /> <ArrowRight className="w-3.5 h-3.5" />
+                                </span>
+                            </div>
 
-                {geoLoading && <p className="text-sm text-ink-charcoal">Getting your location...</p>}
+                            <div>
+                                <h3 className="text-base font-black text-[#2d2329] group-hover:text-[#e13b68] transition-colors font-heading">
+                                    <TranslatedText text={card.title} />
+                                </h3>
+                                <p className="text-xs font-semibold text-[#7d6974] mt-1 leading-relaxed">
+                                    <TranslatedText text={card.subtitle} />
+                                </p>
+                            </div>
+                        </button>
+                    );
+                })}
+            </div>
+
+            {/* Nearby Clinics */}
+            <div className="bg-white border border-[#f5e4ec] rounded-3xl p-6 flex flex-col gap-4 shadow-xs">
+                <h3 className="text-lg font-black text-[#2d2329] font-heading">Nearby Clinics</h3>
+
+                {geoLoading && <p className="text-xs font-semibold text-[#7d6974]">Getting your location...</p>}
                 {permissionDenied && (
-                    <p className="text-sm text-ink-charcoal">
+                    <p className="text-xs font-semibold text-[#7d6974]">
                         Location access denied. Enable location permission to see clinics near you.
                     </p>
                 )}
-                {clinicsLoading && <p className="text-sm text-ink-charcoal">Finding clinics near you...</p>}
-                {clinicsError && <p className="text-sm text-red-500">{clinicsError}</p>}
+                {clinicsLoading && <p className="text-xs font-semibold text-[#7d6974]">Finding clinics near you...</p>}
+                {clinicsError && <p className="text-xs font-semibold text-rose-600">{clinicsError}</p>}
                 {!clinicsLoading && !clinicsError && coords && clinics.length === 0 && (
-                    <p className="text-sm text-ink-charcoal">No verified clinics found nearby.</p>
+                    <p className="text-xs font-semibold text-[#7d6974]">No verified clinics found nearby.</p>
                 )}
 
                 {clinics.length > 0 && (
@@ -243,45 +271,30 @@ export const PatientDashboard = () => {
                         {clinics.map((clinic) => (
                             <div
                                 key={clinic.userId}
-                                className="border-2 border-ink-black rounded-xl p-4 flex flex-col gap-2"
+                                className="border border-[#f5e4ec] bg-[#fdf5f7] rounded-2xl p-4 flex flex-col gap-2"
                             >
                                 <div className="flex justify-between items-start gap-2">
-                                    <h4 className="font-bold text-ink-black">{clinic.clinicName}</h4>
-                                    <span className="text-xs font-semibold text-cerulean-dark whitespace-nowrap">
-                                        {Number(clinic.distanceKm).toFixed(1)} km
-                                    </span>
+                                    <h4 className="font-black text-xs md:text-sm text-[#2d2329]">{clinic.clinicName}</h4>
+                                    <Badge variant="pink">{Number(clinic.distanceKm).toFixed(1)} km</Badge>
                                 </div>
-                                <p className="text-xs text-ink-muted">{clinic.address}</p>
-                                <p className="text-xs text-ink-charcoal">
+                                <p className="text-xs text-[#7d6974] font-medium">{clinic.address}</p>
+                                <p className="text-xs font-bold text-[#4a3c45]">
                                     {Number(clinic.doctorCount || 0)} doctor{Number(clinic.doctorCount || 0) !== 1 ? 's' : ''} available
                                 </p>
-                                {clinic.specializations?.filter(Boolean).length > 0 && (
-                                    <div className="flex flex-wrap gap-1">
-                                        {clinic.specializations.filter(Boolean).map((spec) => (
-                                            <span
-                                                key={spec}
-                                                className="px-2 py-0.5 text-[10px] font-semibold rounded-full border border-cerulean bg-pastel-sky-soft text-cerulean-dark uppercase"
-                                            >
-                                                {spec}
-                                            </span>
-                                        ))}
-                                    </div>
-                                )}
                             </div>
                         ))}
                     </div>
                 )}
             </div>
 
-            {/* ── Nearby Recommended Doctors ── */}
-            <div className="bg-white border-2 border-ink-black rounded-2xl p-6 flex flex-col gap-4">
-                <h3 className="text-lg font-bold text-ink-black">Nearby Recommended Doctors</h3>
+            {/* Recommended Doctors */}
+            <div className="bg-white border border-[#f5e4ec] rounded-3xl p-6 flex flex-col gap-4 shadow-xs">
+                <h3 className="text-lg font-black text-[#2d2329] font-heading">Nearby Recommended Doctors</h3>
 
-                {geoLoading && <p className="text-sm text-ink-charcoal">Getting your location...</p>}
-                {doctorsLoading && <p className="text-sm text-ink-charcoal">Finding doctors near you...</p>}
-                {doctorsError && <p className="text-sm text-red-500">{doctorsError}</p>}
+                {doctorsLoading && <p className="text-xs font-semibold text-[#7d6974]">Finding doctors near you...</p>}
+                {doctorsError && <p className="text-xs font-semibold text-rose-600">{doctorsError}</p>}
                 {!doctorsLoading && !doctorsError && coords && doctors.length === 0 && (
-                    <p className="text-sm text-ink-charcoal">No verified doctors found nearby.</p>
+                    <p className="text-xs font-semibold text-[#7d6974]">No verified doctors found nearby.</p>
                 )}
 
                 {doctors.length > 0 && (
@@ -291,44 +304,6 @@ export const PatientDashboard = () => {
                         ))}
                     </div>
                 )}
-            </div>
-
-            {/* ── Demographics + Health Records ── */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-white border-2 border-ink-black rounded-2xl p-6 flex flex-col gap-4">
-                    <h3 className="text-lg font-bold text-ink-black">Demographics Profile</h3>
-                    <div className="flex flex-col gap-2">
-                        <div>
-                            <span className="text-xs text-ink-muted uppercase font-bold tracking-wider">Date of Birth</span>
-                            <p className="font-semibold text-ink-black">{profile.dateOfBirth || 'N/A'}</p>
-                        </div>
-                        <div>
-                            <span className="text-xs text-ink-muted uppercase font-bold tracking-wider">Sex</span>
-                            <p className="font-semibold text-ink-black capitalize">{profile.sex || 'N/A'}</p>
-                        </div>
-                        <div>
-                            <span className="text-xs text-ink-muted uppercase font-bold tracking-wider">Preferred Language</span>
-                            <p className="font-semibold text-ink-black">{profile.preferredLanguage || 'N/A'}</p>
-                        </div>
-                        <div>
-                            <span className="text-xs text-ink-muted uppercase font-bold tracking-wider">Region</span>
-                            <p className="font-semibold text-ink-black">{profile.region || 'N/A'}</p>
-                        </div>
-                        {profile.abhaNumber && (
-                            <div>
-                                <span className="text-xs text-ink-muted uppercase font-bold tracking-wider">ABHA Number</span>
-                                <p className="font-semibold text-ink-black">{profile.abhaNumber}</p>
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-                <div className="bg-white border-2 border-ink-black rounded-2xl p-6 flex flex-col gap-4">
-                    <h3 className="text-lg font-bold text-ink-black">Longitudinal Health Records</h3>
-                    <p className="text-sm text-ink-charcoal">
-                        No health records or consultations found. Book an appointment or visit an operational OPD counter to update your queue token.
-                    </p>
-                </div>
             </div>
         </div>
     );

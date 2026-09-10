@@ -23,18 +23,24 @@ async function startServer() {
     // If you manage Socket.io directly here:
     const { Server } = require('socket.io');
     const ALLOWED_ORIGINS = [
-      process.env.FRONTEND_URL || 'http://localhost:5173',
+      process.env.FRONTEND_URL,
       'http://localhost:5173',
+      'http://localhost:5174',
       'http://127.0.0.1:5173',
-    ];
+      'http://127.0.0.1:5174',
+    ].filter(Boolean);
     // Global WebRTC timeout tracker
     const disconnectTimers = new Map();
     const io = new Server(server, {
       cors: {
-        origin: ALLOWED_ORIGINS,
+        origin: (origin, callback) => {
+          if (!origin || /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin) || ALLOWED_ORIGINS.includes(origin)) {
+            callback(null, true);
+          } else {
+            callback(new Error(`CORS blocked for origin: ${origin}`));
+          }
+        },
         methods: ['GET', 'POST'],
-        // Do NOT set credentials: true with a wildcard origin
-
       }
     });
 
