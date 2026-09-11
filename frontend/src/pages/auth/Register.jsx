@@ -1,11 +1,52 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { Heart } from 'lucide-react';
 import useAuth from '../../hooks/useAuth';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
 import ClinicRegisterForm from '../../components/clinic/ClinicRegisterForm';
 import clinicService from '../../services/clinicService';
 import healthWorkerAdminService from '../../services/healthWorkerAdminService';
+import CareMascotVisual from '../../components/auth/CareMascotVisual';
+
+export const INDIAN_MEDICAL_SPECIALIZATIONS = [
+    'General Medicine / Internal Medicine',
+    'General Surgery',
+    'Obstetrics & Gynaecology (OB-GYN)',
+    'Pediatrics & Neonatology',
+    'Cardiology & Interventional Cardiology',
+    'Dermatology, Venereology & Leprosy (DVL)',
+    'Orthopaedics & Joint Replacement',
+    'Neurology',
+    'Neurosurgery',
+    'Ophthalmology (Eye Specialist)',
+    'ENT (Otorhinolaryngology / Head & Neck)',
+    'Psychiatry & Behavioral Health',
+    'Pulmonology / Respiratory Medicine',
+    'Gastroenterology & Hepatology',
+    'Endocrinology & Diabetology',
+    'Nephrology & Renal Medicine',
+    'Medical Oncology & Chemotherapy',
+    'Surgical Oncology',
+    'Urology & Uro-Surgery',
+    'Emergency Medicine & Trauma Care',
+    'Anaesthesiology & Critical Care',
+    'Radiology & Radio-Diagnosis',
+    'Pathology & Laboratory Medicine',
+    'Community Medicine & Family Medicine',
+    'Infectious Diseases',
+    'Rheumatology & Clinical Immunology',
+    'Physical Medicine & Rehabilitation (PMR)',
+    'Plastic & Reconstructive Surgery',
+    'Pediatric Surgery',
+    'Cardiothoracic & Vascular Surgery (CTVS)',
+    'Dental Surgery (BDS / MDS)',
+    'Ayurveda (BAMS / MD Ayurveda)',
+    'Homeopathy (BHMS / MD Homeopathy)',
+    'Unani Medicine (BUMS)',
+    'Siddha Medicine (BSMS)',
+    'Other NMC Registered Specialization',
+];
 
 export const Register = () => {
     const { registerPatient, registerDoctor, registerHealthWorker } = useAuth();
@@ -46,10 +87,9 @@ export const Register = () => {
         primaryMedicalQualification: '',
         medicalCollege: '',
         graduationYear: '',
-        consultationFee: '',
-        clinicOrHospital: '',
         clinicId: '',
     });
+    const [selectedSpecializations, setSelectedSpecializations] = useState([]);
     const [allClinics, setAllClinics] = useState([]);
     const [clinicOptions, setClinicOptions] = useState([]);
     const [clinicSearch, setClinicSearch] = useState('');
@@ -83,13 +123,22 @@ export const Register = () => {
         setDoctorData((prev) => ({ ...prev, [name]: value }));
     };
 
-    const handleHealthWorkerChange = (e) => {
-        const { name, value } = e.target;
-        setHealthWorkerData((prev) => ({ ...prev, [name]: value }));
+    const handleAddSpecialization = (specToAdd) => {
+        if (!specToAdd) return;
+        if (!selectedSpecializations.includes(specToAdd)) {
+            const updated = [...selectedSpecializations, specToAdd];
+            setSelectedSpecializations(updated);
+            setDoctorData((prev) => ({ ...prev, specialization: updated.join(', ') }));
+        }
     };
 
-    // Fetch clinics once when doctor role is selected
-    /* eslint-disable react-hooks/set-state-in-effect */
+    const handleRemoveSpecialization = (specToRemove) => {
+        const updated = selectedSpecializations.filter((s) => s !== specToRemove);
+        setSelectedSpecializations(updated);
+        setDoctorData((prev) => ({ ...prev, specialization: updated.join(', ') }));
+    };
+
+    // Load registered clinics when doctor role is active
     useEffect(() => {
         if (role === 'doctor') {
             setClinicsLoading(true);
@@ -103,52 +152,58 @@ export const Register = () => {
         }
     }, [role]);
 
+    // Filter clinics when search input changes
     useEffect(() => {
-        if (role !== 'patient') return;
-        healthWorkerAdminService.getGeography().then((data) => setGeoOptions((previous) => ({ ...previous, districts: data.districts || [] }))).catch(() => {});
-    }, [role]);
-
-    useEffect(() => {
-        if (role !== 'health_worker') return;
-        healthWorkerAdminService.getGeography().then((data) => setWorkerGeoOptions((previous) => ({ ...previous, states: data.states || [] }))).catch(() => {});
-    }, [role]);
-
-    useEffect(() => {
-        if (!healthWorkerData.stateId) return;
-        healthWorkerAdminService.getGeography({ stateId: healthWorkerData.stateId }).then((data) => setWorkerGeoOptions((previous) => ({ ...previous, districts: data.districts || [], areas: [] }))).catch(() => {});
-    }, [healthWorkerData.stateId]);
-
-    useEffect(() => {
-        if (!healthWorkerData.districtId) return;
-        healthWorkerAdminService.getGeography({ districtId: healthWorkerData.districtId }).then((data) => setWorkerGeoOptions((previous) => ({ ...previous, areas: data.areas || [] }))).catch(() => {});
-    }, [healthWorkerData.districtId]);
-
-    useEffect(() => {
-        if (!patientData.districtId) return;
-        healthWorkerAdminService.getGeography({ districtId: patientData.districtId }).then((data) => setGeoOptions((previous) => ({ ...previous, villages: data.villages || [], areas: [] }))).catch(() => {});
-    }, [patientData.districtId]);
-
-    useEffect(() => {
-        if (!patientData.villageId || !patientData.districtId) return;
-        healthWorkerAdminService.getGeography({ districtId: patientData.districtId, villageId: patientData.villageId }).then((data) => setGeoOptions((previous) => ({ ...previous, areas: data.areas || [] }))).catch(() => {});
-    }, [patientData.villageId, patientData.districtId]);
-    /* eslint-enable react-hooks/set-state-in-effect */
-
-    // Filter clinics locally when search text changes
-    useEffect(() => {
-        if (clinicSearch.trim() === '') {
+        if (!clinicSearch.trim()) {
             setClinicOptions(allClinics);
         } else {
-            const lowerSearch = clinicSearch.toLowerCase();
+            const lower = clinicSearch.toLowerCase();
             setClinicOptions(
                 allClinics.filter(
                     (c) =>
-                        c.clinicName.toLowerCase().includes(lowerSearch) ||
-                        c.city.toLowerCase().includes(lowerSearch)
+                        (c.clinicName && c.clinicName.toLowerCase().includes(lower)) ||
+                        (c.name && c.name.toLowerCase().includes(lower)) ||
+                        (c.city && c.city.toLowerCase().includes(lower))
                 )
             );
         }
     }, [clinicSearch, allClinics]);
+
+    const handleHealthWorkerChange = (e) => {
+        const { name, value } = e.target;
+        setHealthWorkerData((prev) => ({ ...prev, [name]: value }));
+    };
+
+    useEffect(() => {
+        if (role !== 'patient') return;
+        healthWorkerAdminService.getGeography().then((data) => setGeoOptions((previous) => ({ ...previous, districts: data.districts || [] }))).catch(() => { });
+    }, [role]);
+
+    useEffect(() => {
+        if (role !== 'health_worker') return;
+        healthWorkerAdminService.getGeography().then((data) => setWorkerGeoOptions((previous) => ({ ...previous, states: data.states || [] }))).catch(() => { });
+    }, [role]);
+
+    useEffect(() => {
+        if (!healthWorkerData.stateId) return;
+        healthWorkerAdminService.getGeography({ stateId: healthWorkerData.stateId }).then((data) => setWorkerGeoOptions((previous) => ({ ...previous, districts: data.districts || [], areas: [] }))).catch(() => { });
+    }, [healthWorkerData.stateId]);
+
+    useEffect(() => {
+        if (!healthWorkerData.districtId) return;
+        healthWorkerAdminService.getGeography({ districtId: healthWorkerData.districtId }).then((data) => setWorkerGeoOptions((previous) => ({ ...previous, areas: data.areas || [] }))).catch(() => { });
+    }, [healthWorkerData.districtId]);
+
+    useEffect(() => {
+        if (!patientData.districtId) return;
+        healthWorkerAdminService.getGeography({ districtId: patientData.districtId }).then((data) => setGeoOptions((previous) => ({ ...previous, villages: data.villages || [], areas: [] }))).catch(() => { });
+    }, [patientData.districtId]);
+
+    useEffect(() => {
+        if (!patientData.villageId || !patientData.districtId) return;
+        healthWorkerAdminService.getGeography({ districtId: patientData.districtId, villageId: patientData.villageId }).then((data) => setGeoOptions((previous) => ({ ...previous, areas: data.areas || [] }))).catch(() => { });
+    }, [patientData.villageId, patientData.districtId]);
+    /* eslint-enable react-hooks/set-state-in-effect */
 
     const handlePatientSubmit = async (e) => {
         e.preventDefault();
@@ -252,8 +307,38 @@ export const Register = () => {
     };
 
     return (
-        <div className="w-full flex-grow flex items-center justify-center p-6 bg-cream-bg">
-            <div className="w-full max-w-xl p-8 bg-white border-2 border-ink-black rounded-3xl shadow-md flex flex-col gap-6 animate-fade-in-up">
+        <div className="relative min-h-screen w-full bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(255,225,235,0.6),rgba(255,252,254,0.95))] text-[#1c1218] overflow-x-hidden flex flex-col justify-between selection:bg-[#fce4ec] selection:text-[#d93864]">
+            {/* Ambient Background Glow */}
+            <div className="fixed top-0 right-1/4 w-[600px] h-[600px] bg-[#ffe6ee]/40 rounded-full blur-3xl pointer-events-none -z-10" />
+
+            {/* Top Navigation */}
+            <header className="w-full max-w-7xl mx-auto px-6 md:px-12 py-5 flex items-center justify-between z-30">
+                <Link
+                    to="/"
+                    className="flex items-center gap-2.5 text-lg font-black tracking-tight text-[#1c1218] group"
+                >
+                    <div className="w-8 h-8 rounded-full bg-[#ffe8ee] border border-[#f8c8d8] flex items-center justify-center text-[#e13b68] shadow-xs group-hover:scale-105 transition-transform">
+                        <Heart className="w-4 h-4 fill-[#e13b68]" />
+                    </div>
+                    <span className="font-heading tracking-tight font-black text-xl">Sanjeevani</span>
+                </Link>
+
+                <div className="flex items-center gap-3">
+                    <span className="text-xs text-[#7d6974] font-medium hidden sm:inline">Already registered?</span>
+                    <Link
+                        to="/login"
+                        className="px-4 py-1.5 rounded-full bg-white border border-[#f5e4ec] hover:border-[#f0d0dc] text-xs font-bold text-[#1c1218] transition shadow-xs"
+                    >
+                        Sign In
+                    </Link>
+                </div>
+            </header>
+
+            {/* Main Composition: Register LEFT + Mascot RIGHT */}
+            <main className="flex-1 w-full max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center my-auto py-6 md:py-10 z-20">
+                {/* Left Column: Form Panel */}
+                <div className="lg:col-span-6 xl:col-span-6 flex flex-col gap-6 w-full mx-auto lg:mx-0">
+                    <div className="w-full p-6 sm:p-8 bg-white border border-[#f5e4ec] rounded-3xl shadow-xs flex flex-col gap-6 animate-fade-in-up">
 
                 {/* Step 1: Select Role */}
                 {!role && (
@@ -543,16 +628,99 @@ export const Register = () => {
                                 {/* Step 2: Professional Profile details */}
                                 {doctorStep === 2 && (
                                     <div className="flex flex-col gap-4">
+                                        {/* Multi-Select Specialization */}
+                                        <div className="flex flex-col gap-1.5 w-full text-left">
+                                            <div className="flex items-center justify-between">
+                                                <label className="text-xs font-bold text-[#4a3c45] uppercase tracking-wider">
+                                                    Specialization(s) (Registered in India) <span className="text-rose-500">*</span>
+                                                </label>
+                                                {selectedSpecializations.length > 0 && (
+                                                    <span className="text-xs font-semibold text-[#8e1d41] bg-[#ffe6ee] px-2 py-0.5 rounded-full">
+                                                        {selectedSpecializations.length} selected
+                                                    </span>
+                                                )}
+                                            </div>
+
+                                            {/* Selected Specialization Chips */}
+                                            {selectedSpecializations.length > 0 && (
+                                                <div className="flex flex-wrap gap-1.5 p-2.5 rounded-2xl bg-[#fffcfd] border border-[#f5e4ec]">
+                                                    {selectedSpecializations.map((spec) => (
+                                                        <span
+                                                            key={spec}
+                                                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold bg-[#ffe6ee] text-[#8e1d41] border border-[#f5c6d6] shadow-2xs"
+                                                        >
+                                                            <span>{spec}</span>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => handleRemoveSpecialization(spec)}
+                                                                className="w-3.5 h-3.5 rounded-full bg-[#8e1d41]/10 hover:bg-[#8e1d41]/25 flex items-center justify-center text-[#8e1d41] transition-colors"
+                                                                title="Remove specialization"
+                                                            >
+                                                                &times;
+                                                            </button>
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            )}
+
+                                            <div className="relative w-full">
+                                                <select
+                                                    id="specializationSelect"
+                                                    value=""
+                                                    onChange={(e) => {
+                                                        if (e.target.value) {
+                                                            handleAddSpecialization(e.target.value);
+                                                        }
+                                                    }}
+                                                    className="w-full px-4 py-2.5 rounded-2xl border border-[#f5e4ec] bg-white text-[#2d2329] focus:outline-none focus:ring-2 focus:ring-[#e13b68]/30 focus:border-[#e13b68] shadow-xs text-sm transition duration-150 appearance-none pr-10 cursor-pointer"
+                                                >
+                                                    <option value="">
+                                                        {selectedSpecializations.length === 0
+                                                            ? '— Select Specialization(s) (NMC / AYUSH) —'
+                                                            : '+ Add another Specialization...'}
+                                                    </option>
+                                                    {INDIAN_MEDICAL_SPECIALIZATIONS.filter(
+                                                        (spec) => !selectedSpecializations.includes(spec)
+                                                    ).map((spec) => (
+                                                        <option key={spec} value={spec}>
+                                                            {spec}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[#7d6974]">
+                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                                                    </svg>
+                                                </div>
+                                            </div>
+
+                                            {/* Quick-add suggestions */}
+                                            {selectedSpecializations.length === 0 && (
+                                                <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                                                    <span className="text-[11px] text-[#7d6974] font-medium">Quick add:</span>
+                                                    {[
+                                                        'General Medicine / Internal Medicine',
+                                                        'General Surgery',
+                                                        'Pediatrics & Neonatology',
+                                                        'Cardiology & Interventional Cardiology',
+                                                        'Obstetrics & Gynaecology (OB-GYN)',
+                                                        'Dermatology, Venereology & Leprosy (DVL)',
+                                                        'Orthopaedics & Joint Replacement'
+                                                    ].map((s) => (
+                                                        <button
+                                                            key={s}
+                                                            type="button"
+                                                            onClick={() => handleAddSpecialization(s)}
+                                                            className="text-[11px] px-2 py-0.5 rounded-lg border border-[#f5e4ec] bg-white hover:bg-[#ffe6ee] hover:border-[#f5c6d6] text-[#4a3c45] transition-colors"
+                                                        >
+                                                            + {s.split(' ')[0]}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <Input
-                                                label="Specialization"
-                                                id="specialization"
-                                                name="specialization"
-                                                value={doctorData.specialization}
-                                                onChange={handleDoctorChange}
-                                                required
-                                                placeholder="e.g. Cardiologist"
-                                            />
                                             <Input
                                                 label="Medical Registration Number"
                                                 id="medicalRegistrationNumber"
@@ -560,10 +728,8 @@ export const Register = () => {
                                                 value={doctorData.medicalRegistrationNumber}
                                                 onChange={handleDoctorChange}
                                                 required
-                                                placeholder="e.g. Registration No."
+                                                placeholder="e.g. 12345/MCI/2018"
                                             />
-                                        </div>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <Input
                                                 label="State Medical Council"
                                                 id="stateMedicalCouncil"
@@ -572,24 +738,28 @@ export const Register = () => {
                                                 onChange={handleDoctorChange}
                                                 placeholder="e.g. Jharkhand Medical Council"
                                             />
+                                        </div>
+
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <Input
                                                 label="Primary Medical Qualification"
                                                 id="primaryMedicalQualification"
                                                 name="primaryMedicalQualification"
                                                 value={doctorData.primaryMedicalQualification}
                                                 onChange={handleDoctorChange}
-                                                placeholder="e.g. MBBS, MD"
+                                                placeholder="e.g. MBBS, MD, MS, DNB"
                                             />
-                                        </div>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <Input
                                                 label="Medical College / University"
                                                 id="medicalCollege"
                                                 name="medicalCollege"
                                                 value={doctorData.medicalCollege}
                                                 onChange={handleDoctorChange}
-                                                placeholder="e.g. AIIMS"
+                                                placeholder="e.g. AIIMS New Delhi / RIMS"
                                             />
+                                        </div>
+
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <Input
                                                 label="Graduation Year"
                                                 id="graduationYear"
@@ -599,58 +769,49 @@ export const Register = () => {
                                                 placeholder="e.g. 2018"
                                             />
                                         </div>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <Input
-                                                label="Consultation Fee (INR)"
-                                                id="consultationFee"
-                                                name="consultationFee"
-                                                type="number"
-                                                value={doctorData.consultationFee}
-                                                onChange={handleDoctorChange}
-                                                placeholder="e.g. 500"
-                                            />
-                                            <Input
-                                                label="Clinic / Hospital Name"
-                                                id="clinicOrHospital"
-                                                name="clinicOrHospital"
-                                                value={doctorData.clinicOrHospital}
-                                                onChange={handleDoctorChange}
-                                                placeholder="e.g. Sanjeevani Clinic"
-                                            />
-                                        </div>
 
-                                        {/* New: optional link to a registered clinic in the system */}
-                                        <div className="flex flex-col gap-1 w-full text-left">
-                                            <label className="text-xs font-semibold text-ink-charcoal uppercase tracking-wider">
-                                                Link to Registered Clinic <span className="normal-case font-normal text-ink-muted">(optional)</span>
+                                        {/* Optional Link to Registered Hospital or Clinic */}
+                                        <div className="flex flex-col gap-1.5 w-full text-left pt-2 border-t border-[#f5e4ec]">
+                                            <label className="text-xs font-bold text-[#4a3c45] uppercase tracking-wider flex items-center justify-between">
+                                                <span>Link to Registered Hospital / Clinic</span>
+                                                <span className="normal-case font-normal text-xs text-[#7d6974] bg-[#ffe6ee] px-2 py-0.5 rounded-full">Optional</span>
                                             </label>
-                                            <input
-                                                type="text"
-                                                placeholder="Search registered clinics..."
-                                                value={clinicSearch}
-                                                onChange={(e) => setClinicSearch(e.target.value)}
-                                                className="w-full px-4 py-2.5 rounded-xl border border-ink-black bg-white focus:ring-2 focus:ring-rose-mauve text-sm mb-1"
-                                            />
-                                            <select
-                                                name="clinicId"
-                                                value={doctorData.clinicId}
-                                                onChange={handleDoctorChange}
-                                                disabled={clinicsLoading}
-                                                className="w-full px-4 py-2.5 rounded-xl border border-ink-black bg-white focus:ring-2 focus:ring-rose-mauve"
-                                            >
-                                                <option value="">— Not linked to a registered clinic —</option>
-                                                {clinicOptions.map((clinic) => (
-                                                    <option key={clinic.userId} value={clinic.userId}>
-                                                        {clinic.clinicName} ({clinic.city})
-                                                    </option>
-                                                ))}
-                                            </select>
-                                            {clinicsLoading && (
-                                                <span className="text-xs text-ink-muted">Loading clinics…</span>
-                                            )}
-                                            <p className="text-xs text-ink-muted mt-1">
-                                                If your clinic is already registered on Sanjeevani, link it here so patients can find you in nearby-doctor searches. Otherwise, leave blank.
-                                            </p>
+                                            <div className="flex flex-col gap-2">
+                                                <input
+                                                    type="text"
+                                                    placeholder="Search registered hospitals or clinics..."
+                                                    value={clinicSearch}
+                                                    onChange={(e) => setClinicSearch(e.target.value)}
+                                                    className="w-full px-4 py-2 rounded-xl border border-[#f5e4ec] bg-white text-[#2d2329] placeholder:text-[#7d6974]/50 focus:outline-none focus:ring-2 focus:ring-[#e13b68]/30 focus:border-[#e13b68] text-xs transition duration-150"
+                                                />
+                                                <div className="relative w-full">
+                                                    <select
+                                                        name="clinicId"
+                                                        value={doctorData.clinicId || ''}
+                                                        onChange={handleDoctorChange}
+                                                        disabled={clinicsLoading}
+                                                        className="w-full px-4 py-2.5 rounded-2xl border border-[#f5e4ec] bg-white text-[#2d2329] focus:outline-none focus:ring-2 focus:ring-[#e13b68]/30 focus:border-[#e13b68] shadow-xs text-sm transition duration-150 appearance-none pr-10 cursor-pointer"
+                                                    >
+                                                        <option value="">— Not linked to a registered hospital or clinic (link later) —</option>
+                                                        {clinicOptions.map((clinic) => (
+                                                            <option key={clinic.userId || clinic.id} value={clinic.userId || clinic.id}>
+                                                                {clinic.clinicName || clinic.name} {clinic.city ? `(${clinic.city})` : ''}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[#7d6974]">
+                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                                {clinicsLoading && (
+                                                    <span className="text-xs text-[#7d6974]">Loading registered medical centers…</span>
+                                                )}
+                                                <p className="text-xs text-[#7d6974]">
+                                                    If your hospital or clinic is registered on Sanjeevani, link it here. You can also register or update clinic affiliations later in your dashboard.
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
                                 )}
@@ -738,7 +899,20 @@ export const Register = () => {
                         )}
                     </div>
                 )}
-            </div>
+                    </div>
+                </div>
+
+                {/* Right Column: Static Minimalist Care Mascot */}
+                <div className="lg:col-span-6 xl:col-span-6 hidden lg:flex items-center justify-center p-4">
+                    <CareMascotVisual />
+                </div>
+            </main>
+
+            {/* Bottom Footer */}
+            <footer className="w-full max-w-7xl mx-auto px-6 md:px-12 py-5 flex flex-col sm:flex-row items-center justify-between text-[11px] text-[#9c8491] gap-2 border-t border-[#f7ebf0]">
+                <span>© {new Date().getFullYear()} Sanjeevani Clinical Network</span>
+                <span className="font-mono">Empathetic Care • Teleconsultation • Records</span>
+            </footer>
         </div>
     );
 };

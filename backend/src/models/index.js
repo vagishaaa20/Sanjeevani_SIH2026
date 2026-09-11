@@ -24,7 +24,7 @@ const HealthWorkerProfile = require('./healthWorkerProfileModel');
 const HealthWorkerAssignment = require('./healthWorkerAssignmentModel');
 const HealthWorkerFollowup = require('./healthWorkerFollowupModel');
 const HealthWorkerReferral = require('./healthWorkerReferralModel');
-
+const VerificationDocument = require('./verificationDocumentModel');
 
 // ── User → profile associations (1:1, cascade delete) ────────────────────────
 User.hasOne(PatientProfile, { foreignKey: 'userId', as: 'patientProfile', onDelete: 'CASCADE' });
@@ -37,8 +37,12 @@ DoctorProfile.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 ClinicProfile.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 HealthWorkerProfile.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 
+// ── User → verification documents (1:many, cascade delete) ──────────────────────
+User.hasMany(VerificationDocument, { foreignKey: 'userId', as: 'verificationDocuments', onDelete: 'CASCADE' });
+VerificationDocument.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+VerificationDocument.belongsTo(User, { foreignKey: 'reviewedBy', as: 'reviewer' });
 
-// ── User → documents (1:many, cascade delete) ────────────────────────────────
+// Backward compatible aliases
 User.hasMany(ProfessionalDocument, { foreignKey: 'ownerId', as: 'documents', onDelete: 'CASCADE' });
 ProfessionalDocument.belongsTo(User, { foreignKey: 'ownerId', as: 'owner' });
 
@@ -134,5 +138,6 @@ module.exports = {
   HealthWorkerProfile,
   HealthWorkerAssignment,
   HealthWorkerFollowup,
-  HealthWorkerReferral
+  HealthWorkerReferral,
+  VerificationDocument,
 };

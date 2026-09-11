@@ -4,6 +4,7 @@ import { Heart, Lock, Mail, Phone, Sparkles } from 'lucide-react';
 import useAuth from '../../hooks/useAuth';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
+import CareMascotVisual from '../../components/auth/CareMascotVisual';
 
 const DEV_ADMIN_EMAIL = 'admin@sanjeevani.gov.in';
 const DEV_ADMIN_PASSWORD = 'admin1234';
@@ -117,51 +118,83 @@ export const Login = () => {
     const isDev = import.meta.env.DEV;
 
     return (
-        <div className="w-full max-w-md mx-auto py-8 px-4 flex flex-col items-center animate-fade-in-up">
-            {/* Header Brand */}
-            <div className="flex flex-col items-center gap-2 mb-6 text-center">
-                <div className="w-12 h-12 rounded-full bg-[#ffe6ee] border border-[#f8c8d8] flex items-center justify-center text-[#e13b68] shadow-xs">
-                    <Heart className="w-6 h-6 fill-[#e13b68]" />
-                </div>
-                <h1 className="text-3xl font-black text-[#2d2329] tracking-tight font-heading">
-                    Sanjeevani
-                </h1>
-                <p className="text-xs font-semibold text-[#7d6974]">
-                    AI-Assisted Telemedicine & Care Infrastructure
-                </p>
-            </div>
+        <div className="relative min-h-screen w-full bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(255,225,235,0.6),rgba(255,252,254,0.95))] text-[#1c1218] overflow-x-hidden flex flex-col justify-between selection:bg-[#fce4ec] selection:text-[#d93864]">
+            {/* Ambient Background Glow */}
+            <div className="fixed top-0 right-1/4 w-[600px] h-[600px] bg-[#ffe6ee]/40 rounded-full blur-3xl pointer-events-none -z-10" />
 
-            {/* Login Card Container */}
-            <div className="w-full bg-white border border-[#f5e4ec] rounded-3xl p-6 md:p-8 shadow-sm flex flex-col gap-6 text-left">
-                {/* Role Tabs */}
-                <div className="grid grid-cols-3 sm:grid-cols-5 gap-1.5 p-1.5 bg-[#fdf0f4] border border-[#f5e4ec] rounded-2xl">
-                    {[
-                        { key: 'patient', label: 'Patient' },
-                        { key: 'staff', label: 'Doctor' },
-                        { key: 'health_worker', label: 'Health Worker' },
-                        { key: 'clinic', label: 'Clinic' },
-                        { key: 'admin', label: 'Admin' },
-                    ].map(({ key, label }) => (
-                        <button
-                            key={key}
-                            type="button"
-                            onClick={() => switchTab(key)}
-                            className={`py-2 text-[11px] font-bold rounded-xl cursor-pointer transition-all ${
-                                activeTab === key
-                                    ? 'bg-white text-[#e13b68] shadow-xs font-black'
-                                    : 'text-[#7d6974] hover:text-[#2d2329]'
-                            }`}
-                        >
-                            {label}
-                        </button>
-                    ))}
-                </div>
-
-                {error && (
-                    <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold rounded-2xl">
-                        {error}
+            {/* Top Navigation */}
+            <header className="w-full max-w-7xl mx-auto px-6 md:px-12 py-5 flex items-center justify-between z-30">
+                <Link
+                    to="/"
+                    className="flex items-center gap-2.5 text-lg font-black tracking-tight text-[#1c1218] group"
+                >
+                    <div className="w-8 h-8 rounded-full bg-[#ffe8ee] border border-[#f8c8d8] flex items-center justify-center text-[#e13b68] shadow-xs group-hover:scale-105 transition-transform">
+                        <Heart className="w-4 h-4 fill-[#e13b68]" />
                     </div>
-                )}
+                    <span className="font-heading tracking-tight font-black text-xl">Sanjeevani</span>
+                </Link>
+
+                <div className="flex items-center gap-3">
+                    <span className="text-xs text-[#7d6974] font-medium hidden sm:inline">New to Sanjeevani?</span>
+                    <Link
+                        to="/register"
+                        className="px-4 py-1.5 rounded-full bg-white border border-[#f5e4ec] hover:border-[#f0d0dc] text-xs font-bold text-[#1c1218] transition shadow-xs"
+                    >
+                        Register
+                    </Link>
+                </div>
+            </header>
+
+            {/* Main Composition: Auth LEFT (5 cols) + Mascot RIGHT (7 cols) */}
+            <main className="flex-1 w-full max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center my-auto py-6 md:py-10 z-20">
+                {/* Left Column: Authentication Panel (5 cols) */}
+                <div className="lg:col-span-5 flex flex-col gap-6 max-w-md w-full mx-auto lg:mx-0">
+                    <div className="flex flex-col gap-2">
+                        <div className="flex items-center gap-2 text-[11px] font-black tracking-[0.2em] text-[#e13b68] uppercase font-mono">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#e13b68]" />
+                            Access Portal
+                        </div>
+                        <h1 className="text-3xl sm:text-4xl font-black text-[#1c1218] tracking-tight font-heading">
+                            Welcome back.
+                        </h1>
+                        <p className="text-xs sm:text-sm font-medium text-[#7d6974]">
+                            Select your portal to sign in to your Sanjeevani workspace.
+                        </p>
+                    </div>
+
+                    {/* Role Selector Tabs */}
+                    <div className="grid grid-cols-3 sm:grid-cols-5 gap-1 p-1 bg-[#faf0f4] border border-[#f5e4ec] rounded-2xl">
+                        {[
+                            { key: 'patient', label: 'Patient' },
+                            { key: 'staff', label: 'Doctor' },
+                            { key: 'health_worker', label: 'Worker' },
+                            { key: 'clinic', label: 'Clinic' },
+                            { key: 'admin', label: 'Admin' },
+                        ].map(({ key, label }) => (
+                            <button
+                                key={key}
+                                type="button"
+                                onClick={() => switchTab(key)}
+                                className={`py-2 text-[11px] font-bold rounded-xl cursor-pointer transition-all ${
+                                    activeTab === key
+                                        ? 'bg-white text-[#e13b68] shadow-xs font-black'
+                                        : 'text-[#7d6974] hover:text-[#1c1218]'
+                                }`}
+                            >
+                                {label}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Error Banner */}
+                    {error && (
+                        <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold rounded-2xl">
+                            {error}
+                        </div>
+                    )}
+
+                    {/* Form Container */}
+                    <div className="w-full bg-white border border-[#f5e4ec] rounded-3xl p-6 md:p-7 shadow-xs flex flex-col gap-5">
 
                 {/* Patient OTP */}
                 {isPatientTab && (
@@ -353,6 +386,19 @@ export const Login = () => {
                     </p>
                 </div>
             </div>
+        </div>
+
+        {/* Right Column: Static Minimalist Care Mascot (7 cols) */}
+        <div className="lg:col-span-7 hidden lg:flex items-center justify-center p-4">
+            <CareMascotVisual />
+        </div>
+    </main>
+
+            {/* Bottom Footer */}
+            <footer className="w-full max-w-7xl mx-auto px-6 md:px-12 py-5 flex flex-col sm:flex-row items-center justify-between text-[11px] text-[#9c8491] gap-2 border-t border-[#f7ebf0]">
+                <span>© {new Date().getFullYear()} Sanjeevani Clinical Network</span>
+                <span className="font-mono">Empathetic Care • Teleconsultation • Records</span>
+            </footer>
         </div>
     );
 };

@@ -1,13 +1,25 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
+import api from '../../services/api';
 import DoctorOutbreakWidget from '../../components/doctor/DoctorOutbreakWidget';
 import DoctorQueueList from '../../components/doctor/DoctorQueueList';
-import DoctorReferralForm from './DoctorReferralForm';
 import DoctorActiveConsultations from '../../components/doctor/DoctorActiveConsultations';
-import DoctorIncomingReferrals from '../../components/doctor/DoctorIncomingReferrals';
-import CareHeroBanner from '../../components/common/CareHeroBanner';
 import Badge from '../../components/common/Badge';
+import { 
+    Users, 
+    CheckCircle2, 
+    Star, 
+    Building, 
+    ShieldCheck, 
+    MapPin, 
+    ArrowUpRight, 
+    Stethoscope,
+    Share2,
+    Activity,
+    FileText,
+    Flame
+} from 'lucide-react';
 
 const STATUS_MESSAGES = {
     PENDING_VERIFICATION: {
@@ -91,10 +103,10 @@ const VerificationGate = ({ status }) => {
                     </p>
                 </div>
                 <Link
-                    to="/doctor/documents"
+                    to="/doctor/profile"
                     className="px-5 py-2.5 rounded-full bg-[#e13b68] hover:bg-[#c92a55] text-white text-xs font-bold shadow-xs transition flex-shrink-0"
                 >
-                    📄 Manage Documents →
+                    📄 View Profile & Documents →
                 </Link>
             </div>
         </div>
@@ -103,6 +115,21 @@ const VerificationGate = ({ status }) => {
 
 const DoctorDashboard = () => {
     const { user } = useAuth();
+    const [stats, setStats] = useState(null);
+    const [practiceLocationsCount, setPracticeLocationsCount] = useState(1);
+
+    useEffect(() => {
+        if (!user || user.role !== 'doctor') return;
+        api.get('/doctors/stats/overview')
+            .then((res) => {
+                setStats(res.data?.stats || {});
+                const locs = res.data?.practiceLocations || user?.profile?.availability?.practiceLocations || [];
+                setPracticeLocationsCount(locs.length || 1);
+            })
+            .catch(() => {
+                setStats({});
+            });
+    }, [user]);
 
     if (!user || user.role !== 'doctor') {
         return (
@@ -120,42 +147,172 @@ const DoctorDashboard = () => {
     }
 
     const profile = user.profile || {};
+    const doctorInitials = profile.fullName ? profile.fullName.charAt(0).toUpperCase() : 'D';
 
     return (
         <div className="w-full flex flex-col gap-6 text-left animate-fade-in-up">
-            <CareHeroBanner
-                headline="Care. Connect. Heal."
-                tagline="Delivering compassionate, accessible healthcare every day."
-            />
+            {/* Executive Clinical Command Header */}
+            <div className="bg-white border border-[#f5e4ec] rounded-3xl p-6 md:p-8 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden">
+                <div className="absolute top-0 right-0 -mr-16 -mt-16 w-56 h-56 bg-radial from-[#ffe6ee] to-transparent rounded-full pointer-events-none opacity-50" />
 
-            <div className="bg-white border border-[#f5e4ec] rounded-3xl p-6 md:p-8 flex flex-col md:flex-row md:justify-between md:items-center gap-6 shadow-xs">
-                <div className="flex flex-col gap-1.5">
-                    <div className="flex flex-wrap items-center gap-3">
-                        <h2 className="text-2xl md:text-3xl font-black text-[#2d2329] font-heading">
-                            Dr. {profile.fullName || 'Doctor'}
-                        </h2>
-                        <Badge variant="mint" dot>
-                            Verified Practitioner
-                        </Badge>
+                <div className="flex items-start gap-4 md:gap-6 z-10">
+                    <div className="w-16 h-16 md:w-20 md:h-20 rounded-3xl bg-linear-to-tr from-[#ffe6ee] to-[#fffcfd] border-2 border-[#f5c6d6] text-[#e13b68] flex items-center justify-center font-heading text-2xl md:text-3xl font-black shadow-xs flex-shrink-0">
+                        {doctorInitials}
                     </div>
-                    <p className="text-xs font-bold text-[#7d6974]">
-                        {profile.specialization || 'General Practitioner'} · {profile.city || 'N/A'}
-                    </p>
+
+                    <div className="flex flex-col gap-1.5">
+                        <div className="flex flex-wrap items-center gap-2.5">
+                            <h1 className="text-2xl md:text-3xl font-black text-[#2d2329] font-heading">
+                                Dr. {profile.fullName || 'Doctor'}
+                            </h1>
+                            <Badge variant="mint" dot>
+                                NMC Verified Practitioner
+                            </Badge>
+                        </div>
+
+                        <p className="text-xs md:text-sm font-bold text-[#e13b68]">
+                            {profile.specialization || 'General Medicine & Specialist'}
+                        </p>
+
+                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-[#7d6974] font-medium mt-1">
+                            {profile.medicalRegistrationNumber && (
+                                <span className="flex items-center gap-1">
+                                    <ShieldCheck className="w-3.5 h-3.5 text-[#e13b68]" />
+                                    Reg: <strong>{profile.medicalRegistrationNumber}</strong>
+                                </span>
+                            )}
+                            {profile.city && (
+                                <span className="flex items-center gap-1">
+                                    <MapPin className="w-3.5 h-3.5 text-[#e13b68]" />
+                                    {profile.city}, India
+                                </span>
+                            )}
+                            <span className="flex items-center gap-1.5 font-bold text-emerald-700">
+                                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                                Available for Consultations
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2.5 z-10 self-start md:self-auto">
+                    <Link
+                        to="/doctor/profile"
+                        className="px-4 py-2 rounded-full bg-[#ffe6ee] hover:bg-[#f5c6d6] text-[#8e1d41] text-xs font-bold transition shadow-2xs"
+                    >
+                        My Profile & Stats →
+                    </Link>
+                    <Link
+                        to="/doctor/clinics"
+                        className="px-4 py-2 rounded-full bg-[#ffe6ee] hover:bg-[#f5c6d6] text-[#8e1d41] text-xs font-bold transition shadow-2xs"
+                    >
+                        Practice Locations →
+                    </Link>
+                    <Link
+                        to="/doctor/referrals"
+                        className="px-4 py-2 rounded-full bg-[#e13b68] hover:bg-[#c92a55] text-white text-xs font-bold transition shadow-xs"
+                    >
+                        Referral Desk →
+                    </Link>
                 </div>
             </div>
 
+            {/* Quick Clinical Metrics Bar */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="bg-white border border-[#f5e4ec] rounded-3xl p-5 shadow-xs flex flex-col gap-1">
+                    <div className="w-9 h-9 rounded-2xl bg-[#ffe6ee] text-[#e13b68] flex items-center justify-center mb-1">
+                        <Users className="w-4 h-4" />
+                    </div>
+                    <span className="text-2xl md:text-3xl font-black text-[#2d2329] font-heading">
+                        {stats?.uniquePatients ?? 0}
+                    </span>
+                    <span className="text-xs font-bold text-[#7d6974]">Patients Checked</span>
+                </div>
+
+                <div className="bg-white border border-[#f5e4ec] rounded-3xl p-5 shadow-xs flex flex-col gap-1">
+                    <div className="w-9 h-9 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-1">
+                        <CheckCircle2 className="w-4 h-4" />
+                    </div>
+                    <span className="text-2xl md:text-3xl font-black text-[#2d2329] font-heading">
+                        {stats?.completedConsultations ?? 0}
+                    </span>
+                    <span className="text-xs font-bold text-[#7d6974]">Consultations Done</span>
+                </div>
+
+                <div className="bg-white border border-[#f5e4ec] rounded-3xl p-5 shadow-xs flex flex-col gap-1">
+                    <div className="w-9 h-9 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center mb-1">
+                        <Building className="w-4 h-4" />
+                    </div>
+                    <span className="text-2xl md:text-3xl font-black text-[#2d2329] font-heading">
+                        {practiceLocationsCount}
+                    </span>
+                    <span className="text-xs font-bold text-[#7d6974]">Practice Clinics</span>
+                </div>
+
+                <div className="bg-white border border-[#f5e4ec] rounded-3xl p-5 shadow-xs flex flex-col gap-1">
+                    <div className="w-9 h-9 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mb-1">
+                        <Star className="w-4 h-4 fill-amber-500 text-amber-500" />
+                    </div>
+                    <span className="text-2xl md:text-3xl font-black text-[#2d2329] font-heading">
+                        {stats?.avgRating ? Number(stats.avgRating).toFixed(1) : '5.0'}
+                    </span>
+                    <span className="text-xs font-bold text-[#7d6974]">
+                        Rating ({stats?.reviewCount ?? 0} reviews)
+                    </span>
+                </div>
+            </div>
+
+            {/* Main Clinical Grid: Active Calls & Queue on Left, Surveillance & Shortcuts on Right */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2 flex flex-col gap-6">
                     <DoctorActiveConsultations />
                     <DoctorQueueList />
                 </div>
-                <div>
+                <div className="flex flex-col gap-6">
                     <DoctorOutbreakWidget />
+
+                    {/* Rapid Clinical Shortcuts */}
+                    <div className="bg-white rounded-3xl border border-[#f5e4ec] p-6 shadow-xs flex flex-col gap-4">
+                        <h3 className="font-black text-[#2d2329] text-sm font-heading">
+                            Clinical Shortcuts
+                        </h3>
+                        <div className="flex flex-col gap-2.5">
+                            <Link
+                                to="/doctor/referrals"
+                                className="p-3 rounded-2xl bg-[#fffcfd] hover:bg-[#ffe6ee]/50 border border-[#f5e4ec] text-xs font-bold text-[#2d2329] flex items-center justify-between transition group"
+                            >
+                                <span className="flex items-center gap-2">
+                                    <Share2 className="w-4 h-4 text-[#e13b68]" />
+                                    <span>Incoming ASHA Referrals</span>
+                                </span>
+                                <ArrowUpRight className="w-3.5 h-3.5 text-[#7d6974] group-hover:text-[#e13b68] transition-colors" />
+                            </Link>
+
+                            <Link
+                                to="/doctor/clinics"
+                                className="p-3 rounded-2xl bg-[#fffcfd] hover:bg-[#ffe6ee]/50 border border-[#f5e4ec] text-xs font-bold text-[#2d2329] flex items-center justify-between transition group"
+                            >
+                                <span className="flex items-center gap-2">
+                                    <Building className="w-4 h-4 text-[#e13b68]" />
+                                    <span>Clinic Timings & Fees</span>
+                                </span>
+                                <ArrowUpRight className="w-3.5 h-3.5 text-[#7d6974] group-hover:text-[#e13b68] transition-colors" />
+                            </Link>
+
+                            <Link
+                                to="/doctor/heatmap"
+                                className="p-3 rounded-2xl bg-[#fffcfd] hover:bg-[#ffe6ee]/50 border border-[#f5e4ec] text-xs font-bold text-[#2d2329] flex items-center justify-between transition group"
+                            >
+                                <span className="flex items-center gap-2">
+                                    <Flame className="w-4 h-4 text-[#e13b68]" />
+                                    <span>Nationwide Epidemic Map</span>
+                                </span>
+                                <ArrowUpRight className="w-3.5 h-3.5 text-[#7d6974] group-hover:text-[#e13b68] transition-colors" />
+                            </Link>
+                        </div>
+                    </div>
                 </div>
             </div>
-
-            <DoctorIncomingReferrals />
-            <DoctorReferralForm />
         </div>
     );
 };

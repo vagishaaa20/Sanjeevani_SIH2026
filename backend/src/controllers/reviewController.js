@@ -77,4 +77,71 @@ async function postReview(req, res) {
     }
 }
 
-module.exports = { postReview };
+/**
+ * GET /api/doctors/:doctorId/reviews
+ * Returns all reviews for a specific doctor.
+ */
+async function getDoctorReviews(req, res) {
+    const { doctorId } = req.params;
+    try {
+        const reviews = await DoctorReview.findAll({
+            where: { doctorId },
+            order: [['createdAt', 'DESC']],
+            limit: 30,
+        });
+
+        // Compute aggregate stats
+        const aggregate = await DoctorReview.findOne({
+            where: { doctorId },
+            attributes: [
+                [fn('AVG', col('rating')), 'avgRating'],
+                [fn('COUNT', col('id')), 'reviewCount'],
+            ],
+            raw: true,
+        });
+
+        return res.json({
+            reviews,
+            stats: {
+                avgRating: aggregate?.avgRating ? parseFloat(aggregate.avgRating).toFixed(1) : '5.0',
+                reviewCount: parseInt(aggregate?.reviewCount || 0, 10),
+            },
+        });
+    } catch (err) {
+        console.error('[getDoctorReviews] error:', err);
+        return res.status(500).json({ error: 'Failed to fetch doctor reviews' });
+    }
+}
+
+const { VERIFICATION_STATUS } = require('../constants/roles');
+
+/**
+ * GET /api/doctors/leaderboard
+ * Returns top-rated doctors across the platform.
+ */
+async function getLeaderboard(req, res) {
+    try {
+        const topDoctors = await DoctorProfile.findAll({
+            where: {
+                verificationStatus: VERIFICATION_STATUS.VERIFIED,
+            },
+            attributes: [
+                'userId', 'fullName', 'specialization', 'city',
+                'avgRating', 'reviewCount', 'yearsOfExperience', 'consultationFee', 'clinicOrHospital'
+            ],
+            order: [
+                ['avgRating', 'DESC'],
+                ['reviewCount', 'DESC'],
+            ],
+            limit: 10,
+        });
+
+        return res.json({ leaderboard: topDoctors });
+    } catch (err) {
+        console.error('[getLeaderboard] error:', err);
+        return res.status(500).json({ error: 'Failed to fetch leaderboard' });
+    }
+}
+
+module.exports = { postReview, getDoctorReviews, getLeaderboard };
+

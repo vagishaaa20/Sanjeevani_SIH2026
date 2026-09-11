@@ -2,15 +2,16 @@ import React, { useEffect, useState, useContext } from 'react';
 import { outbreakService } from '../../services/outbreakService';
 import { SocketContext } from '../../context/SocketContext';
 import { Link } from 'react-router-dom';
+import { Flame, ShieldAlert, ArrowRight, Activity, MapPin } from 'lucide-react';
+import Badge from '../common/Badge';
 
-// Note: In an ideal scenario this maps exactly to doctor city. For demo, we just show top 3 nationwide.
 const DoctorOutbreakWidget = () => {
     const [alerts, setAlerts] = useState([]);
     const { socket } = useContext(SocketContext);
 
     useEffect(() => {
         outbreakService.getActiveAlerts().then(res => {
-            const sorted = res.alerts.sort((a, b) => (b.confirmedCount - a.confirmedCount) || (b.reportedCount - a.reportedCount)).slice(0, 3);
+            const sorted = (res.alerts || []).sort((a, b) => (b.confirmedCount - a.confirmedCount) || (b.reportedCount - a.reportedCount)).slice(0, 3);
             setAlerts(sorted);
         }).catch(err => console.error(err));
     }, []);
@@ -35,31 +36,100 @@ const DoctorOutbreakWidget = () => {
         return () => {
             socket.off('outbreak:update');
             socket.off('outbreak:resolved');
-        }
+        };
     }, [socket]);
 
-    if (alerts.length === 0) return null;
+    if (alerts.length === 0) {
+        return (
+            <div className="bg-white rounded-3xl border border-[#f5e4ec] p-6 shadow-xs flex flex-col gap-4">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-xl bg-[#ffe6ee] text-[#e13b68] flex items-center justify-center">
+                            <Activity className="w-4 h-4" />
+                        </div>
+                        <h3 className="font-black text-[#2d2329] text-sm font-heading">Epidemic Surveillance</h3>
+                    </div>
+                    <Badge variant="mint" dot>
+                        All Quiet
+                    </Badge>
+                </div>
+                <p className="text-xs text-[#7d6974] font-medium leading-relaxed">
+                    No active high-risk disease outbreak clusters detected in your regional surveillance zone.
+                </p>
+                <Link
+                    to="/doctor/heatmap"
+                    className="mt-1 text-xs font-bold text-[#e13b68] hover:text-[#c92a55] flex items-center gap-1.5 transition"
+                >
+                    <span>View Nationwide Heatmap</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+            </div>
+        );
+    }
 
     return (
-        <div className="bg-white rounded-2xl border-2 border-red-300 p-4 shadow-sm flex flex-col gap-3">
-            <div className="flex items-center gap-2">
-                <span className="text-xl">⚠️</span>
-                <h3 className="font-black text-red-900 text-sm tracking-wide uppercase">Active Regional Outbreaks</h3>
-            </div>
-            <div className="flex flex-col gap-2">
-                {alerts.map(a => (
-                    <div key={a.id} className="flex justify-between items-center text-xs font-semibold bg-red-50 px-3 py-2 rounded-lg border border-red-100">
-                        <span className="text-red-900">{a.diseaseCategory}</span>
-                        <div className="flex items-center gap-2">
-                            <span className={`px-1.5 py-0.5 rounded text-[9px] uppercase font-black text-white
-                                ${a.riskLevel === 'severe' ? 'bg-red-500' : a.riskLevel === 'moderate' ? 'bg-orange-500' : 'bg-amber-400'}`}>
-                                {a.riskLevel}
-                            </span>
-                            <span className="text-red-700 bg-red-200 px-1.5 py-0.5 rounded font-black whitespace-nowrap text-[9px]">{a.confirmedCount || 0} conf. / {a.reportedCount || 0} rep.</span>
-                        </div>
+        <div className="bg-white rounded-3xl border border-[#f5e4ec] p-6 shadow-xs flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
+                        <ShieldAlert className="w-4 h-4" />
                     </div>
-                ))}
+                    <div>
+                        <h3 className="font-black text-[#2d2329] text-sm font-heading">Active Outbreaks</h3>
+                        <p className="text-[10px] text-[#7d6974] font-semibold">Regional surveillance alerts</p>
+                    </div>
+                </div>
+                <Badge variant="pink" pulse>
+                    Live Alert
+                </Badge>
             </div>
+
+            <div className="flex flex-col gap-2.5">
+                {alerts.map(a => {
+                    const isSevere = a.riskLevel === 'severe';
+                    const isModerate = a.riskLevel === 'moderate';
+
+                    return (
+                        <div
+                            key={a.id}
+                            className="flex flex-col gap-2 bg-[#fffcfd] p-3.5 rounded-2xl border border-[#f5e4ec] hover:border-[#f5c6d6] transition shadow-2xs"
+                        >
+                            <div className="flex items-center justify-between">
+                                <span className="font-bold text-xs text-[#2d2329]">{a.diseaseCategory}</span>
+                                <span
+                                    className={`px-2 py-0.5 rounded-full text-[9px] uppercase font-black tracking-wider ${
+                                        isSevere
+                                            ? 'bg-rose-100 text-rose-800 border border-rose-200'
+                                            : isModerate
+                                            ? 'bg-amber-100 text-amber-800 border border-amber-200'
+                                            : 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                                    }`}
+                                >
+                                    {a.riskLevel}
+                                </span>
+                            </div>
+
+                            <div className="flex items-center justify-between text-[11px] text-[#7d6974] pt-1 border-t border-[#f5e4ec]/60">
+                                <span className="flex items-center gap-1 font-medium">
+                                    <MapPin className="w-3 h-3 text-[#e13b68]" />
+                                    <span>{a.region || a.district || 'Regional Hub'}</span>
+                                </span>
+                                <span className="font-bold text-[#8e1d41] bg-[#ffe6ee] px-2 py-0.5 rounded-md text-[10px]">
+                                    {a.confirmedCount || 0} conf. / {a.reportedCount || 0} rep.
+                                </span>
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+
+            <Link
+                to="/doctor/heatmap"
+                className="mt-1 pt-3 border-t border-[#f5e4ec] text-xs font-bold text-[#e13b68] hover:text-[#c92a55] flex items-center justify-between transition group"
+            >
+                <span>View Full Epidemic Heatmap</span>
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+            </Link>
         </div>
     );
 };

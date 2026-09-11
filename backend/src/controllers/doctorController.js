@@ -16,35 +16,35 @@ const { findNearbyDoctors } = require('../services/locationService');
  *   ?page=1&limit=20
  */
 async function listPublicDoctors(req, res) {
-  const page = Math.max(1, parseInt(req.query.page, 10) || 1);
-  const limit = Math.min(50, Math.max(1, parseInt(req.query.limit, 10) || 20));
-  const offset = (page - 1) * limit;
+    const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+    const limit = Math.min(50, Math.max(1, parseInt(req.query.limit, 10) || 20));
+    const offset = (page - 1) * limit;
 
-  const profileWhere = {
-    verificationStatus: VERIFICATION_STATUS.VERIFIED,
-  };
+    const profileWhere = {
+        verificationStatus: VERIFICATION_STATUS.VERIFIED,
+    };
 
-  if (req.query.city) {
-    profileWhere.city = { [Op.iLike]: `%${req.query.city}%` };
-  }
-  if (req.query.specialization) {
-    profileWhere.specialization = { [Op.iLike]: `%${req.query.specialization}%` };
-  }
+    if (req.query.city) {
+        profileWhere.city = { [Op.iLike]: `%${req.query.city}%` };
+    }
+    if (req.query.specialization) {
+        profileWhere.specialization = { [Op.iLike]: `%${req.query.specialization}%` };
+    }
 
-  const { count, rows } = await DoctorProfile.findAndCountAll({
-    where: profileWhere,
-    // PUBLIC FIELDS ONLY — sensitive data explicitly excluded
-    attributes: [
-      'userId', 'fullName', 'specialization', 'subSpecialization',
-      'city', 'consultationFee', 'languages', 'regionsServed',
-      'clinicOrHospital', 'bio', 'availability', 'yearsOfExperience',
-    ],
-    limit,
-    offset,
-    order: [['fullName', 'ASC']],
-  });
+    const { count, rows } = await DoctorProfile.findAndCountAll({
+        where: profileWhere,
+        // PUBLIC FIELDS ONLY — sensitive data explicitly excluded
+        attributes: [
+            'userId', 'fullName', 'specialization', 'subSpecialization',
+            'city', 'consultationFee', 'languages', 'regionsServed',
+            'clinicOrHospital', 'bio', 'availability', 'yearsOfExperience',
+        ],
+        limit,
+        offset,
+        order: [['fullName', 'ASC']],
+    });
 
-  return res.json({ total: count, page, limit, doctors: rows });
+    return res.json({ total: count, page, limit, doctors: rows });
 }
 
 // ── GET /api/doctors/public/:userId ──────────────────────────────────────────
@@ -54,38 +54,38 @@ async function listPublicDoctors(req, res) {
  * Safe fields only — no NMC details, documents, or verification notes.
  */
 async function getPublicDoctor(req, res) {
-  const profile = await DoctorProfile.findOne({
-    where: {
-      userId: req.params.userId,
-      verificationStatus: VERIFICATION_STATUS.VERIFIED,
-    },
-    attributes: [
-      'userId', 'fullName', 'specialization', 'subSpecialization',
-      'city', 'consultationFee', 'languages', 'regionsServed',
-      'clinicOrHospital', 'bio', 'availability', 'yearsOfExperience',
-    ],
-  });
+    const profile = await DoctorProfile.findOne({
+        where: {
+            userId: req.params.userId,
+            verificationStatus: VERIFICATION_STATUS.VERIFIED,
+        },
+        attributes: [
+            'userId', 'fullName', 'specialization', 'subSpecialization',
+            'city', 'consultationFee', 'languages', 'regionsServed',
+            'clinicOrHospital', 'bio', 'availability', 'yearsOfExperience',
+        ],
+    });
 
-  if (!profile) return res.status(404).json({ error: 'Doctor not found or not yet verified' });
-  return res.json({ doctor: profile });
+    if (!profile) return res.status(404).json({ error: 'Doctor not found or not yet verified' });
+    return res.json({ doctor: profile });
 }
 
 const getNearbyDoctors = async (req, res, next) => {
-  try {
-    const { lat, lng, radiusKm, specialization } = req.query;
-    if (!lat || !lng) {
-      return res.status(400).json({ message: 'lat and lng are required' });
+    try {
+        const { lat, lng, radiusKm, specialization } = req.query;
+        if (!lat || !lng) {
+            return res.status(400).json({ message: 'lat and lng are required' });
+        }
+        const doctors = await findNearbyDoctors({
+            lat: parseFloat(lat),
+            lng: parseFloat(lng),
+            radiusKm: radiusKm ? parseFloat(radiusKm) : 15,
+            specialization: specialization || null
+        });
+        res.json({ count: doctors.length, doctors });
+    } catch (err) {
+        next(err);
     }
-    const doctors = await findNearbyDoctors({
-      lat: parseFloat(lat),
-      lng: parseFloat(lng),
-      radiusKm: radiusKm ? parseFloat(radiusKm) : 15,
-      specialization: specialization || null
-    });
-    res.json({ count: doctors.length, doctors });
-  } catch (err) {
-    next(err);
-  }
 };
 
 // ── Add this to doctorController.js ──────────────────────────────────────────
@@ -173,7 +173,7 @@ const getRecentPatients = async (req, res, next) => {
                 });
             }
         }
-        
+
         return res.json({ patients: Array.from(patientsMap.values()) });
     } catch (err) {
         next(err);
@@ -245,7 +245,7 @@ const updateIncomingReferral = async (req, res, next) => {
         }
 
         const updates = { status };
-        
+
         if (status === 'COMPLETED') {
             updates.completedAt = new Date();
         } else if (status === 'ATTENDED') {
@@ -265,4 +265,59 @@ const updateIncomingReferral = async (req, res, next) => {
     }
 };
 
-module.exports = { listPublicDoctors, getPublicDoctor, getNearbyDoctors, updateOwnProfile, getRecentPatients, getIncomingReferrals, updateIncomingReferral };
+const getDoctorStats = async (req, res, next) => {
+    try {
+        const { Consultation, HealthWorkerReferral, DoctorProfile } = require('../models');
+        const doctorId = req.user.id;
+        const profile = await DoctorProfile.findOne({ where: { userId: doctorId } });
+
+        const totalConsultations = await Consultation.count({ where: { doctorId } }).catch(() => 0);
+        const completedConsultations = await Consultation.count({ where: { doctorId, status: 'COMPLETED' } }).catch(() => 0);
+        
+        const todayStart = new Date();
+        todayStart.setHours(0, 0, 0, 0);
+        const todayConsultations = await Consultation.count({
+            where: {
+                doctorId,
+                createdAt: { [Op.gte]: todayStart }
+            }
+        }).catch(() => 0);
+
+        const recentConsultations = await Consultation.findAll({
+            where: { doctorId },
+            attributes: ['patientId']
+        }).catch(() => []);
+        const uniquePatients = new Set(recentConsultations.map(c => c.patientId)).size;
+
+        const totalReferrals = await HealthWorkerReferral.count({ where: { toDoctorId: doctorId } }).catch(() => 0);
+        const pendingReferrals = await HealthWorkerReferral.count({ where: { toDoctorId: doctorId, status: 'SENT' } }).catch(() => 0);
+
+        return res.json({
+            stats: {
+                totalConsultations,
+                completedConsultations,
+                todayConsultations,
+                uniquePatients,
+                totalReferrals,
+                pendingReferrals,
+                avgRating: profile?.avgRating ? Number(profile.avgRating) : 5.0,
+                reviewCount: profile?.reviewCount || 0,
+                practiceLocationsCount: (profile?.availability?.practiceLocations || []).length
+            },
+            practiceLocations: profile?.availability?.practiceLocations || []
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+
+module.exports = {
+    listPublicDoctors,
+    getPublicDoctor,
+    getNearbyDoctors,
+    updateOwnProfile,
+    getRecentPatients,
+    getIncomingReferrals,
+    updateIncomingReferral,
+    getDoctorStats,
+};

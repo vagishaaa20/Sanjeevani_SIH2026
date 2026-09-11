@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import api from '../../services/api';
+import { CheckCircle2 } from 'lucide-react';
 
 const WA_BUSINESS_NUMBER = import.meta.env.VITE_WA_BUSINESS_NUMBER || '919999999999'; // fallback
 
@@ -83,7 +84,10 @@ export default function WhatsAppModal({ isOpen, onClose }) {
 
                     {status === 'success' && (
                         <div className="bg-emerald-50 border border-emerald-300 rounded-xl p-4 text-center flex flex-col gap-1">
-                            <p className="font-bold text-emerald-700 text-sm">✅ Message sent!</p>
+                            <p className="font-bold text-emerald-700 text-sm flex items-center justify-center gap-1.5">
+                                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                                <span>Message sent!</span>
+                            </p>
                             <p className="text-xs text-emerald-600">
                                 Check WhatsApp — a message from Sanjeevani will arrive shortly. Reply *MENU* to get started.
                             </p>

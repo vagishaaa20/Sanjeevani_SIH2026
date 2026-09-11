@@ -35,14 +35,22 @@ async function notifyOutbreak(alert, io) {
 
     // 4. WhatsApp dispatch for 'severe' risk level
     if (alert.riskLevel === 'severe') {
-        const radiusLat = alert.radiusKm / 111.32; // ~1 degree lat is 111km
-        const radiusLng = alert.radiusKm / (40075 * Math.cos(alert.centerLat * Math.PI / 180) / 360);
+        const cLat = parseFloat(alert.centerLat);
+        const cLng = parseFloat(alert.centerLng);
+        const rKm = parseFloat(alert.radiusKm) || 10;
+        const radiusLat = rKm / 111.32; // ~1 degree lat is 111km
+        const radiusLng = rKm / (40075 * Math.cos(cLat * Math.PI / 180) / 360);
+
+        const minLat = cLat - radiusLat;
+        const maxLat = cLat + radiusLat;
+        const minLng = cLng - radiusLng;
+        const maxLng = cLng + radiusLng;
 
         // Simple Haversine approximation query for patients within radius
         const patients = await PatientProfile.findAll({
             where: sequelize.literal(`
-                latitude BETWEEN ${alert.centerLat - radiusLat} AND ${alert.centerLat + radiusLat}
-                AND longitude BETWEEN ${alert.centerLng - radiusLng} AND ${alert.centerLng + radiusLng}
+                latitude BETWEEN ${minLat} AND ${maxLat}
+                AND longitude BETWEEN ${minLng} AND ${maxLng}
             `),
             include: ['user'] // Need User to get phone number
         });
