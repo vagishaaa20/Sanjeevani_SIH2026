@@ -69,9 +69,8 @@ export const AuthProvider = ({ children }) => {
             setUser(completeUser);
             localStorage.setItem('user', JSON.stringify(completeUser));
             return completeUser;
-        } catch (error) {
+        } finally {
             setLoading(false);
-            throw error;
         }
     };
 
@@ -105,9 +104,8 @@ export const AuthProvider = ({ children }) => {
             setUser(completeUser);
             localStorage.setItem('user', JSON.stringify(completeUser));
             return completeUser;
-        } catch (error) {
+        } finally {
             setLoading(false);
-            throw error;
         }
     };
 

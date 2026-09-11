@@ -10,6 +10,10 @@ const PRECAUTIONS = {
     'Other': 'Maintain standard hygiene practices and consult a physician if you develop any severe symptoms.'
 };
 
+// Minimum case threshold for displaying public emergency epidemic alerts
+const MIN_CONFIRMED_THRESHOLD = 10;
+const MIN_REPORTED_THRESHOLD = 25;
+
 const OutbreakBanner = ({ userRegionGeohash }) => {
     const { socket, connected } = useContext(SocketContext);
     const [alerts, setAlerts] = useState([]);
@@ -20,11 +24,12 @@ const OutbreakBanner = ({ userRegionGeohash }) => {
     });
 
     useEffect(() => {
-        // Fetch active alerts on mount to see if there's any matching user's region
+        // Fetch active alerts on mount to see if there's any matching user's region and crossing genuine epidemic threshold
         outbreakService.getActiveAlerts().then(res => {
-            const matches = res.alerts.filter(a =>
+            const matches = (res.alerts || []).filter(a =>
                 a.geohash === userRegionGeohash &&
-                (a.riskLevel === 'severe' || a.riskLevel === 'moderate')
+                (a.riskLevel === 'severe' || a.riskLevel === 'moderate') &&
+                (a.isGovernmentAdvisory || a.confirmedCount >= MIN_CONFIRMED_THRESHOLD || a.reportedCount >= MIN_REPORTED_THRESHOLD)
             );
             setAlerts(matches);
         }).catch(err => console.error('Failed to load alerts for banner', err));

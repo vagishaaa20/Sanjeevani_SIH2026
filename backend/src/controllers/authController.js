@@ -1,11 +1,13 @@
 const sequelize = require('../config/db');
 const fs = require('fs');
-const { User, PatientProfile, DoctorProfile, ClinicProfile, ReviewerProfile, ProfessionalDocument, HealthWorkerProfile } = require('../models');
+const { v4: uuidv4 } = require('uuid');
+const { User, PatientProfile, DoctorProfile, ClinicProfile, ReviewerProfile, ProfessionalDocument, VerificationDocument, HealthWorkerProfile } = require('../models');
 const { hashPassword, comparePassword } = require('../utils/hash');
 const { generateAccessToken, generateRefreshToken, verifyRefreshToken } = require('../utils/jwt');
 const { generateOtp, getOtpExpiry, isOtpValid } = require('../utils/otp');
 const { ROLES, PATIENT_STATUS, VERIFICATION_STATUS, DOCUMENT_TYPE, DOCUMENT_STATUS } = require('../constants/roles');
 const { enqueueFreeText } = require('../services/waCloudService');
+const storageService = require('../services/verificationStorageService');
 
 function cleanupUploadedFiles(files) {
   if (!files) return;
@@ -205,30 +207,75 @@ async function registerDoctor(req, res) {
       { transaction: t }
     );
 
+    const medDocId = uuidv4();
+    const qualDocId = uuidv4();
+    const medStoragePath = `doctors/${user.id}/${medDocId}.pdf`;
+    const qualStoragePath = `doctors/${user.id}/${qualDocId}.pdf`;
+
+    // Upload to private verification storage
+    if (fs.existsSync(medCert.path)) {
+      const medBuffer = fs.readFileSync(medCert.path);
+      await storageService.uploadVerificationPdf(medBuffer, medStoragePath, medCert.mimetype || 'application/pdf');
+    }
+    if (fs.existsSync(qualificationCert.path)) {
+      const qualBuffer = fs.readFileSync(qualificationCert.path);
+      await storageService.uploadVerificationPdf(qualBuffer, qualStoragePath, qualificationCert.mimetype || 'application/pdf');
+    }
+
+    await VerificationDocument.bulkCreate([
+      {
+        id: medDocId,
+        userId: user.id,
+        role: ROLES.DOCTOR,
+        documentType: DOCUMENT_TYPE.MEDICAL_REGISTRATION_CERTIFICATE,
+        fileName: medCert.originalname,
+        storagePath: medStoragePath,
+        mimeType: medCert.mimetype || 'application/pdf',
+        fileSize: medCert.size,
+        status: 'PENDING',
+        uploadedAt: new Date(),
+      },
+      {
+        id: qualDocId,
+        userId: user.id,
+        role: ROLES.DOCTOR,
+        documentType: DOCUMENT_TYPE.MBBS_OR_PRIMARY_QUALIFICATION,
+        fileName: qualificationCert.originalname,
+        storagePath: qualStoragePath,
+        mimeType: qualificationCert.mimetype || 'application/pdf',
+        fileSize: qualificationCert.size,
+        status: 'PENDING',
+        uploadedAt: new Date(),
+      },
+    ], { transaction: t });
+
     await ProfessionalDocument.bulkCreate([
       {
+        id: medDocId,
         ownerId: user.id,
         ownerRole: ROLES.DOCTOR,
         documentType: DOCUMENT_TYPE.MEDICAL_REGISTRATION_CERTIFICATE,
-        storageKey: medCert.path,
+        storageKey: medStoragePath,
         originalFileName: medCert.originalname,
-        mimeType: medCert.mimetype,
+        mimeType: medCert.mimetype || 'application/pdf',
         fileSizeBytes: medCert.size,
         status: DOCUMENT_STATUS.PENDING,
       },
       {
+        id: qualDocId,
         ownerId: user.id,
         ownerRole: ROLES.DOCTOR,
         documentType: DOCUMENT_TYPE.MBBS_OR_PRIMARY_QUALIFICATION,
-        storageKey: qualificationCert.path,
+        storageKey: qualStoragePath,
         originalFileName: qualificationCert.originalname,
-        mimeType: qualificationCert.mimetype,
+        mimeType: qualificationCert.mimetype || 'application/pdf',
         fileSizeBytes: qualificationCert.size,
         status: DOCUMENT_STATUS.PENDING,
       },
     ], { transaction: t });
 
     await t.commit();
+    cleanupUploadedFiles(files);
 
     return res.status(201).json({
       message: 'Doctor account created with verification documents uploaded. Access is pending admin audit.',

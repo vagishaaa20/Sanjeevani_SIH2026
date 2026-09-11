@@ -1,14 +1,11 @@
 import React, { useState } from 'react';
+import { Bot, Sparkles, Loader2, FileText, CheckCircle } from 'lucide-react';
 import consultationService from '../../services/consultationService';
 
 /**
  * AiSummaryCard
  * Displayed under a completed consultation entry.
  * Summary is generated on-demand (lazy) and cached server-side.
- *
- * Props:
- *   consultationId {string}
- *   existingSummary {string|null} — pre-cached summary from consultation list response
  */
 export default function AiSummaryCard({ consultationId, existingSummary }) {
     const [summary, setSummary] = useState(existingSummary || null);
@@ -24,55 +21,69 @@ export default function AiSummaryCard({ consultationId, existingSummary }) {
             setSummary(data.aiSummary);
             setGenerated(true);
         } catch (err) {
-            setError(err.response?.data?.error || 'Could not generate summary');
+            setError(err.response?.data?.error || 'Could not generate AI clinical summary');
         } finally {
             setLoading(false);
         }
     };
 
-    // No notes / prescription on server — don't show anything
     if (generated && !summary) return null;
 
     return (
-        <div className="mt-3 bg-gradient-to-r from-sky-50 to-teal-50 border border-teal-200 rounded-xl p-4 flex flex-col gap-2">
+        <div className="bg-[#fff9fb] border border-[#f8c8d8] rounded-2xl p-4 sm:p-5 flex flex-col gap-3 shadow-2xs">
             {/* Header row */}
             <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-1.5">
-                    <span className="text-base" aria-hidden="true">🤖</span>
-                    <p className="text-[10px] font-bold text-teal-700 uppercase tracking-wide">
-                        AI-generated Summary
+                <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-xl bg-[#ffe6ee] border border-[#f8c8d8] flex items-center justify-center text-[#e13b68]">
+                        <Bot className="w-4 h-4" />
+                    </div>
+                    <p className="text-xs font-black text-[#e13b68] uppercase tracking-wider">
+                        AI Clinical Summary
                     </p>
                 </div>
+
                 {!generated && (
                     <button
                         type="button"
                         onClick={handleGenerate}
                         disabled={loading}
-                        className="text-[10px] font-bold text-cerulean-dark border border-cerulean rounded-lg px-2 py-0.5 hover:bg-cerulean hover:text-white transition-colors disabled:opacity-50"
+                        className="text-xs font-bold px-3 py-1.5 rounded-full bg-[#e13b68] text-white hover:bg-[#c92a55] transition shadow-2xs disabled:opacity-50 flex items-center gap-1.5 cursor-pointer"
                     >
-                        {loading ? 'Generating…' : 'Generate Summary'}
+                        {loading ? (
+                            <>
+                                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                <span>Generating...</span>
+                            </>
+                        ) : (
+                            <>
+                                <Sparkles className="w-3.5 h-3.5" />
+                                <span>Generate Summary</span>
+                            </>
+                        )}
                     </button>
                 )}
             </div>
 
             {/* Skeleton while loading */}
             {loading && (
-                <div className="flex flex-col gap-1.5 animate-pulse">
-                    <div className="h-3 bg-teal-200 rounded w-full" />
-                    <div className="h-3 bg-teal-200 rounded w-5/6" />
-                    <div className="h-3 bg-teal-200 rounded w-3/4" />
+                <div className="flex flex-col gap-2 animate-pulse pt-2">
+                    <div className="h-3.5 bg-[#fce4ec] rounded-md w-full" />
+                    <div className="h-3.5 bg-[#fce4ec] rounded-md w-5/6" />
+                    <div className="h-3.5 bg-[#fce4ec] rounded-md w-3/4" />
                 </div>
             )}
 
             {/* Summary text */}
             {!loading && summary && (
-                <p className="text-sm text-ink-charcoal leading-relaxed">{summary}</p>
+                <div className="pt-1">
+                    <p className="text-xs sm:text-sm text-[#4a3c45] font-semibold leading-relaxed">
+                        {summary}
+                    </p>
+                </div>
             )}
 
             {/* Error */}
-            {error && (
-                <p className="text-xs text-red-500">{error}</p>
-            )}
+            {error && <p className="text-xs font-bold text-rose-600">{error}</p>}
         </div>
     );
 }

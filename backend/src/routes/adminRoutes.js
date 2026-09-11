@@ -11,6 +11,7 @@ router.use(requireRole('admin'));
 
 // ── Verification queue ────────────────────────────────────────────────────────
 router.get('/pending', controller.listPending);
+router.get('/verification-documents', controller.listVerificationRequests);
 
 // ── User management ───────────────────────────────────────────────────────────
 router.get('/users', controller.listUsers);
@@ -19,7 +20,8 @@ router.get('/users/:userId', controller.getUserDetail);
 // ── Verification actions ──────────────────────────────────────────────────────
 router.patch('/verify/:userId', controller.verifyUser);
 
-// ── Document review ───────────────────────────────────────────────────────────
+// ── Document review & signed URL generation ──────────────────────────────────
+router.get('/documents/:documentId/signed-url', controller.getAdminDocumentSignedUrl);
 router.patch('/documents/:documentId', controller.reviewDocument);
 router.get('/documents/:documentId/file', controller.serveDocument);
 

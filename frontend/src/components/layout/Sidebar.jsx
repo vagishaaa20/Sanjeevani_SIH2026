@@ -18,6 +18,7 @@ import {
     ClipboardList,
     Pill,
     FileText,
+    Flame,
 } from 'lucide-react';
 import useAuth from '../../hooks/useAuth';
 
@@ -40,13 +41,22 @@ export const Sidebar = () => {
         ],
         doctor: [
             { path: '/doctor/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-            { path: '/doctor/documents', label: 'My Documents', icon: FileText },
+            { path: '/doctor/profile', label: 'Doctor Profile & Stats', icon: Users },
+            { path: '/doctor/clinics', label: 'Practice Locations', icon: Building },
+            { path: '/doctor/referrals', label: 'Patient Referrals', icon: HeartPulse },
+            { path: '/doctor/leaderboard', label: 'Health Champions', icon: BarChart3 },
+            { path: '/doctor/heatmap', label: 'Epidemic Heatmap', icon: Flame },
         ],
         patient: [
             { path: '/patient/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-            { path: '/patient/medicine-availability', label: 'Medicine Availability', icon: Search },
-            { path: '/patient/consultations', label: 'Appointments', icon: Calendar },
+            { path: '/patient/ai-triage', label: 'AI Clinical Triage', icon: Stethoscope },
+            { path: '/patient/doctors', label: 'Find Doctors & Reviews', icon: Search },
+            { path: '/patient/leaderboard', label: 'Health Champions', icon: BarChart3 },
+            { path: '/patient/heatmap', label: 'Epidemic Heatmap', icon: Flame },
+            { path: '/patient/consultations', label: 'My Consultations', icon: Calendar },
+            { path: '/patient/medicine-availability', label: 'Find Medicines', icon: Pill },
             { path: '/patient/subsidy', label: 'Subsidy & Assistance', icon: HeartPulse },
+            { path: '/patient/profile', label: 'My Profile & ABHA', icon: Users },
         ],
         health_worker: [
             { path: '/health-worker/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -88,10 +98,9 @@ export const Sidebar = () => {
                                 key={link.path}
                                 to={link.path}
                                 className={({ isActive }) =>
-                                    `whitespace-nowrap px-4 py-3 rounded-2xl text-xs md:text-sm font-bold transition-all duration-150 flex items-center gap-3 flex-shrink-0 ${
-                                        isActive
-                                            ? 'bg-[#ffe6ee] text-[#e13b68] shadow-xs font-black'
-                                            : 'text-[#4a3c45] hover:text-[#e13b68] hover:bg-white/60'
+                                    `whitespace-nowrap px-4 py-3 rounded-2xl text-xs md:text-sm font-bold transition-all duration-150 flex items-center gap-3 flex-shrink-0 ${isActive
+                                        ? 'bg-[#ffe6ee] text-[#e13b68] shadow-xs font-black'
+                                        : 'text-[#4a3c45] hover:text-[#e13b68] hover:bg-white/60'
                                     }`
                                 }
                             >

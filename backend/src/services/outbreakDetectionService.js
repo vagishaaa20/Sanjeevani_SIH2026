@@ -25,18 +25,18 @@ function calculateRiskLevel(currentConfirmed, currentReported, prevConfirmed, pr
         reportedGrowth = 100;
     }
 
-    // Evaluate severe (driven strictly by confirmed diagnoses)
-    if (currentConfirmed >= thresholds.severe.minCases || confirmedGrowth >= thresholds.severe.growthPct) {
+    // Evaluate severe (driven strictly by confirmed diagnoses with minimum volume)
+    if (currentConfirmed >= thresholds.severe.minCases || (currentConfirmed >= 8 && confirmedGrowth >= thresholds.severe.growthPct)) {
         return 'severe';
     }
-    // Evaluate moderate (driven strictly by confirmed diagnoses)
-    if (currentConfirmed >= thresholds.moderate.minCases || confirmedGrowth >= thresholds.moderate.growthPct) {
+    // Evaluate moderate (driven strictly by confirmed diagnoses with minimum volume)
+    if (currentConfirmed >= thresholds.moderate.minCases || (currentConfirmed >= 4 && confirmedGrowth >= thresholds.moderate.growthPct)) {
         return 'moderate';
     }
     // Evaluate watch (driven by unconfirmed/reported signals OR early confirmed signals)
     if (currentConfirmed >= thresholds.watch.minCases ||
         currentReported >= thresholds.moderate.minCases ||
-        reportedGrowth >= thresholds.moderate.growthPct) {
+        (currentReported >= 5 && reportedGrowth >= thresholds.moderate.growthPct)) {
         return 'watch';
     }
     if (currentReported >= thresholds.watch.minCases) {

@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react';
 import api from '../../services/api';
 import Button from '../../components/common/Button';
 import Badge from '../../components/common/Badge';
+import AdminPdfViewerModal from '../../components/admin/AdminPdfViewerModal';
+import { FileText, Eye, CheckCircle2, XCircle, RotateCcw } from 'lucide-react';
 
 const DOCUMENT_TYPE_LABELS = {
     MEDICAL_REGISTRATION_CERTIFICATE: 'Medical Registration Certificate',
     MBBS_OR_PRIMARY_QUALIFICATION: 'MBBS / Primary Qualification',
     INTERNSHIP_COMPLETION_CERTIFICATE: 'Internship Completion Certificate',
-    GOVERNMENT_IDENTITY: 'Government Identity',
+    GOVERNMENT_IDENTITY: 'Government Identity (Aadhar / PAN)',
     PROFESSIONAL_PHOTOGRAPH: 'Professional Photograph',
     PG_QUALIFICATION_CERTIFICATE: 'PG Qualification Certificate',
     ADDITIONAL_QUALIFICATION_PROOF: 'Additional Qualification Proof',
@@ -19,8 +21,10 @@ const DOCUMENT_TYPE_LABELS = {
 
 const DOC_STATUS_CONFIG = {
     PENDING: { variant: 'warning', label: 'Pending' },
-    ACCEPTED: { variant: 'success', label: 'Accepted' },
+    ACCEPTED: { variant: 'success', label: 'Approved' },
+    APPROVED: { variant: 'success', label: 'Approved' },
     REJECTED: { variant: 'error', label: 'Rejected' },
+    RESUBMISSION_REQUIRED: { variant: 'warning', label: 'Resubmission Required' },
 };
 
 const VERIFY_STATUS_CONFIG = {
@@ -33,6 +37,7 @@ const VERIFY_STATUS_CONFIG = {
 
 const formatBytes = (bytes) => {
     if (!bytes) return '—';
+    if (bytes < 1024) return `${bytes} B`;
     if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 };
@@ -40,140 +45,100 @@ const formatBytes = (bytes) => {
 // ─────────────────────────────────────────────────────────────────────────────
 // DocumentsSection — rendered inside each doctor card
 // ─────────────────────────────────────────────────────────────────────────────
-const DocumentsSection = ({ userId, expanded }) => {
+const DocumentsSection = ({ userId, expanded, doctorName }) => {
     const [documents, setDocuments] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [actioning, setActioning] = useState(null); // docId being acted upon
-    const [viewingDocId, setViewingDocId] = useState(null); // docId being viewed
+    const [selectedDoc, setSelectedDoc] = useState(null);
     const [msg, setMsg] = useState({ type: '', text: '' });
 
-    const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-
-    useEffect(() => {
-        if (!expanded) return;
+    const loadDocs = () => {
         setLoading(true);
         api.get(`/admin/users/${userId}`)
             .then((res) => setDocuments(res.data.documents || []))
             .catch((err) => setMsg({ type: 'error', text: err.response?.data?.error || 'Failed to load documents' }))
             .finally(() => setLoading(false));
+    };
+
+    useEffect(() => {
+        if (!expanded) return;
+        loadDocs();
     }, [userId, expanded]);
-
-    const handleDocAction = async (docId, status) => {
-        setActioning(docId);
-        setMsg({ type: '', text: '' });
-        try {
-            await api.patch(`/admin/documents/${docId}`, { status });
-            setDocuments((prev) =>
-                prev.map((d) => (d.id === docId ? { ...d, status } : d))
-            );
-            setMsg({ type: 'success', text: `Document ${status === 'ACCEPTED' ? 'accepted' : 'rejected'}.` });
-        } catch (err) {
-            setMsg({ type: 'error', text: err.response?.data?.error || 'Action failed' });
-        } finally {
-            setActioning(null);
-        }
-    };
-
-    const handleViewDocument = async (docId) => {
-        setViewingDocId(docId);
-        setMsg({ type: '', text: '' });
-        try {
-            const response = await api.get(`/admin/documents/${docId}/file`, {
-                responseType: 'blob'
-            });
-            const url = window.URL.createObjectURL(new Blob([response.data]));
-            const link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('target', '_blank');
-            document.body.appendChild(link);
-            link.click();
-            link.parentNode.removeChild(link);
-            setTimeout(() => window.URL.revokeObjectURL(url), 10000);
-        } catch (err) {
-            setMsg({ type: 'error', text: 'Failed to access document file securely.' });
-        } finally {
-            setViewingDocId(null);
-        }
-    };
 
     if (!expanded) return null;
 
     return (
-        <div className="mt-3 flex flex-col gap-3 border-t border-ink-black/10 pt-4">
-            <h4 className="text-xs font-black text-ink-black uppercase tracking-wide">
-                📄 Verification Documents
+        <div className="mt-3 flex flex-col gap-3 border-t border-[#f5e4ec] pt-4">
+            <h4 className="text-xs font-black text-[#1c1218] uppercase tracking-wide flex items-center gap-1.5">
+                <FileText className="w-4 h-4 text-[#e13b68]" />
+                <span>Verification Documents</span>
             </h4>
 
             {msg.text && (
-                <p className={`text-xs font-semibold px-3 py-2 rounded-lg ${msg.type === 'success' ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
+                <p className={`text-xs font-semibold px-3 py-2 rounded-xl ${msg.type === 'success' ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'}`}>
                     {msg.text}
                 </p>
             )}
 
             {loading ? (
                 <div className="flex justify-center py-4">
-                    <div className="w-6 h-6 border-4 border-t-pastel-pink-action border-r-transparent border-b-cerulean border-l-transparent rounded-full animate-spin" />
+                    <div className="w-6 h-6 border-4 border-t-[#e13b68] border-r-transparent border-b-[#e13b68] border-l-transparent rounded-full animate-spin" />
                 </div>
             ) : documents.length === 0 ? (
-                <p className="text-xs text-ink-muted font-medium italic">No documents uploaded yet by this doctor.</p>
+                <p className="text-xs text-[#7d6974] font-medium italic">No verification documents uploaded yet by this doctor.</p>
             ) : (
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-2.5">
                     {documents.map((doc) => {
                         const statusCfg = DOC_STATUS_CONFIG[doc.status] || DOC_STATUS_CONFIG.PENDING;
                         const friendlyType = DOCUMENT_TYPE_LABELS[doc.documentType] || doc.documentType;
-                        const isActioning = actioning === doc.id;
 
                         return (
                             <div
                                 key={doc.id}
-                                className="flex items-center justify-between gap-3 flex-wrap bg-cream-bg rounded-xl px-4 py-3"
+                                className="flex items-center justify-between gap-3 flex-wrap bg-[#fffafc] border border-[#f5e4ec] rounded-2xl px-4 py-3"
                             >
                                 <div className="flex flex-col gap-0.5 flex-grow">
                                     <div className="flex items-center gap-2 flex-wrap">
-                                        <p className="text-xs font-bold text-ink-black">{friendlyType}</p>
+                                        <p className="text-xs font-bold text-[#1c1218]">{friendlyType}</p>
                                         <Badge variant={statusCfg.variant}>{statusCfg.label}</Badge>
                                     </div>
-                                    <p className="text-2xs text-ink-muted font-medium">
-                                        {doc.originalFileName} · {formatBytes(doc.fileSizeBytes)}
+                                    <p className="text-[11px] text-[#7d6974] font-medium">
+                                        {doc.fileName || doc.originalFileName} · {formatBytes(doc.fileSize || doc.fileSizeBytes)}
                                     </p>
+                                    {doc.rejectionReason && (
+                                        <p className="text-[11px] font-semibold text-rose-700 mt-0.5">
+                                            Reason: {doc.rejectionReason}
+                                        </p>
+                                    )}
                                 </div>
 
-                                <div className="flex items-center gap-1.5 flex-wrap">
-                                    {/* View file securely via authenticated fetch */}
+                                <div className="flex items-center gap-2 flex-wrap">
                                     <button
                                         type="button"
-                                        onClick={() => handleViewDocument(doc.id)}
-                                        disabled={viewingDocId === doc.id || isActioning}
-                                        className="text-2xs font-bold px-3 py-1.5 rounded-lg border border-ink-black/20 text-ink-charcoal hover:bg-white transition disabled:opacity-50"
+                                        onClick={() => setSelectedDoc(doc)}
+                                        className="text-xs font-bold px-3.5 py-1.5 rounded-full bg-[#fdf5f7] border border-[#f8c8d8] text-[#e13b68] hover:bg-[#ffe6ee] transition shadow-2xs flex items-center gap-1.5 cursor-pointer"
                                     >
-                                        {viewingDocId === doc.id ? 'Loading...' : '👁 View'}
+                                        <Eye className="w-3.5 h-3.5" />
+                                        <span>View PDF Document</span>
                                     </button>
-
-                                    {doc.status !== 'ACCEPTED' && (
-                                        <button
-                                            type="button"
-                                            onClick={() => handleDocAction(doc.id, 'ACCEPTED')}
-                                            disabled={isActioning}
-                                            className="text-2xs font-bold px-3 py-1.5 rounded-lg border border-emerald-300 bg-emerald-50 text-emerald-800 hover:bg-emerald-100 cursor-pointer transition disabled:opacity-50"
-                                        >
-                                            {isActioning ? '…' : '✓ Accept'}
-                                        </button>
-                                    )}
-                                    {doc.status !== 'REJECTED' && (
-                                        <button
-                                            type="button"
-                                            onClick={() => handleDocAction(doc.id, 'REJECTED')}
-                                            disabled={isActioning}
-                                            className="text-2xs font-bold px-3 py-1.5 rounded-lg border border-red-300 bg-red-50 text-red-700 hover:bg-red-100 cursor-pointer transition disabled:opacity-50"
-                                        >
-                                            {isActioning ? '…' : '✗ Reject'}
-                                        </button>
-                                    )}
                                 </div>
                             </div>
                         );
                     })}
                 </div>
+            )}
+
+            {/* Complete Full PDF Viewer Modal */}
+            {selectedDoc && (
+                <AdminPdfViewerModal
+                    isOpen={!!selectedDoc}
+                    onClose={() => setSelectedDoc(null)}
+                    documentId={selectedDoc.id}
+                    initialDoc={selectedDoc}
+                    user={{ name: doctorName, role: 'Doctor' }}
+                    onActionSuccess={() => {
+                        loadDocs();
+                    }}
+                />
             )}
         </div>
     );
@@ -334,7 +299,7 @@ const DoctorApprovalList = () => {
                                     {docsExpanded ? '▲ Hide Documents' : '▼ View Documents'}
                                 </button>
 
-                                <DocumentsSection userId={doc.userId} expanded={docsExpanded} />
+                                <DocumentsSection userId={doc.userId} expanded={docsExpanded} doctorName={doc.fullName} />
 
                                 {/* Admin notes */}
                                 <div className="flex flex-col gap-1">
