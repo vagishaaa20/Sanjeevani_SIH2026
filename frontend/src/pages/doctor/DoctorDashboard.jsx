@@ -162,12 +162,13 @@ const DoctorDashboard = () => {
 
                     <div className="flex flex-col gap-1.5">
                         <div className="flex flex-wrap items-center gap-2.5">
-                            <h1 className="text-2xl md:text-3xl font-black text-[#2d2329] font-heading">
+                            <h1 className="text-2xl md:text-3xl font-black text-[#1c1218] font-heading tracking-tight">
                                 Dr. {profile.fullName || 'Doctor'}
                             </h1>
-                            <Badge variant="mint" dot>
-                                NMC Verified Practitioner
-                            </Badge>
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[11px] font-bold">
+                                <ShieldCheck className="w-3 h-3 text-emerald-600" />
+                                NMC Verified
+                            </span>
                         </div>
 
                         <p className="text-xs md:text-sm font-bold text-[#e13b68]">
@@ -178,7 +179,7 @@ const DoctorDashboard = () => {
                             {profile.medicalRegistrationNumber && (
                                 <span className="flex items-center gap-1">
                                     <ShieldCheck className="w-3.5 h-3.5 text-[#e13b68]" />
-                                    Reg: <strong>{profile.medicalRegistrationNumber}</strong>
+                                    Reg: <strong className="text-[#2d2329] font-bold">{profile.medicalRegistrationNumber}</strong>
                                 </span>
                             )}
                             {profile.city && (
@@ -198,21 +199,24 @@ const DoctorDashboard = () => {
                 <div className="flex flex-wrap items-center gap-2.5 z-10 self-start md:self-auto">
                     <Link
                         to="/doctor/profile"
-                        className="px-4 py-2 rounded-full bg-[#ffe6ee] hover:bg-[#f5c6d6] text-[#8e1d41] text-xs font-bold transition shadow-2xs"
+                        className="px-4 py-2 rounded-full bg-white hover:bg-[#fff0f5] border border-[#f0d0dc] hover:border-[#e13b68]/40 text-[#2d2329] hover:text-[#e13b68] text-xs font-bold transition shadow-xs flex items-center gap-1.5"
                     >
-                        My Profile & Stats →
+                        <User className="w-3.5 h-3.5 text-[#e13b68]" />
+                        <span>Profile & Documents</span>
                     </Link>
                     <Link
                         to="/doctor/clinics"
-                        className="px-4 py-2 rounded-full bg-[#ffe6ee] hover:bg-[#f5c6d6] text-[#8e1d41] text-xs font-bold transition shadow-2xs"
+                        className="px-4 py-2 rounded-full bg-white hover:bg-[#fff0f5] border border-[#f0d0dc] hover:border-[#e13b68]/40 text-[#2d2329] hover:text-[#e13b68] text-xs font-bold transition shadow-xs flex items-center gap-1.5"
                     >
-                        Practice Locations →
+                        <Building2 className="w-3.5 h-3.5 text-[#e13b68]" />
+                        <span>Clinics ({practiceLocationsCount})</span>
                     </Link>
                     <Link
                         to="/doctor/referrals"
-                        className="px-4 py-2 rounded-full bg-[#e13b68] hover:bg-[#c92a55] text-white text-xs font-bold transition shadow-xs"
+                        className="px-4 py-2 rounded-full bg-[#e13b68] hover:bg-[#c92a55] text-white text-xs font-bold transition shadow-xs flex items-center gap-1.5"
                     >
-                        Referral Desk →
+                        <Sparkles className="w-3.5 h-3.5" />
+                        <span>Referral Desk</span>
                     </Link>
                 </div>
             </div>

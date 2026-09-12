@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Heart, Lock, Mail, Phone, Sparkles } from 'lucide-react';
+import { Heart, Lock, Mail, Phone, Sparkles, User, Stethoscope, HeartPulse, Building2, Shield } from 'lucide-react';
 import useAuth from '../../hooks/useAuth';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
@@ -166,26 +166,33 @@ export const Login = () => {
                         </p>
                     </div>
 
-                    {/* Role Selector Tabs */}
-                    <div className="grid grid-cols-3 sm:grid-cols-5 gap-1 p-1 bg-[#faf0f4] border border-[#f5e4ec] rounded-2xl">
+                    {/* Minimalist Role Selector Tabs with Micro-Avatars */}
+                    <div className="grid grid-cols-5 gap-1.5 p-1.5 bg-[#faf0f4] border border-[#f5e4ec] rounded-2xl">
                         {[
-                            { key: 'patient', label: 'Patient' },
-                            { key: 'staff', label: 'Doctor' },
-                            { key: 'health_worker', label: 'Worker' },
-                            { key: 'clinic', label: 'Clinic' },
-                            { key: 'admin', label: 'Admin' },
-                        ].map(({ key, label }) => (
+                            { key: 'patient', label: 'Patient', icon: User },
+                            { key: 'staff', label: 'Doctor', icon: Stethoscope },
+                            { key: 'health_worker', label: 'Worker', icon: HeartPulse },
+                            { key: 'clinic', label: 'Clinic', icon: Building2 },
+                            { key: 'admin', label: 'Admin', icon: Shield },
+                        ].map(({ key, label, icon: Icon }) => (
                             <button
                                 key={key}
                                 type="button"
                                 onClick={() => switchTab(key)}
-                                className={`py-2 text-[11px] font-bold rounded-xl cursor-pointer transition-all ${
+                                className={`flex flex-col items-center justify-center gap-1 py-2 px-1 text-[11px] font-bold rounded-xl cursor-pointer transition-all ${
                                     activeTab === key
-                                        ? 'bg-white text-[#e13b68] shadow-xs font-black'
-                                        : 'text-[#7d6974] hover:text-[#1c1218]'
+                                        ? 'bg-white text-[#e13b68] shadow-xs font-black border border-[#f5c6d6]'
+                                        : 'text-[#7d6974] hover:text-[#1c1218] hover:bg-white/60 border border-transparent'
                                 }`}
                             >
-                                {label}
+                                <div className={`w-6 h-6 rounded-full flex items-center justify-center transition-all ${
+                                    activeTab === key
+                                        ? 'bg-gradient-to-tr from-[#ffe6ee] to-white text-[#e13b68] shadow-2xs'
+                                        : 'bg-[#f0e4ea]/70 text-[#7d6974]'
+                                }`}>
+                                    <Icon className="w-3.5 h-3.5" />
+                                </div>
+                                <span className="truncate">{label}</span>
                             </button>
                         ))}
                     </div>

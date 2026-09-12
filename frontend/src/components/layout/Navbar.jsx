@@ -130,20 +130,6 @@ export const Navbar = () => {
                 </div>
             </div>
 
-            {/* Center: Search Bar */}
-            <div className="hidden sm:flex items-center flex-1 max-w-md mx-6">
-                <div className="relative w-full">
-                    <Search className="w-4 h-4 text-[#7d6974] absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
-                    <input
-                        type="text"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="Search doctors, symptoms, medicines..."
-                        className="w-full pl-10 pr-4 py-2 text-xs font-semibold rounded-full bg-[#fdf5f7] border border-[#f5e4ec] text-[#2d2329] placeholder:text-[#7d6974]/60 focus:outline-none focus:ring-2 focus:ring-[#e13b68]/30 focus:bg-white transition"
-                    />
-                </div>
-            </div>
-
             {/* Right: Actions, Notifications, Language, Avatar */}
             <div className="flex items-center gap-2 md:gap-3">
                 {/* Working Indian Language Switcher Dropdown */}
@@ -288,12 +274,15 @@ export const Navbar = () => {
                         <button
                             type="button"
                             onClick={() => setProfileMenuOpen(!profileMenuOpen)}
-                            className="flex items-center gap-2 p-1 rounded-full hover:bg-[#fdf0f4] transition cursor-pointer"
+                            className="flex items-center gap-2 p-0.5 rounded-full hover:bg-[#fff0f5] border border-transparent hover:border-[#f5c6d6] transition-all cursor-pointer group"
                         >
-                            <div className="w-9 h-9 rounded-full bg-[#ffe6ee] border-2 border-[#f8c8d8] flex items-center justify-center text-xs font-black text-[#e13b68] uppercase shadow-xs">
-                                {(userName || 'P').charAt(0)}
+                            <div className="relative">
+                                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-tr from-[#ffe6ee] via-white to-[#ffeef3] border border-[#f5c6d6] flex items-center justify-center text-xs font-black text-[#e13b68] uppercase shadow-xs group-hover:scale-105 transition-transform">
+                                    {(userName || 'P').charAt(0)}
+                                </div>
+                                <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white" />
                             </div>
-                            <ChevronDown className="w-3.5 h-3.5 text-[#7d6974] hidden sm:block" />
+                            <ChevronDown className="w-3.5 h-3.5 text-[#7d6974] group-hover:text-[#e13b68] hidden sm:block transition-colors" />
                         </button>
 
                         {profileMenuOpen && (
