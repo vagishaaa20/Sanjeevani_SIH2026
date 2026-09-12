@@ -77,15 +77,15 @@ export const Sidebar = () => {
             <div className="flex flex-col gap-6">
                 {/* Brand Logo in Sidebar (Desktop) */}
                 <div className="hidden md:flex flex-col items-start gap-1 pb-4 border-b border-[#f3dce5]">
-                    <div className="flex items-center gap-2.5">
-                        <div className="w-9 h-9 rounded-2xl bg-white border border-[#f5c6d6] flex items-center justify-center shadow-2xs flex-shrink-0 p-1">
-                            <SanjeevaniLogo variant="emblem" size={28} />
+                    <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#ffe6ee] to-white border-2 border-[#f5c6d6] flex items-center justify-center shadow-xs flex-shrink-0 p-1">
+                            <SanjeevaniLogo variant="emblem" size={40} />
                         </div>
                         <div className="flex flex-col text-left">
-                            <span className="text-lg font-black text-[#2d2329] font-heading tracking-tight leading-tight">
+                            <span className="text-xl font-black text-[#2d2329] font-heading tracking-tight leading-none">
                                 Sanjeevani
                             </span>
-                            <span className="text-[10px] font-bold text-[#e13b68] tracking-widest uppercase">
+                            <span className="text-[10px] font-extrabold text-[#e13b68] tracking-widest uppercase mt-1">
                                 Clinical Platform
                             </span>
                         </div>

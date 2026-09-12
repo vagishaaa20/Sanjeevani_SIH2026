@@ -5,6 +5,7 @@ import useAuth from '../../hooks/useAuth';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
 import CareMascotVisual from '../../components/auth/CareMascotVisual';
+import SanjeevaniLogo from '../../components/common/SanjeevaniLogo';
 
 const DEV_ADMIN_EMAIL = 'admin@sanjeevani.gov.in';
 const DEV_ADMIN_PASSWORD = 'admin1234';
@@ -126,12 +127,15 @@ export const Login = () => {
             <header className="w-full max-w-7xl mx-auto px-6 md:px-12 py-5 flex items-center justify-between z-30">
                 <Link
                     to="/"
-                    className="flex items-center gap-2.5 text-lg font-black tracking-tight text-[#1c1218] group"
+                    className="flex items-center gap-3 text-lg font-black tracking-tight text-[#1c1218] group"
                 >
-                    <div className="w-8 h-8 rounded-full bg-[#ffe8ee] border border-[#f8c8d8] flex items-center justify-center text-[#e13b68] shadow-xs group-hover:scale-105 transition-transform">
-                        <Heart className="w-4 h-4 fill-[#e13b68]" />
+                    <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#ffe6ee] to-white border-2 border-[#f5c6d6] flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform p-1">
+                        <SanjeevaniLogo variant="emblem" size={32} />
                     </div>
-                    <span className="font-heading tracking-tight font-black text-xl">Sanjeevani</span>
+                    <div className="flex flex-col text-left">
+                        <span className="font-heading tracking-tight font-black text-xl leading-none">SANJEEVANI</span>
+                        <span className="text-[9px] font-bold text-[#e13b68] tracking-widest uppercase mt-0.5">Clinical Platform</span>
+                    </div>
                 </Link>
 
                 <div className="flex items-center gap-3">

@@ -113,11 +113,11 @@ export const Navbar = () => {
         <header className="bg-white/80 backdrop-blur-md border-b border-[#f5e4ec] py-3 px-4 md:px-8 flex justify-between items-center sticky top-0 z-40">
             {/* Left: Mobile Brand & Greeting */}
             <div className="flex items-center gap-3">
-                <Link to="/" className="flex items-center gap-2 font-heading md:hidden">
-                    <div className="w-8 h-8 rounded-xl bg-white border border-[#f5c6d6] flex items-center justify-center shadow-2xs flex-shrink-0 p-0.5">
-                        <SanjeevaniLogo variant="emblem" size={24} />
+                <Link to="/" className="flex items-center gap-2.5 font-heading md:hidden">
+                    <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#ffe6ee] to-white border border-[#f5c6d6] flex items-center justify-center shadow-2xs flex-shrink-0 p-1">
+                        <SanjeevaniLogo variant="emblem" size={32} />
                     </div>
-                    <span className="text-lg font-black tracking-tight text-[#2d2329]">Sanjeevani</span>
+                    <span className="text-xl font-black tracking-tight text-[#2d2329]">Sanjeevani</span>
                 </Link>
 
                 <div className="hidden md:flex flex-col text-left">
