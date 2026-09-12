@@ -59,7 +59,7 @@ export const LandingHero = () => {
                         className="flex items-center gap-3.5 text-lg font-black tracking-tight group"
                         style={{ color: 'var(--text-primary)' }}
                     >
-                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#ffe6ee] to-white border-2 border-[#f5c6d6] flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform p-1">
+                        <div className="w-12 h-12 rounded-2xl border-2 flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform p-1" style={{ background: 'var(--logo-gradient)', borderColor: 'var(--border)' }}>
                             <SanjeevaniLogo variant="emblem" size={42} />
                         </div>
                         <div className="flex flex-col text-left">

@@ -124,7 +124,7 @@ export const Navbar = () => {
             {/* Left: Mobile Brand & Greeting */}
             <div className="flex items-center gap-3">
                 <Link to="/" className="flex items-center gap-2.5 font-heading md:hidden">
-                    <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#ffe6ee] to-white border border-[#f5c6d6] flex items-center justify-center shadow-2xs flex-shrink-0 p-1">
+                    <div className="w-10 h-10 rounded-2xl border flex items-center justify-center shadow-2xs flex-shrink-0 p-1" style={{ background: 'var(--logo-gradient)', borderColor: 'var(--border)' }}>
                         <SanjeevaniLogo variant="emblem" size={32} />
                     </div>
                     <span className="text-xl font-black tracking-tight" style={{ color: 'var(--text-primary)' }}>Sanjeevani</span>
