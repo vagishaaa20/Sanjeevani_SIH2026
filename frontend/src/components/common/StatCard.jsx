@@ -12,43 +12,53 @@ export const StatCard = ({
     className = '',
 }) => {
     const iconBgs = {
-        pink: 'bg-[#ffe6ee] text-[#e13b68]',
-        peach: 'bg-[#fff0e6] text-[#e07a38]',
-        lavender: 'bg-[#f3e8ff] text-[#7c3aed]',
-        mint: 'bg-[#e6f9f0] text-[#10b981]',
-        sky: 'bg-[#e8f4fa] text-[#1e7ab8]',
-        default: 'bg-[#fdf0f4] text-[#e13b68]',
+        pink: { bg: 'var(--pastel-pink-bg)', color: 'var(--pastel-pink-text)' },
+        peach: { bg: 'var(--pastel-peach-bg)', color: 'var(--pastel-peach-text)' },
+        lavender: { bg: 'var(--pastel-lavender-bg)', color: 'var(--pastel-lavender-text)' },
+        mint: { bg: 'var(--pastel-mint-bg)', color: 'var(--pastel-mint-text)' },
+        sky: { bg: 'var(--pastel-sky-bg)', color: 'var(--pastel-sky-text)' },
+        default: { bg: 'var(--bg-surface)', color: 'var(--accent)' },
     };
 
     const subtextColors = {
-        pink: 'text-[#e13b68]',
-        peach: 'text-[#e07a38]',
-        lavender: 'text-[#7c3aed]',
-        mint: 'text-[#10b981]',
-        sky: 'text-[#1e7ab8]',
-        default: 'text-[#7d6974]',
+        pink: 'var(--pastel-pink-text)',
+        peach: 'var(--pastel-peach-text)',
+        lavender: 'var(--pastel-lavender-text)',
+        mint: 'var(--pastel-mint-text)',
+        sky: 'var(--pastel-sky-text)',
+        default: 'var(--text-secondary)',
     };
+
+    const iconStyle = iconBgs[variant] || iconBgs.default;
 
     return (
         <div
-            className={`p-5 rounded-2xl bg-white border border-[#f5e4ec] shadow-xs transition-all duration-200 hover:-translate-y-1 hover:shadow-md flex flex-col justify-between ${className}`}
+            className={`p-5 rounded-2xl transition-all duration-200 hover:-translate-y-1 hover:shadow-md flex flex-col justify-between ${className}`}
+            style={{
+                background: 'var(--card-bg)',
+                border: '1px solid var(--border)',
+                boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+            }}
         >
             <div className="flex items-center gap-3 mb-3">
                 {Icon && (
-                    <div className={`w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 ${iconBgs[variant] || iconBgs.pink}`}>
+                    <div
+                        className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0"
+                        style={{ background: iconStyle.bg, color: iconStyle.color }}
+                    >
                         <Icon className="w-5 h-5" />
                     </div>
                 )}
                 <div className="flex flex-col text-left">
-                    <p className="text-xs font-bold text-[#7d6974] tracking-tight">
+                    <p className="text-xs font-bold tracking-tight" style={{ color: 'var(--text-secondary)' }}>
                         {title}
                     </p>
                     <div className="flex items-baseline gap-1">
-                        <span className="text-2xl md:text-3xl font-black text-[#2d2329] tracking-tight font-heading">
+                        <span className="text-2xl md:text-3xl font-black tracking-tight font-heading" style={{ color: 'var(--text-primary)' }}>
                             {value}
                         </span>
                         {unit && (
-                            <span className="text-xs font-bold text-[#7d6974]">
+                            <span className="text-xs font-bold" style={{ color: 'var(--text-secondary)' }}>
                                 {unit}
                             </span>
                         )}
@@ -57,22 +67,26 @@ export const StatCard = ({
             </div>
 
             {(description || trend) && (
-                <div className="flex items-center justify-between text-xs pt-1 border-t border-[#f8e7ee]/60">
+                <div
+                    className="flex items-center justify-between text-xs pt-1 border-t"
+                    style={{ borderColor: 'var(--border-subtle)' }}
+                >
                     {description && (
-                        <span className={`text-[11px] font-bold ${subtextColors[variant] || subtextColors.pink}`}>
+                        <span className="text-[11px] font-bold" style={{ color: subtextColors[variant] || subtextColors.default }}>
                             {description}
                         </span>
                     )}
 
                     {trend && (
                         <span
-                            className={`px-2 py-0.5 rounded-full font-bold text-[10px] flex items-center gap-0.5 ${
+                            className="px-2 py-0.5 rounded-full font-bold text-[10px] flex items-center gap-0.5"
+                            style={
                                 trendDirection === 'up'
-                                    ? 'bg-[#e6f9f0] text-[#10b981]'
+                                    ? { background: 'var(--pastel-mint-bg)', color: 'var(--pastel-mint-text)' }
                                     : trendDirection === 'down'
-                                    ? 'bg-[#ffe6ee] text-[#e13b68]'
-                                    : 'bg-gray-100 text-gray-700'
-                            }`}
+                                        ? { background: 'var(--pastel-pink-bg)', color: 'var(--pastel-pink-text)' }
+                                        : { background: 'var(--bg-surface)', color: 'var(--text-secondary)' }
+                            }
                         >
                             {trendDirection === 'up' ? '↑' : trendDirection === 'down' ? '↓' : '•'} {trend}
                         </span>

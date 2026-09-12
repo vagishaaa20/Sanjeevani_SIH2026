@@ -17,14 +17,14 @@ export const ReturnDnaSection = ({ onEnterPlatform }) => {
             </div>
 
             {/* Concise Calm Statement */}
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#1c1218] tracking-tight leading-[1.1] max-w-2xl mb-4">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight leading-[1.1] max-w-2xl mb-4" style={{ color: 'var(--text-primary)' }}>
                 Your health deserves a{' '}
-                <span className="font-serif italic font-normal text-[#c4325c]">
+                <span className="font-serif italic font-normal" style={{ color: 'var(--accent-hover)' }}>
                     calmer experience.
                 </span>
             </h2>
 
-            <p className="text-sm sm:text-base text-[#7d6974] font-medium leading-relaxed max-w-md mb-8">
+            <p className="text-sm sm:text-base font-medium leading-relaxed max-w-md mb-8" style={{ color: 'var(--text-secondary)' }}>
                 Structured AI clinical triage, secure health records, and seamless care networks in one unified platform.
             </p>
 
@@ -32,7 +32,8 @@ export const ReturnDnaSection = ({ onEnterPlatform }) => {
             <div className="flex flex-wrap items-center justify-center gap-4">
                 <MagneticButton
                     onClick={onEnterPlatform}
-                    className="px-8 py-3.5 rounded-full bg-[#e13b68] hover:bg-[#c92a55] text-white text-sm font-black shadow-md hover:shadow-xl transition-all flex items-center gap-2.5 cursor-pointer"
+                    className="px-8 py-3.5 rounded-full text-white text-sm font-black shadow-md hover:shadow-xl transition-all flex items-center gap-2.5 cursor-pointer"
+                    style={{ background: 'var(--accent)' }}
                 >
                     <span>{user ? 'Enter Dashboard' : 'Get Started with Sanjeevani'}</span>
                     <ArrowRight className="w-4 h-4" />
@@ -41,7 +42,8 @@ export const ReturnDnaSection = ({ onEnterPlatform }) => {
                 {!user && (
                     <Link
                         to="/login"
-                        className="px-6 py-3.5 rounded-full bg-white/80 hover:bg-white border border-[#f5e4ec] hover:border-[#f0d0dc] text-xs font-bold text-[#1c1218] transition shadow-xs"
+                        className="px-6 py-3.5 rounded-full border text-xs font-bold transition shadow-xs hover:opacity-80"
+                        style={{ background: 'var(--card-bg)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
                     >
                         Sign In to Account
                     </Link>
@@ -60,7 +62,7 @@ export const ReturnDnaSection = ({ onEnterPlatform }) => {
                 <p>© 2026 Sanjeevani Health Network.</p>
 
                 <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                    <span className="w-2 h-2 rounded-full" style={{ background: 'var(--pastel-mint-text)' }} />
                     <span>Clinical Network Active</span>
                 </div>
             </div>

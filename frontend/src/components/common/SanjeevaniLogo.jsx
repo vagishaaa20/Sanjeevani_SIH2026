@@ -16,7 +16,10 @@ export const SanjeevaniLogo = ({
     showText = true,
     showSubtitle = true,
 }) => {
-    // Standalone Magnified Emblem Icon (Tight viewBox for maximum impact & zero dead margins)
+    // Generate a unique identifier for this SVG instance to prevent <defs> ID conflicts
+    const uid = React.useId().replace(/:/g, '');
+
+    // Standalone Magnified Emblem Icon
     if (variant === 'emblem') {
         return (
             <svg
@@ -27,33 +30,33 @@ export const SanjeevaniLogo = ({
                 xmlns="http://www.w3.org/2000/svg"
             >
                 <defs>
-                    <radialGradient id="emblemPinkHalo" cx="50%" cy="50%" r="50%">
+                    <radialGradient id={`emblemPinkHalo-${uid}`} cx="50%" cy="50%" r="50%">
                         <stop offset="0%" stopColor="#FF2A85" stopOpacity="0.28" />
                         <stop offset="60%" stopColor="#FF5C9D" stopOpacity="0.10" />
                         <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
                     </radialGradient>
 
-                    <linearGradient id="emblemInfinityPink" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <linearGradient id={`emblemInfinityPink-${uid}`} x1="0%" y1="0%" x2="100%" y2="100%">
                         <stop offset="0%" stopColor="#FF2A7A" />
                         <stop offset="35%" stopColor="#E91E63" />
                         <stop offset="70%" stopColor="#D81B60" />
                         <stop offset="100%" stopColor="#AD1457" />
                     </linearGradient>
 
-                    <linearGradient id="emblemChrome" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <linearGradient id={`emblemChrome-${uid}`} x1="0%" y1="0%" x2="100%" y2="0%">
                         <stop offset="0%" stopColor="#F8BBD0" />
                         <stop offset="40%" stopColor="#FFFFFF" />
                         <stop offset="70%" stopColor="#F48FB1" />
                         <stop offset="100%" stopColor="#AD1457" />
                     </linearGradient>
 
-                    <filter id="emblemGlow" x="-20%" y="-20%" width="140%" height="140%">
+                    <filter id={`emblemGlow-${uid}`} x="-20%" y="-20%" width="140%" height="140%">
                         <feDropShadow dx="0" dy="3" stdDeviation="5" floodColor="#D81B60" floodOpacity="0.25" />
                     </filter>
                 </defs>
 
                 {/* Ambient Soft Glow */}
-                <circle cx="450" cy="275" r="160" fill="url(#emblemPinkHalo)" />
+                <circle cx="450" cy="275" r="160" fill={`url(#emblemPinkHalo-${uid})`} />
 
                 {/* Subtle Tech Dial Rings */}
                 <g opacity="0.4" stroke="#F48FB1" fill="none">
@@ -62,7 +65,7 @@ export const SanjeevaniLogo = ({
                 </g>
 
                 {/* Main Stethoscope Infinity Ribbon with Glow */}
-                <g filter="url(#emblemGlow)">
+                <g filter={`url(#emblemGlow-${uid})`}>
                     {/* Binaural Earpieces */}
                     <circle cx="395" cy="112" r="8.5" fill="#FFFFFF" stroke="#C2185B" strokeWidth="4" />
                     <circle cx="505" cy="112" r="8.5" fill="#FFFFFF" stroke="#C2185B" strokeWidth="4" />
@@ -71,7 +74,7 @@ export const SanjeevaniLogo = ({
                     <path
                         d="M 395 118 C 395 156, 424 174, 450 180 C 476 174, 505 156, 505 118"
                         fill="none"
-                        stroke="url(#emblemChrome)"
+                        stroke={`url(#emblemChrome-${uid})`}
                         strokeWidth="6"
                         strokeLinecap="round"
                     />
@@ -80,13 +83,13 @@ export const SanjeevaniLogo = ({
                     <rect x="445.5" y="177" width="9" height="13" rx="2.5" fill="#FFFFFF" stroke="#C2185B" strokeWidth="2.5" />
 
                     {/* Lead Tube connecting stem to Ribbon Loop */}
-                    <path d="M 450 190 L 450 202" fill="none" stroke="url(#emblemInfinityPink)" strokeWidth="10" strokeLinecap="round" />
+                    <path d="M 450 190 L 450 202" fill="none" stroke={`url(#emblemInfinityPink-${uid})`} strokeWidth="10" strokeLinecap="round" />
 
                     {/* Ribbon Strand A: Sweeps Left across the Kinetic Infinity Loop */}
                     <path
                         d="M 450 190 C 410 190, 305 210, 305 290 C 305 362, 410 392, 450 285 C 485 192, 595 222, 595 290 C 595 352, 525 382, 475 382"
                         fill="none"
-                        stroke="url(#emblemInfinityPink)"
+                        stroke={`url(#emblemInfinityPink-${uid})`}
                         strokeWidth="12"
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -96,7 +99,7 @@ export const SanjeevaniLogo = ({
                     <path
                         d="M 475 382 C 440 382, 420 372, 400 352 C 385 336, 380 315, 395 298 C 410 282, 435 282, 450 285"
                         fill="none"
-                        stroke="url(#emblemInfinityPink)"
+                        stroke={`url(#emblemInfinityPink-${uid})`}
                         strokeWidth="12"
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -117,7 +120,7 @@ export const SanjeevaniLogo = ({
                     <path
                         d="M 595 290 C 615 325, 608 376, 568 412 C 536 438, 480 438, 440 432 L 380 432"
                         fill="none"
-                        stroke="url(#emblemInfinityPink)"
+                        stroke={`url(#emblemInfinityPink-${uid})`}
                         strokeWidth="9"
                         strokeLinecap="round"
                     />
@@ -125,7 +128,7 @@ export const SanjeevaniLogo = ({
                     {/* Acoustic Sensor Disc (Chestpiece) */}
                     <g transform="translate(365, 432)">
                         <circle cx="0" cy="0" r="27" fill="none" stroke="#E91E63" strokeWidth="3" strokeDasharray="10 4" />
-                        <circle cx="0" cy="0" r="21" fill="#FFFFFF" stroke="url(#emblemChrome)" strokeWidth="4.5" />
+                        <circle cx="0" cy="0" r="21" fill="#FFFFFF" stroke={`url(#emblemChrome-${uid})`} strokeWidth="4.5" />
                         <circle cx="0" cy="0" r="11" fill="#F06292" />
                         <circle cx="0" cy="0" r="5.5" fill="#AD1457" />
                     </g>

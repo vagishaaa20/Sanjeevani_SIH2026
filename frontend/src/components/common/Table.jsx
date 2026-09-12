@@ -4,23 +4,37 @@ export const Table = ({ headers, children, emptyState, className = '' }) => {
     const hasChildren = React.Children.count(children) > 0;
 
     return (
-        <div className={`overflow-x-auto w-full border border-[#f5e4ec] rounded-2xl bg-white shadow-xs ${className}`}>
+        <div
+            className={`overflow-x-auto w-full rounded-2xl shadow-xs ${className}`}
+            style={{
+                background: 'var(--card-bg)',
+                border: '1px solid var(--border)',
+            }}
+        >
             <table className="w-full border-collapse text-left text-sm">
                 <thead>
-                    <tr className="bg-[#fdf0f4] border-b border-[#f5e4ec]">
+                    <tr style={{ background: 'var(--bg-surface)', borderBottom: '1px solid var(--border)' }}>
                         {headers.map((h, i) => (
-                            <th key={i} className="px-5 py-3 text.5 text-[11px] font-black text-[#7d6974] uppercase tracking-wider">
+                            <th
+                                key={i}
+                                className="px-5 py-3 text-[11px] font-black uppercase tracking-wider"
+                                style={{ color: 'var(--text-secondary)' }}
+                            >
                                 {h}
                             </th>
                         ))}
                     </tr>
                 </thead>
-                <tbody className="divide-y divide-[#f5e4ec]/60">
+                <tbody>
                     {hasChildren ? (
                         children
                     ) : emptyState ? (
                         <tr>
-                            <td colSpan={headers.length} className="px-5 py-8 text-center text-[#7d6974]">
+                            <td
+                                colSpan={headers.length}
+                                className="px-5 py-8 text-center"
+                                style={{ color: 'var(--text-secondary)' }}
+                            >
                                 {emptyState}
                             </td>
                         </tr>

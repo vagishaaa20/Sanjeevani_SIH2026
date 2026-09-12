@@ -20,7 +20,7 @@ export const LeaderboardView = () => {
             badge: 'Top Rural Care Champion',
             rating: 5.0,
             avatar: 'S',
-            accent: 'bg-emerald-500',
+            accent: 'var(--pastel-mint-text)',
         },
         {
             id: 'c2',
@@ -30,7 +30,7 @@ export const LeaderboardView = () => {
             badge: 'Maternal Health Lead',
             rating: 4.9,
             avatar: 'P',
-            accent: 'bg-[#e13b68]',
+            accent: 'var(--accent)',
         },
         {
             id: 'c3',
@@ -40,7 +40,7 @@ export const LeaderboardView = () => {
             badge: 'Remote Outreach Hero',
             rating: 4.9,
             avatar: 'A',
-            accent: 'bg-amber-500',
+            accent: 'var(--pastel-peach-text)',
         },
     ];
 
@@ -58,45 +58,59 @@ export const LeaderboardView = () => {
     return (
         <div className="w-full flex flex-col gap-6 text-left animate-fade-in-up max-w-7xl mx-auto pb-12">
             {/* Header Title */}
-            <div className="bg-white border border-[#f5e4ec] rounded-3xl p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-xs">
+            <div
+                className="rounded-3xl p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-xs"
+                style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}
+            >
                 <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 rounded-3xl bg-[#ffe6ee] text-[#e13b68] flex items-center justify-center font-bold shadow-xs">
+                    <div
+                        className="w-16 h-16 rounded-3xl flex items-center justify-center font-bold shadow-xs"
+                        style={{ background: 'var(--accent-light)', color: 'var(--accent)', border: '1px solid var(--notif-unread-border)' }}
+                    >
                         <Trophy className="w-8 h-8" />
                     </div>
                     <div>
                         <div className="flex items-center gap-2">
-                            <h1 className="text-2xl md:text-3xl font-black text-[#2d2329] font-heading">
+                            <h1 className="text-2xl md:text-3xl font-black font-heading" style={{ color: 'var(--text-primary)' }}>
                                 Sanjeevani Health Leaderboard
                             </h1>
                             <Badge variant="mint" dot>
                                 Verified Rankings
                             </Badge>
                         </div>
-                        <p className="text-xs md:text-sm font-semibold text-[#7d6974] mt-1">
+                        <p className="text-xs md:text-sm font-semibold mt-1" style={{ color: 'var(--text-secondary)' }}>
                             Recognizing top verified clinical practitioners and frontline ASHA health heroes delivering empathetic care.
                         </p>
                     </div>
                 </div>
 
-                <div className="flex items-center gap-2 bg-[#fdf0f4] p-1.5 rounded-2xl border border-[#f5e4ec]">
+                <div className="flex items-center gap-2 p-1.5 rounded-2xl" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)' }}>
                     <button
                         onClick={() => setActiveTab('doctors')}
-                        className={`px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${
+                        className={`px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${activeTab === 'doctors'
+                                ? 'shadow-xs font-black'
+                                : 'hover:opacity-80'
+                            }`}
+                        style={
                             activeTab === 'doctors'
-                                ? 'bg-white text-[#e13b68] shadow-xs font-black'
-                                : 'text-[#7d6974] hover:text-[#2d2329]'
-                        }`}
+                                ? { background: 'var(--card-bg)', color: 'var(--accent)' }
+                                : { color: 'var(--text-secondary)' }
+                        }
                     >
                         <Stethoscope className="w-3.5 h-3.5" />
                         <span>Top Doctors</span>
                     </button>
                     <button
                         onClick={() => setActiveTab('champions')}
-                        className={`px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${
+                        className={`px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${activeTab === 'champions'
+                                ? 'shadow-xs font-black'
+                                : 'hover:opacity-80'
+                            }`}
+                        style={
                             activeTab === 'champions'
-                                ? 'bg-white text-[#e13b68] shadow-xs font-black'
-                                : 'text-[#7d6974] hover:text-[#2d2329]'
-                        }`}
+                                ? { background: 'var(--card-bg)', color: 'var(--accent)' }
+                                : { color: 'var(--text-secondary)' }
+                        }
                     >
                         <Users className="w-3.5 h-3.5" />
                         <span>Frontline Champions</span>
@@ -108,22 +122,25 @@ export const LeaderboardView = () => {
             {activeTab === 'doctors' ? (
                 <div className="flex flex-col gap-4">
                     {loading ? (
-                        <div className="p-12 text-center text-xs font-bold text-[#7d6974] animate-pulse">
+                        <div className="p-12 text-center text-xs font-bold animate-pulse" style={{ color: 'var(--text-secondary)' }}>
                             Loading leaderboard...
                         </div>
                     ) : (
-                        <div className="bg-white border border-[#f5e4ec] rounded-3xl overflow-hidden shadow-xs">
-                            <div className="p-6 border-b border-[#f5e4ec] flex items-center justify-between">
-                                <h3 className="font-black text-base text-[#2d2329] font-heading flex items-center gap-2">
-                                    <Trophy className="w-5 h-5 text-amber-500" />
+                        <div
+                            className="rounded-3xl overflow-hidden shadow-xs"
+                            style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}
+                        >
+                            <div className="p-6 flex items-center justify-between" style={{ borderBottom: '1px solid var(--border)' }}>
+                                <h3 className="font-black text-base font-heading flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
+                                    <Trophy className="w-5 h-5" style={{ color: 'var(--pastel-peach-text)' }} />
                                     <span>Highest Patient-Rated Doctors</span>
                                 </h3>
-                                <span className="text-xs font-semibold text-[#7d6974]">
+                                <span className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>
                                     Updated hourly based on verified patient ratings
                                 </span>
                             </div>
 
-                            <div className="divide-y divide-[#fdf0f4]">
+                            <div>
                                 {leaderboard.map((doc, idx) => {
                                     const rank = idx + 1;
                                     const rating = parseFloat(doc.avgRating || 4.9).toFixed(1);
@@ -132,34 +149,41 @@ export const LeaderboardView = () => {
                                     return (
                                         <div
                                             key={doc.userId}
-                                            className="p-5 md:p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 hover:bg-[#fdf9fb] transition"
+                                            className="p-5 md:p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition hover-bg-light-dark"
+                                            style={{ borderBottom: '1px solid var(--border-subtle)' }}
                                         >
                                             <div className="flex items-center gap-4">
-                                                <span className={`w-8 h-8 rounded-full flex items-center justify-center font-black text-xs ${
-                                                    rank === 1 ? 'bg-amber-100 text-amber-800 border border-amber-300' :
-                                                    rank === 2 ? 'bg-zinc-100 text-zinc-700 border border-zinc-300' :
-                                                    rank === 3 ? 'bg-orange-100 text-orange-800 border border-orange-300' :
-                                                    'bg-transparent text-[#7d6974]'
-                                                }`}>
+                                                <span
+                                                    className="w-8 h-8 rounded-full flex items-center justify-center font-black text-xs"
+                                                    style={
+                                                        rank === 1 ? { background: 'var(--pastel-peach-bg)', color: 'var(--pastel-peach-text)', border: '1px solid var(--pastel-peach-text)' } :
+                                                            rank === 2 ? { background: 'var(--bg-surface)', color: 'var(--text-secondary)', border: '1px solid var(--text-muted)' } :
+                                                                rank === 3 ? { background: 'rgba(234, 88, 12, 0.1)', color: 'rgb(234, 88, 12)', border: '1px solid rgb(234, 88, 12)' } :
+                                                                    { color: 'var(--text-secondary)' }
+                                                    }
+                                                >
                                                     #{rank}
                                                 </span>
 
-                                                <div className="w-12 h-12 rounded-2xl bg-[#ffe6ee] border border-[#f8c8d8] flex items-center justify-center text-base font-black text-[#e13b68]">
+                                                <div
+                                                    className="w-12 h-12 rounded-2xl flex items-center justify-center text-base font-black"
+                                                    style={{ background: 'var(--accent-light)', border: '1px solid var(--notif-unread-border)', color: 'var(--accent)' }}
+                                                >
                                                     {doc.fullName ? doc.fullName.replace('Dr. ', '').charAt(0) : 'D'}
                                                 </div>
 
                                                 <div>
                                                     <div className="flex items-center gap-2">
-                                                        <h4 className="font-black text-sm md:text-base text-[#2d2329]">
+                                                        <h4 className="font-black text-sm md:text-base" style={{ color: 'var(--text-primary)' }}>
                                                             {doc.fullName}
                                                         </h4>
-                                                        <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                                                        <ShieldCheck className="w-4 h-4" style={{ color: 'var(--pastel-mint-text)' }} />
                                                     </div>
-                                                    <p className="text-xs font-bold text-[#e13b68]">
+                                                    <p className="text-xs font-bold" style={{ color: 'var(--accent)' }}>
                                                         {doc.specialization} {doc.city && `• ${doc.city}`}
                                                     </p>
                                                     {doc.clinicOrHospital && (
-                                                        <p className="text-[11px] font-semibold text-[#7d6974]">
+                                                        <p className="text-[11px] font-semibold" style={{ color: 'var(--text-secondary)' }}>
                                                             {doc.clinicOrHospital}
                                                         </p>
                                                     )}
@@ -168,11 +192,11 @@ export const LeaderboardView = () => {
 
                                             <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
                                                 <div className="flex flex-col text-right">
-                                                    <div className="flex items-center gap-1 text-xs font-black text-[#b7791f]">
+                                                    <div className="flex items-center gap-1 text-xs font-black" style={{ color: '#f59e0b' }}>
                                                         <Star className="w-4 h-4 fill-[#f59e0b] text-[#f59e0b]" />
                                                         <span>{rating} / 5.0</span>
                                                     </div>
-                                                    <span className="text-[11px] font-semibold text-[#7d6974]">
+                                                    <span className="text-[11px] font-semibold" style={{ color: 'var(--text-secondary)' }}>
                                                         {count} verified reviews
                                                     </span>
                                                 </div>
@@ -189,19 +213,26 @@ export const LeaderboardView = () => {
                     {COMMUNITY_CHAMPIONS.map((champ, idx) => (
                         <div
                             key={champ.id}
-                            className="bg-white border border-[#f5e4ec] rounded-3xl p-6 shadow-xs flex flex-col justify-between gap-6 relative overflow-hidden"
+                            className="rounded-3xl p-6 shadow-xs flex flex-col justify-between gap-6 relative overflow-hidden"
+                            style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}
                         >
                             <div className="flex items-start justify-between">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-12 h-12 rounded-2xl bg-[#ffe6ee] flex items-center justify-center font-black text-lg text-[#e13b68]">
+                                    <div
+                                        className="w-12 h-12 rounded-2xl flex items-center justify-center font-black text-lg"
+                                        style={{ background: 'var(--accent-light)', color: 'var(--accent)' }}
+                                    >
                                         {champ.avatar}
                                     </div>
                                     <div>
-                                        <h4 className="font-black text-sm text-[#2d2329]">{champ.name}</h4>
-                                        <p className="text-xs text-[#7d6974]">{champ.area}</p>
+                                        <h4 className="font-black text-sm" style={{ color: 'var(--text-primary)' }}>{champ.name}</h4>
+                                        <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>{champ.area}</p>
                                     </div>
                                 </div>
-                                <span className="text-xs font-black px-2.5 py-0.5 rounded-full bg-[#fdf0f4] text-[#e13b68]">
+                                <span
+                                    className="text-xs font-black px-2.5 py-0.5 rounded-full"
+                                    style={{ background: 'var(--bg-surface)', color: 'var(--accent)' }}
+                                >
                                     #{idx + 1}
                                 </span>
                             </div>
@@ -210,9 +241,9 @@ export const LeaderboardView = () => {
                                 <Badge variant="mint" className="self-start">
                                     {champ.badge}
                                 </Badge>
-                                <div className="flex items-center justify-between text-xs font-bold pt-2 border-t border-[#fdf0f4]">
-                                    <span className="text-[#7d6974]">Patients Guided:</span>
-                                    <span className="text-[#2d2329]">{champ.patientsHelped} verified cases</span>
+                                <div className="flex items-center justify-between text-xs font-bold pt-2" style={{ borderTop: '1px solid var(--border-subtle)' }}>
+                                    <span style={{ color: 'var(--text-secondary)' }}>Patients Guided:</span>
+                                    <span style={{ color: 'var(--text-primary)' }}>{champ.patientsHelped} verified cases</span>
                                 </div>
                             </div>
                         </div>

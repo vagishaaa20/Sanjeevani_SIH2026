@@ -308,9 +308,9 @@ export const Register = () => {
     };
 
     return (
-        <div className="relative min-h-screen w-full bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(255,225,235,0.6),rgba(255,252,254,0.95))] text-[#1c1218] overflow-x-hidden flex flex-col justify-between selection:bg-[#fce4ec] selection:text-[#d93864]">
+        <div className="relative min-h-screen w-full bg-[var(--bg-primary)] text-[var(--text-primary)] overflow-x-hidden flex flex-col justify-between selection:bg-[var(--pastel-pink-bg)] selection:text-[var(--accent)]">
             {/* Ambient Background Glow */}
-            <div className="fixed top-0 right-1/4 w-[600px] h-[600px] bg-[#ffe6ee]/40 rounded-full blur-3xl pointer-events-none -z-10" />
+            <div className="fixed top-0 right-1/4 w-[600px] h-[600px] bg-[var(--pastel-pink-bg)] rounded-full blur-3xl pointer-events-none -z-10" />
 
             {/* Top Navigation */}
             <header className="w-full max-w-7xl mx-auto px-6 md:px-12 py-5 flex items-center justify-between z-30">
@@ -328,10 +328,10 @@ export const Register = () => {
                 </Link>
 
                 <div className="flex items-center gap-3">
-                    <span className="text-xs text-[#7d6974] font-medium hidden sm:inline">Already registered?</span>
+                    <span className="text-xs text-[var(--text-secondary)] font-medium hidden sm:inline">Already registered?</span>
                     <Link
                         to="/login"
-                        className="px-4 py-1.5 rounded-full bg-white border border-[#f5e4ec] hover:border-[#f0d0dc] text-xs font-bold text-[#1c1218] transition shadow-xs"
+                        className="px-4 py-1.5 rounded-full bg-[var(--bg-surface)] border border-[var(--border)] hover:border-[var(--border-hover)] text-xs font-bold text-[var(--text-primary)] transition shadow-xs"
                     >
                         Sign In
                     </Link>
@@ -342,58 +342,58 @@ export const Register = () => {
             <main className="flex-1 w-full max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center my-auto py-6 md:py-10 z-20">
                 {/* Left Column: Form Panel */}
                 <div className="lg:col-span-6 xl:col-span-6 flex flex-col gap-6 w-full mx-auto lg:mx-0">
-                    <div className="w-full p-6 sm:p-8 bg-white border border-[#f5e4ec] rounded-3xl shadow-xs flex flex-col gap-6 animate-fade-in-up">
+                    <div className="w-full p-6 sm:p-8 bg-[var(--bg-surface)] border border-[var(--border)] rounded-3xl shadow-xs flex flex-col gap-6 animate-fade-in-up">
 
                 {/* Step 1: Select Role */}
                 {!role && (
                     <div className="flex flex-col gap-6 text-center">
                         <div>
-                            <h2 className="text-3xl font-black text-ink-black">Create Account</h2>
-                            <p className="text-sm font-semibold text-ink-charcoal mt-1">Select your profile type to register</p>
+                            <h2 className="text-3xl font-black text-[var(--text-primary)]">Create Account</h2>
+                            <p className="text-sm font-semibold text-[var(--text-secondary)] mt-1">Select your profile type to register</p>
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                             <button
                                 onClick={() => setRole('patient')}
-                                className="p-6 bg-cream-surface border-2 border-ink-black rounded-2xl flex flex-col items-center gap-2 hover:-translate-y-1 hover:bg-pastel-sky-soft hover:shadow cursor-pointer transition duration-200"
+                                className="p-6 bg-[var(--card-bg)] border-2 border-[var(--border)] rounded-2xl flex flex-col items-center gap-2 hover:-translate-y-1 hover:bg-[rgba(59,130,246,0.1)] hover:shadow cursor-pointer transition duration-200"
                             >
-                                <span className="w-12 h-12 rounded-full bg-pastel-sky flex items-center justify-center text-xl font-bold border border-ink-black">👤</span>
-                                <span className="font-bold text-ink-black">Patient Care</span>
-                                <span className="text-xs text-ink-muted">Register health card via OTP</span>
+                                <span className="w-12 h-12 rounded-full bg-[rgba(59,130,246,0.2)] flex items-center justify-center text-xl font-bold border border-[var(--border)]">👤</span>
+                                <span className="font-bold text-[var(--text-primary)]">Patient Care</span>
+                                <span className="text-xs text-[var(--text-muted)]">Register health card via OTP</span>
                             </button>
 
                             <button
                                 onClick={() => setRole('doctor')}
-                                className="p-6 bg-cream-surface border-2 border-ink-black rounded-2xl flex flex-col items-center gap-2 hover:-translate-y-1 hover:bg-pastel-pink-soft hover:shadow cursor-pointer transition duration-200"
+                                className="p-6 bg-[var(--card-bg)] border-2 border-[var(--border)] rounded-2xl flex flex-col items-center gap-2 hover:-translate-y-1 hover:bg-[rgba(244,63,94,0.1)] hover:shadow cursor-pointer transition duration-200"
                             >
-                                <span className="w-12 h-12 rounded-full bg-pastel-pink flex items-center justify-center text-xl font-bold border border-ink-black">🩺</span>
-                                <span className="font-bold text-ink-black">Doctor Profile</span>
-                                <span className="text-xs text-ink-muted">Onboard verified practitioner</span>
+                                <span className="w-12 h-12 rounded-full bg-[rgba(244,63,94,0.2)] flex items-center justify-center text-xl font-bold border border-[var(--border)]">🩺</span>
+                                <span className="font-bold text-[var(--text-primary)]">Doctor Profile</span>
+                                <span className="text-xs text-[var(--text-muted)]">Onboard verified practitioner</span>
                             </button>
 
                             <button
                                 onClick={() => setRole('clinic')}
-                                className="p-6 bg-cream-surface border-2 border-ink-black rounded-2xl flex flex-col items-center gap-2 hover:-translate-y-1 hover:bg-icy-mint-soft hover:shadow cursor-pointer transition duration-200"
+                                className="p-6 bg-[var(--card-bg)] border-2 border-[var(--border)] rounded-2xl flex flex-col items-center gap-2 hover:-translate-y-1 hover:bg-[rgba(16,185,129,0.1)] hover:shadow cursor-pointer transition duration-200"
                             >
-                                <span className="w-12 h-12 rounded-full bg-icy-mint flex items-center justify-center text-xl font-bold border border-ink-black">🏥</span>
-                                <span className="font-bold text-ink-black">Clinic / Lab</span>
-                                <span className="text-xs text-ink-muted">Onboard hospital & department</span>
+                                <span className="w-12 h-12 rounded-full bg-[rgba(16,185,129,0.2)] flex items-center justify-center text-xl font-bold border border-[var(--border)]">🏥</span>
+                                <span className="font-bold text-[var(--text-primary)]">Clinic / Lab</span>
+                                <span className="text-xs text-[var(--text-muted)]">Onboard hospital & department</span>
                             </button>
 
                             <button
                                 onClick={() => setRole('health_worker')}
-                                className="p-6 bg-cream-surface border-2 border-ink-black rounded-2xl flex flex-col items-center gap-2 hover:-translate-y-1 hover:bg-icy-mint-soft hover:shadow cursor-pointer transition duration-200"
+                                className="p-6 bg-[var(--card-bg)] border-2 border-[var(--border)] rounded-2xl flex flex-col items-center gap-2 hover:-translate-y-1 hover:bg-[rgba(16,185,129,0.1)] hover:shadow cursor-pointer transition duration-200"
                             >
-                                <span className="w-12 h-12 rounded-full bg-icy-mint flex items-center justify-center text-xl font-bold border border-ink-black">🧑‍⚕️</span>
-                                <span className="font-bold text-ink-black">Health Worker</span>
-                                <span className="text-xs text-ink-muted">Frontline care access</span>
+                                <span className="w-12 h-12 rounded-full bg-[rgba(16,185,129,0.2)] flex items-center justify-center text-xl font-bold border border-[var(--border)]">🧑‍⚕️</span>
+                                <span className="font-bold text-[var(--text-primary)]">Health Worker</span>
+                                <span className="text-xs text-[var(--text-muted)]">Frontline care access</span>
                             </button>
                         </div>
 
                         <div className="pt-4 border-t border-cream-surface text-center">
-                            <p className="text-xs font-semibold text-ink-charcoal">
+                            <p className="text-xs font-semibold text-[var(--text-secondary)]">
                                 Already registered?{' '}
-                                <Link to="/login" className="text-pastel-pink-action hover:underline font-bold">Log In</Link>
+                                <Link to="/login" className="text-[var(--accent)] hover:underline font-bold">Log In</Link>
                             </p>
                         </div>
                     </div>
@@ -409,17 +409,17 @@ export const Register = () => {
                                     setError('');
                                     setOtpVerifyNeeded(false);
                                 }}
-                                className="text-xs font-bold text-ink-muted hover:text-ink-black cursor-pointer"
+                                className="text-xs font-bold text-[var(--text-muted)] hover:text-[var(--text-primary)] cursor-pointer"
                             >
                                 ← Change Role
                             </button>
-                            <span className="text-xs font-bold uppercase tracking-wider text-ink-charcoal">
+                            <span className="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">
                                 {role} registration
                             </span>
                         </div>
 
                         {error && (
-                            <div className="p-3 bg-red-100 border border-red-300 text-red-800 text-sm font-semibold rounded-xl">
+                            <div className="p-3 bg-[var(--pastel-pink-bg)] border border-[var(--accent)] text-[var(--accent)] text-sm font-semibold rounded-xl">
                                 {error}
                             </div>
                         )}
@@ -441,12 +441,12 @@ export const Register = () => {
                                 </div>
                                 <div className="grid grid-cols-1 gap-4">
                                     <div className="flex flex-col gap-1 w-full text-left">
-                                        <label className="text-xs font-semibold text-ink-charcoal uppercase tracking-wider">Worker Type</label>
+                                        <label className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Worker Type</label>
                                         <select
                                             name="workerType"
                                             value={healthWorkerData.workerType}
                                             onChange={handleHealthWorkerChange}
-                                            className="w-full px-4 py-2.5 rounded-xl border border-ink-black bg-white focus:ring-2 focus:ring-rose-mauve"
+                                            className="w-full px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] focus:ring-2 focus:ring-rose-mauve"
                                         >
                                             <option value="COMMUNITY_WORKER">Community Worker</option>
                                             <option value="ASHA">ASHA</option>
@@ -456,7 +456,7 @@ export const Register = () => {
                                     </div>
                                 </div>
 
-                                <p className="text-xs text-ink-muted">Your account will be reviewed by an administrator before Health Worker access is enabled.</p>
+                                <p className="text-xs text-[var(--text-muted)]">Your account will be reviewed by an administrator before Health Worker access is enabled.</p>
                                 <Button type="submit" variant="primary" className="w-full" disabled={loading}>{loading ? 'Registering...' : 'Create Health Worker Account'}</Button>
                             </form>
                         )}
@@ -496,12 +496,12 @@ export const Register = () => {
                                             required
                                         />
                                         <div className="flex flex-col gap-1 w-full text-left">
-                                            <label className="text-xs font-semibold text-ink-charcoal uppercase tracking-wider">Sex</label>
+                                            <label className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Sex</label>
                                             <select
                                                 name="sex"
                                                 value={patientData.sex}
                                                 onChange={handlePatientChange}
-                                                className="w-full px-4 py-2.5 rounded-xl border border-ink-black bg-white focus:ring-2 focus:ring-rose-mauve"
+                                                className="w-full px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] focus:ring-2 focus:ring-rose-mauve"
                                             >
                                                 <option value="male">Male</option>
                                                 <option value="female">Female</option>
@@ -542,12 +542,12 @@ export const Register = () => {
                                 </form>
                             ) : (
                                 <div className="flex flex-col gap-4 text-center">
-                                    <h3 className="text-xl font-bold text-ink-black">Confirm Registration</h3>
-                                    <p className="text-sm text-ink-charcoal">
+                                    <h3 className="text-xl font-bold text-[var(--text-primary)]">Confirm Registration</h3>
+                                    <p className="text-sm text-[var(--text-secondary)]">
                                         Registration request successful! A code has been dispatched. Log in via your phone number from the Sign In page to verify and start operations.
                                     </p>
                                     {devOtp && (
-                                        <div className="p-3 bg-blue-50 border border-blue-200 text-blue-800 text-xs font-mono font-bold rounded-lg mt-2">
+                                        <div className="p-3 bg-[rgba(59,130,246,0.1)] border border-[rgb(59,130,246)] text-[rgb(59,130,246)] text-xs font-mono font-bold rounded-lg mt-2">
                                             [Development OTP]: {devOtp}
                                         </div>
                                     )}
@@ -563,10 +563,10 @@ export const Register = () => {
                             <form className="flex flex-col gap-4 text-left" onSubmit={handleDoctorSubmit}>
                                 {/* Progress Indicator */}
                                 <div className="flex items-center justify-between pb-2 border-b border-cream-surface mb-2">
-                                    <span className="text-xs font-bold text-ink-muted">
+                                    <span className="text-xs font-bold text-[var(--text-muted)]">
                                         Step {doctorStep} of 3
                                     </span>
-                                    <span className="text-xs font-bold text-pastel-pink-action">
+                                    <span className="text-xs font-bold text-[var(--accent)]">
                                         {doctorStep === 1 && 'Credentials & Location'}
                                         {doctorStep === 2 && 'Professional Information'}
                                         {doctorStep === 3 && 'Document Upload'}
@@ -635,11 +635,11 @@ export const Register = () => {
                                         {/* Multi-Select Specialization */}
                                         <div className="flex flex-col gap-1.5 w-full text-left">
                                             <div className="flex items-center justify-between">
-                                                <label className="text-xs font-bold text-[#4a3c45] uppercase tracking-wider">
+                                                <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">
                                                     Specialization(s) (Registered in India) <span className="text-rose-500">*</span>
                                                 </label>
                                                 {selectedSpecializations.length > 0 && (
-                                                    <span className="text-xs font-semibold text-[#8e1d41] bg-[#ffe6ee] px-2 py-0.5 rounded-full">
+                                                    <span className="text-xs font-semibold text-[var(--accent-hover)] bg-[var(--pastel-pink-bg)] px-2 py-0.5 rounded-full">
                                                         {selectedSpecializations.length} selected
                                                     </span>
                                                 )}
@@ -647,17 +647,17 @@ export const Register = () => {
 
                                             {/* Selected Specialization Chips */}
                                             {selectedSpecializations.length > 0 && (
-                                                <div className="flex flex-wrap gap-1.5 p-2.5 rounded-2xl bg-[#fffcfd] border border-[#f5e4ec]">
+                                                <div className="flex flex-wrap gap-1.5 p-2.5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border)]">
                                                     {selectedSpecializations.map((spec) => (
                                                         <span
                                                             key={spec}
-                                                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold bg-[#ffe6ee] text-[#8e1d41] border border-[#f5c6d6] shadow-2xs"
+                                                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold bg-[var(--pastel-pink-bg)] text-[var(--accent-hover)] border border-[var(--pastel-pink-text)] shadow-2xs"
                                                         >
                                                             <span>{spec}</span>
                                                             <button
                                                                 type="button"
                                                                 onClick={() => handleRemoveSpecialization(spec)}
-                                                                className="w-3.5 h-3.5 rounded-full bg-[#8e1d41]/10 hover:bg-[#8e1d41]/25 flex items-center justify-center text-[#8e1d41] transition-colors"
+                                                                className="w-3.5 h-3.5 rounded-full bg-[rgba(142,29,65,0.1)] hover:bg-[rgba(142,29,65,0.25)] flex items-center justify-center text-[var(--accent-hover)] transition-colors"
                                                                 title="Remove specialization"
                                                             >
                                                                 &times;
@@ -676,7 +676,7 @@ export const Register = () => {
                                                             handleAddSpecialization(e.target.value);
                                                         }
                                                     }}
-                                                    className="w-full px-4 py-2.5 rounded-2xl border border-[#f5e4ec] bg-white text-[#2d2329] focus:outline-none focus:ring-2 focus:ring-[#e13b68]/30 focus:border-[#e13b68] shadow-xs text-sm transition duration-150 appearance-none pr-10 cursor-pointer"
+                                                    className="w-full px-4 py-2.5 rounded-2xl border border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30 focus:border-[var(--accent)] shadow-xs text-sm transition duration-150 appearance-none pr-10 cursor-pointer"
                                                 >
                                                     <option value="">
                                                         {selectedSpecializations.length === 0
@@ -691,7 +691,7 @@ export const Register = () => {
                                                         </option>
                                                     ))}
                                                 </select>
-                                                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[#7d6974]">
+                                                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[var(--text-secondary)]">
                                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                                                     </svg>
@@ -701,7 +701,7 @@ export const Register = () => {
                                             {/* Quick-add suggestions */}
                                             {selectedSpecializations.length === 0 && (
                                                 <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                                                    <span className="text-[11px] text-[#7d6974] font-medium">Quick add:</span>
+                                                    <span className="text-[11px] text-[var(--text-secondary)] font-medium">Quick add:</span>
                                                     {[
                                                         'General Medicine / Internal Medicine',
                                                         'General Surgery',
@@ -715,7 +715,7 @@ export const Register = () => {
                                                             key={s}
                                                             type="button"
                                                             onClick={() => handleAddSpecialization(s)}
-                                                            className="text-[11px] px-2 py-0.5 rounded-lg border border-[#f5e4ec] bg-white hover:bg-[#ffe6ee] hover:border-[#f5c6d6] text-[#4a3c45] transition-colors"
+                                                            className="text-[11px] px-2 py-0.5 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] hover:bg-[var(--pastel-pink-bg)] hover:border-[var(--pastel-pink-text)] text-[var(--text-secondary)] transition-colors"
                                                         >
                                                             + {s.split(' ')[0]}
                                                         </button>
@@ -775,10 +775,10 @@ export const Register = () => {
                                         </div>
 
                                         {/* Optional Link to Registered Hospital or Clinic */}
-                                        <div className="flex flex-col gap-1.5 w-full text-left pt-2 border-t border-[#f5e4ec]">
-                                            <label className="text-xs font-bold text-[#4a3c45] uppercase tracking-wider flex items-center justify-between">
+                                        <div className="flex flex-col gap-1.5 w-full text-left pt-2 border-t border-[var(--border)]">
+                                            <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider flex items-center justify-between">
                                                 <span>Link to Registered Hospital / Clinic</span>
-                                                <span className="normal-case font-normal text-xs text-[#7d6974] bg-[#ffe6ee] px-2 py-0.5 rounded-full">Optional</span>
+                                                <span className="normal-case font-normal text-xs text-[var(--text-secondary)] bg-[var(--pastel-pink-bg)] px-2 py-0.5 rounded-full">Optional</span>
                                             </label>
                                             <div className="flex flex-col gap-2">
                                                 <input
@@ -786,7 +786,7 @@ export const Register = () => {
                                                     placeholder="Search registered hospitals or clinics..."
                                                     value={clinicSearch}
                                                     onChange={(e) => setClinicSearch(e.target.value)}
-                                                    className="w-full px-4 py-2 rounded-xl border border-[#f5e4ec] bg-white text-[#2d2329] placeholder:text-[#7d6974]/50 focus:outline-none focus:ring-2 focus:ring-[#e13b68]/30 focus:border-[#e13b68] text-xs transition duration-150"
+                                                    className="w-full px-4 py-2 rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-primary)] placeholder:text-[var(--text-secondary)]/50 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30 focus:border-[var(--accent)] text-xs transition duration-150"
                                                 />
                                                 <div className="relative w-full">
                                                     <select
@@ -794,7 +794,7 @@ export const Register = () => {
                                                         value={doctorData.clinicId || ''}
                                                         onChange={handleDoctorChange}
                                                         disabled={clinicsLoading}
-                                                        className="w-full px-4 py-2.5 rounded-2xl border border-[#f5e4ec] bg-white text-[#2d2329] focus:outline-none focus:ring-2 focus:ring-[#e13b68]/30 focus:border-[#e13b68] shadow-xs text-sm transition duration-150 appearance-none pr-10 cursor-pointer"
+                                                        className="w-full px-4 py-2.5 rounded-2xl border border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30 focus:border-[var(--accent)] shadow-xs text-sm transition duration-150 appearance-none pr-10 cursor-pointer"
                                                     >
                                                         <option value="">— Not linked to a registered hospital or clinic (link later) —</option>
                                                         {clinicOptions.map((clinic) => (
@@ -803,16 +803,16 @@ export const Register = () => {
                                                             </option>
                                                         ))}
                                                     </select>
-                                                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[#7d6974]">
+                                                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[var(--text-secondary)]">
                                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                                                         </svg>
                                                     </div>
                                                 </div>
                                                 {clinicsLoading && (
-                                                    <span className="text-xs text-[#7d6974]">Loading registered medical centers…</span>
+                                                    <span className="text-xs text-[var(--text-secondary)]">Loading registered medical centers…</span>
                                                 )}
-                                                <p className="text-xs text-[#7d6974]">
+                                                <p className="text-xs text-[var(--text-secondary)]">
                                                     If your hospital or clinic is registered on Sanjeevani, link it here. You can also register or update clinic affiliations later in your dashboard.
                                                 </p>
                                             </div>
@@ -824,13 +824,13 @@ export const Register = () => {
                                 {doctorStep === 3 && (
                                     <div className="flex flex-col gap-4">
                                         <div className="mb-2">
-                                            <p className="text-xs text-ink-charcoal font-semibold">
+                                            <p className="text-xs text-[var(--text-secondary)] font-semibold">
                                                 Please upload high-quality scans of your documents (PDF, JPG, PNG). Max 10MB per file:
                                             </p>
                                         </div>
                                         <div className="flex flex-col gap-4">
-                                            <div className="border border-zinc-350 p-4 rounded-xl flex flex-col gap-2 bg-cream-surface/30">
-                                                <label className="text-xs font-bold text-ink-black uppercase tracking-wider block">
+                                            <div className="border border-[var(--border)] p-4 rounded-xl flex flex-col gap-2 bg-[var(--card-bg)]/30">
+                                                <label className="text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider block">
                                                     1. Medical Registration Certificate *
                                                 </label>
                                                 <input
@@ -841,14 +841,14 @@ export const Register = () => {
                                                     className="w-full text-xs"
                                                 />
                                                 {medCertFile && (
-                                                    <span className="text-xs text-emerald-700 font-bold block mt-1">
+                                                    <span className="text-xs text-[var(--pastel-mint-text)] font-bold block mt-1">
                                                         ✓ Selected: {medCertFile.name} ({(medCertFile.size / 1024 / 1024).toFixed(2)} MB)
                                                     </span>
                                                 )}
                                             </div>
 
-                                            <div className="border border-zinc-350 p-4 rounded-xl flex flex-col gap-2 bg-cream-surface/30">
-                                                <label className="text-xs font-bold text-ink-black uppercase tracking-wider block">
+                                            <div className="border border-[var(--border)] p-4 rounded-xl flex flex-col gap-2 bg-[var(--card-bg)]/30">
+                                                <label className="text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider block">
                                                     2. MBBS or Primary Qualification Proof *
                                                 </label>
                                                 <input
@@ -859,7 +859,7 @@ export const Register = () => {
                                                     className="w-full text-xs"
                                                 />
                                                 {qualificationFile && (
-                                                    <span className="text-xs text-emerald-700 font-bold block mt-1">
+                                                    <span className="text-xs text-[var(--pastel-mint-text)] font-bold block mt-1">
                                                         ✓ Selected: {qualificationFile.name} ({(qualificationFile.size / 1024 / 1024).toFixed(2)} MB)
                                                     </span>
                                                 )}
@@ -913,7 +913,7 @@ export const Register = () => {
             </main>
 
             {/* Bottom Footer */}
-            <footer className="w-full max-w-7xl mx-auto px-6 md:px-12 py-5 flex flex-col sm:flex-row items-center justify-between text-[11px] text-[#9c8491] gap-2 border-t border-[#f7ebf0]">
+            <footer className="w-full max-w-7xl mx-auto px-6 md:px-12 py-5 flex flex-col sm:flex-row items-center justify-between text-[11px] text-[var(--text-muted)] gap-2 border-t border-[var(--border)]">
                 <span>© {new Date().getFullYear()} Sanjeevani Clinical Network</span>
                 <span className="font-mono">Empathetic Care • Teleconsultation • Records</span>
             </footer>

@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { ArrowRight, ChevronDown, Heart, Globe } from 'lucide-react';
+import { ArrowRight, ChevronDown, Heart, Globe, Sun, Moon } from 'lucide-react';
 import DnaHelix3D from '../../components/landing/DnaHelix3D';
 import ShaderAtmosphere from '../../components/landing/ShaderAtmosphere';
 import MagneticButton from '../../components/landing/MagneticButton';
@@ -9,11 +9,14 @@ import HealthRecordsSection from '../../components/landing/HealthRecordsSection'
 import ReturnDnaSection from '../../components/landing/ReturnDnaSection';
 import useAuth from '../../hooks/useAuth';
 import { useLanguage } from '../../hooks/LanguageContext';
+import { useTheme } from '../../context/ThemeContext';
 import SanjeevaniLogo from '../../components/common/SanjeevaniLogo';
 
 export const LandingHero = () => {
-    const { user } = useAuth();
+    const { user, logout } = useAuth();
     const { currentLang, setCurrentLang } = useLanguage();
+    const { theme, toggleTheme } = useTheme();
+    const isDark = theme === 'dark';
     const navigate = useNavigate();
     const understandSectionRef = useRef(null);
 
@@ -33,41 +36,48 @@ export const LandingHero = () => {
         }
     };
 
+    const handleLogout = async () => {
+        await logout();
+        navigate('/');
+    };
+
     const scrollToUnderstand = () => {
         understandSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
     return (
-        <div className="relative min-h-screen w-full bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(255,225,235,0.55),rgba(255,252,254,0.95))] text-[#1c1218] overflow-x-hidden flex flex-col selection:bg-[#fce4ec] selection:text-[#d93864]">
+        <div className="relative min-h-screen w-full overflow-x-hidden flex flex-col" style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
             {/* Ambient WebGL Shader Mist & Depth */}
             <ShaderAtmosphere />
 
             {/* Sticky Editorial Top Navigation */}
-            <header className="sticky top-0 z-40 w-full bg-[#fffcfd]/85 backdrop-blur-md border-b border-[#fbf1f5]">
-                <div className="max-w-7xl mx-auto px-6 md:px-12 py-4 flex items-center justify-between">
+            <header className="sticky top-0 z-40 w-full backdrop-blur-md" style={{ background: 'var(--navbar-bg)', borderBottom: '1px solid var(--border)' }}>
+                <div className="max-w-7xl mx-auto px-6 md:px-12 py-2 md:py-3 flex items-center justify-between">
                     {/* Brand Mark */}
                     <Link
                         to="/"
-                        className="flex items-center gap-3.5 text-lg font-black tracking-tight text-[#1c1218] group"
+                        className="flex items-center gap-3.5 text-lg font-black tracking-tight group"
+                        style={{ color: 'var(--text-primary)' }}
                     >
                         <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#ffe6ee] to-white border-2 border-[#f5c6d6] flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform p-1">
                             <SanjeevaniLogo variant="emblem" size={42} />
                         </div>
                         <div className="flex flex-col text-left">
-                            <span className="font-heading tracking-tight font-black text-2xl leading-none text-[#1c1218]">SANJEEVANI</span>
-                            <span className="text-[10px] font-extrabold text-[#e13b68] tracking-widest uppercase mt-1">Intelligent Clinical Platform</span>
+                            <span className="font-heading tracking-tight font-black text-2xl leading-none">SANJEEVANI</span>
+                            <span className="text-[10px] font-extrabold tracking-widest uppercase mt-1" style={{ color: 'var(--accent)' }}>Intelligent Clinical Platform</span>
                         </div>
                     </Link>
 
                     {/* Right Actions */}
                     <div className="flex items-center gap-3 md:gap-5">
                         {/* Language Switcher */}
-                        <div className="flex items-center gap-1.5 bg-white/70 backdrop-blur-md border border-[#f5e4ec] hover:border-[#f8c8d8] rounded-full px-3 py-1.5 text-xs font-bold text-[#1c1218] transition">
-                            <Globe className="w-3.5 h-3.5 text-[#e13b68]" />
+                        <div className="flex items-center gap-1.5 backdrop-blur-md rounded-full px-3 py-1.5 text-xs font-bold transition" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}>
+                            <Globe className="w-3.5 h-3.5" style={{ color: 'var(--accent)' }} />
                             <select
                                 value={currentLang}
                                 onChange={(e) => setCurrentLang(e.target.value)}
-                                className="bg-transparent focus:outline-none cursor-pointer font-bold pr-1 text-[#1c1218]"
+                                className="bg-transparent focus:outline-none cursor-pointer font-bold pr-1"
+                                style={{ color: 'var(--text-primary)' }}
                                 aria-label="Select Language"
                             >
                                 <option value="en">English</option>
@@ -76,24 +86,55 @@ export const LandingHero = () => {
                             </select>
                         </div>
 
+                        {/* Dark Mode Toggle */}
+                        <button
+                            type="button"
+                            onClick={toggleTheme}
+                            title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                            className="p-1.5 md:p-2 rounded-full transition cursor-pointer"
+                            style={{
+                                background: 'var(--bg-surface)',
+                                border: '1px solid var(--border)',
+                                color: 'var(--text-primary)',
+                            }}
+                        >
+                            {isDark ? (
+                                <Sun className="w-4 h-4" style={{ color: '#fbbf24' }} />
+                            ) : (
+                                <Moon className="w-4 h-4" style={{ color: 'var(--accent)' }} />
+                            )}
+                        </button>
+
                         {user ? (
-                            <button
-                                onClick={handleEnter}
-                                className="px-5 py-2 rounded-full bg-[#e13b68] hover:bg-[#c92a55] text-white text-xs font-black transition shadow-xs cursor-pointer"
-                            >
-                                Dashboard →
-                            </button>
+                            <div className="flex items-center gap-3">
+                                <button
+                                    onClick={handleLogout}
+                                    className="text-xs font-bold transition cursor-pointer"
+                                    style={{ color: 'var(--text-primary)' }}
+                                >
+                                    Sign Out
+                                </button>
+                                <button
+                                    onClick={handleEnter}
+                                    className="px-5 py-2 rounded-full text-white text-xs font-black transition shadow-xs cursor-pointer"
+                                    style={{ background: 'var(--accent)' }}
+                                >
+                                    Dashboard →
+                                </button>
+                            </div>
                         ) : (
                             <div className="flex items-center gap-3">
                                 <Link
                                     to="/login"
-                                    className="text-xs font-bold text-[#1c1218] hover:text-[#e13b68] transition"
+                                    className="text-xs font-bold transition"
+                                    style={{ color: 'var(--text-primary)' }}
                                 >
                                     Sign In
                                 </Link>
                                 <Link
                                     to="/register"
-                                    className="px-5 py-2 rounded-full bg-[#e13b68] hover:bg-[#c92a55] text-white text-xs font-black transition shadow-xs"
+                                    className="px-5 py-2 rounded-full text-white text-xs font-black transition shadow-xs"
+                                    style={{ background: 'var(--accent)' }}
                                 >
                                     Register
                                 </Link>
@@ -108,15 +149,15 @@ export const LandingHero = () => {
                 {/* Left Column: Refined Editorial Typography & CTAs (6 cols) */}
                 <div className="lg:col-span-6 xl:col-span-6 flex flex-col items-start text-left gap-6 md:gap-7 pt-4 lg:pt-0">
                     {/* Minimal Eyebrow */}
-                    <div className="flex items-center gap-2 text-[11px] font-black tracking-[0.2em] text-[#e13b68] uppercase font-mono">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#e13b68]" />
+                    <div className="flex items-center gap-2 text-[11px] font-black tracking-[0.2em] uppercase font-mono" style={{ color: 'var(--accent)' }}>
+                        <span className="w-1.5 h-1.5 rounded-full" style={{ background: 'var(--accent)' }} />
                         01 — Sanjeevani
                     </div>
 
                     {/* Editorial Headline */}
                     <div className="flex flex-col">
-                        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-[70px] font-black leading-[1.04] tracking-tight text-[#1c1218]">
-                            <span className="font-serif italic font-normal text-[#c4325c] tracking-normal mr-2">
+                        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-[70px] font-black leading-[1.04] tracking-tight" style={{ color: 'var(--text-primary)' }}>
+                            <span className="font-serif italic font-normal tracking-normal mr-2" style={{ color: 'var(--accent)' }}>
                                 Healthcare,
                             </span>
                             <br />
@@ -127,7 +168,7 @@ export const LandingHero = () => {
                     </div>
 
                     {/* Short Supporting Sentence */}
-                    <p className="text-sm md:text-base lg:text-lg font-medium text-[#7d6974] leading-relaxed max-w-md">
+                    <p className="text-sm md:text-base lg:text-lg font-medium leading-relaxed max-w-md" style={{ color: 'var(--text-secondary)' }}>
                         AI-assisted clinical triage connecting patients, doctors, and frontline care workers through intelligent human-centered care.
                     </p>
 
@@ -135,7 +176,8 @@ export const LandingHero = () => {
                     <div className="flex flex-wrap items-center gap-4 pt-2">
                         <MagneticButton
                             onClick={handleEnter}
-                            className="group px-8 py-4 rounded-full bg-[#e13b68] hover:bg-[#c92a55] text-white text-sm md:text-base font-black shadow-md hover:shadow-xl transition-all flex items-center gap-3 cursor-pointer"
+                            className="group px-8 py-4 rounded-full text-white text-sm md:text-base font-black shadow-md hover:shadow-xl transition-all flex items-center gap-3 cursor-pointer"
+                            style={{ background: 'var(--accent)' }}
                         >
                             <span>Enter Sanjeevani</span>
                             <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
@@ -143,10 +185,11 @@ export const LandingHero = () => {
 
                         <button
                             onClick={scrollToUnderstand}
-                            className="px-6 py-4 rounded-full bg-white/70 hover:bg-white border border-[#f5e4ec] hover:border-[#f8c8d8] text-xs md:text-sm font-bold text-[#4a3c45] hover:text-[#e13b68] transition flex items-center gap-2 shadow-xs cursor-pointer"
+                            className="px-6 py-4 rounded-full text-xs md:text-sm font-bold transition flex items-center gap-2 shadow-xs cursor-pointer"
+                            style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
                         >
                             <span>Explore</span>
-                            <ChevronDown className="w-3.5 h-3.5 text-[#7d6974]" />
+                            <ChevronDown className="w-3.5 h-3.5" style={{ color: 'var(--text-secondary)' }} />
                         </button>
                     </div>
                 </div>
@@ -154,7 +197,7 @@ export const LandingHero = () => {
                 {/* Right Column: Live 3D DNA Helix (6 cols) */}
                 <div className="lg:col-span-6 xl:col-span-6 w-full h-full flex items-center justify-center relative min-h-[580px] md:min-h-[700px] lg:min-h-[820px]">
                     {/* Soft Atmospheric Glow */}
-                    <div className="absolute w-80 h-80 md:w-96 md:h-96 bg-[#f8c8d8]/25 rounded-full blur-3xl pointer-events-none -z-10" />
+                    <div className="absolute w-80 h-80 md:w-96 md:h-96 rounded-full blur-3xl pointer-events-none -z-10" style={{ background: 'var(--accent-light)', opacity: 0.4 }} />
 
                     {/* Three.js Live WebGL Extended DNA Helix Canvas */}
                     <DnaHelix3D />

@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { SocketProvider } from './context/SocketContext';
 import { NotificationProvider } from './context/NotificationContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { LanguageProvider } from './hooks/LanguageContext';
 import Navbar from './components/layout/Navbar';
 import Sidebar from './components/layout/Sidebar';
@@ -47,11 +48,11 @@ import VerifyPrescriptionUpload from './pages/shared/VerifyPrescriptionUpload';
 // Main layout wrapper that includes sidebar and navbar for authenticated users
 const AppLayout = ({ children }) => {
     return (
-        <div className="flex flex-col min-h-screen">
+        <div className="flex flex-col min-h-screen" style={{ background: 'var(--bg-primary)' }}>
             <Navbar />
             <div className="flex flex-col md:flex-row flex-grow">
                 <Sidebar />
-                <main className="flex-grow p-6 md:p-8 bg-cream-bg">
+                <main className="flex-grow p-6 md:p-8" style={{ background: 'var(--bg-primary)' }}>
                     <div className="max-w-6xl mx-auto w-full">
                         {children}
                     </div>
@@ -64,373 +65,342 @@ const AppLayout = ({ children }) => {
 export const App = () => {
     return (
         <BrowserRouter>
-            <AuthProvider>
-                <SocketProvider>
-                    <NotificationProvider>
-                        <div className="app-container min-h-screen bg-cream-bg flex flex-col">
-                            <LanguageProvider>
-                                <Routes>
-                                    {/* Landing Hero (Root) */}
-                                    <Route path="/" element={<LandingHero />} />
+            <ThemeProvider>
+                <AuthProvider>
+                    <SocketProvider>
+                        <NotificationProvider>
+                            <div className="app-container min-h-screen flex flex-col" style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
+                                <LanguageProvider>
+                                    <Routes>
+                                        {/* Landing Hero (Root) */}
+                                        <Route path="/" element={<LandingHero />} />
 
-                                    {/* Public Auth Routes */}
-                                    <Route path="/login" element={<Login />} />
-                                    <Route path="/register" element={<Register />} />
+                                        {/* Public Auth Routes */}
+                                        <Route path="/login" element={<Login />} />
+                                        <Route path="/register" element={<Register />} />
 
-                                    {/* Dashboard Guards */}
-                                    <Route
-                                        path="/admin/clinics"
-                                        element={
-                                            <ProtectedRoute allowedRoles={['admin']}>
-                                                <AppLayout>
-                                                    <ClinicApprovalList />
-                                                </AppLayout>
-                                            </ProtectedRoute>
-                                        }
-                                    />
+                                        {/* Dashboard Guards */}
+                                        <Route
+                                            path="/admin/clinics"
+                                            element={
+                                                <ProtectedRoute allowedRoles={['admin']}>
+                                                    <AppLayout>
+                                                        <ClinicApprovalList />
+                                                    </AppLayout>
+                                                </ProtectedRoute>
+                                            }
+                                        />
 
-                                    <Route
-                                        path="/admin/doctors"
-                                        element={
-                                            <ProtectedRoute allowedRoles={['admin']}>
-                                                <AppLayout>
-                                                    <DoctorApprovalList />
-                                                </AppLayout>
-                                            </ProtectedRoute>
-                                        }
-                                    />
+                                        <Route
+                                            path="/admin/doctors"
+                                            element={
+                                                <ProtectedRoute allowedRoles={['admin']}>
+                                                    <AppLayout>
+                                                        <DoctorApprovalList />
+                                                    </AppLayout>
+                                                </ProtectedRoute>
+                                            }
+                                        />
 
-                                    <Route
-                                        path="/admin/health-workers"
-                                        element={
-                                            <ProtectedRoute allowedRoles={['admin']}>
-                                                <AppLayout>
-                                                    <HealthWorkerApprovalList />
-                                                </AppLayout>
-                                            </ProtectedRoute>
-                                        }
-                                    />
+                                        <Route
+                                            path="/admin/health-workers"
+                                            element={
+                                                <ProtectedRoute allowedRoles={['admin']}>
+                                                    <AppLayout>
+                                                        <HealthWorkerApprovalList />
+                                                    </AppLayout>
+                                                </ProtectedRoute>
+                                            }
+                                        />
 
-                                    <Route
-                                        path="/admin/outbreaks"
-                                        element={
-                                            <ProtectedRoute allowedRoles={['admin']}>
-                                                <AppLayout>
-                                                    <AdminOutbreakPanel />
-                                                </AppLayout>
-                                            </ProtectedRoute>
-                                        }
-                                    />
+                                        <Route
+                                            path="/admin/outbreaks"
+                                            element={
+                                                <ProtectedRoute allowedRoles={['admin']}>
+                                                    <AppLayout>
+                                                        <AdminOutbreakPanel />
+                                                    </AppLayout>
+                                                </ProtectedRoute>
+                                            }
+                                        />
 
-                                    <Route
-                                        path="/clinic/profile"
-                                        element={
-                                            <ProtectedRoute allowedRoles={['clinic_admin']}>
-                                                <AppLayout>
-                                                    <ClinicProfile />
-                                                </AppLayout>
-                                            </ProtectedRoute>
-                                        }
-                                    />
-                                    <Route
-                                        path="/clinic/departments"
-                                        element={
-                                            <ProtectedRoute allowedRoles={['clinic_admin']}>
-                                                <AppLayout>
-                                                    <DepartmentManager />
-                                                </AppLayout>
-                                            </ProtectedRoute>
-                                        }
-                                    />
+                                        <Route
+                                            path="/clinic/profile"
+                                            element={
+                                                <ProtectedRoute allowedRoles={['clinic_admin']}>
+                                                    <AppLayout>
+                                                        <ClinicProfile />
+                                                    </AppLayout>
+                                                </ProtectedRoute>
+                                            }
+                                        />
+                                        <Route
+                                            path="/clinic/departments"
+                                            element={
+                                                <ProtectedRoute allowedRoles={['clinic_admin']}>
+                                                    <AppLayout>
+                                                        <DepartmentManager />
+                                                    </AppLayout>
+                                                </ProtectedRoute>
+                                            }
+                                        />
 
-                                    <Route
-                                        path="/doctor/dashboard"
-                                        element={
-                                            <ProtectedRoute allowedRoles={['doctor']}>
-                                                <AppLayout>
-                                                    <DoctorDashboard />
-                                                </AppLayout>
-                                            </ProtectedRoute>
-                                        }
-                                    />
-                                    <Route
-                                        path="/clinic/medicine-inventory"
-                                        element={
-                                            <ProtectedRoute allowedRoles={['clinic_admin']}>
-                                                <AppLayout>
-                                                    <MedicineInventory />
-                                                </AppLayout>
-                                            </ProtectedRoute>
-                                        }
-                                    />
-                                    <Route
-                                        path="/clinic/referrals"
-                                        element={
-                                            <ProtectedRoute allowedRoles={['clinic_admin']}>
-                                                <AppLayout>
-                                                    <ClinicReferrals />
-                                                </AppLayout>
-                                            </ProtectedRoute>
-                                        }
-                                    />
+                                        <Route
+                                            path="/doctor/dashboard"
+                                            element={
+                                                <ProtectedRoute allowedRoles={['doctor']}>
+                                                    <AppLayout>
+                                                        <DoctorDashboard />
+                                                    </AppLayout>
+                                                </ProtectedRoute>
+                                            }
+                                        />
+                                        <Route
+                                            path="/clinic/medicine-inventory"
+                                            element={
+                                                <ProtectedRoute allowedRoles={['clinic_admin']}>
+                                                    <AppLayout>
+                                                        <MedicineInventory />
+                                                    </AppLayout>
+                                                </ProtectedRoute>
+                                            }
+                                        />
+                                        <Route
+                                            path="/clinic/referrals"
+                                            element={
+                                                <ProtectedRoute allowedRoles={['clinic_admin']}>
+                                                    <AppLayout>
+                                                        <ClinicReferrals />
+                                                    </AppLayout>
+                                                </ProtectedRoute>
+                                            }
+                                        />
 
-                                    <Route
-                                        path="/clinic/medicine-inventory"
-                                        element={
-                                            <ProtectedRoute allowedRoles={['clinic_admin']}>
-                                                <AppLayout>
-                                                    <MedicineInventory />
-                                                </AppLayout>
-                                            </ProtectedRoute>
-                                        }
-                                    />
+                                        <Route
+                                            path="/doctor/profile"
+                                            element={
+                                                <ProtectedRoute allowedRoles={['doctor']}>
+                                                    <AppLayout>
+                                                        <DoctorProfile />
+                                                    </AppLayout>
+                                                </ProtectedRoute>
+                                            }
+                                        />
+                                        <Route
+                                            path="/doctor/clinics"
+                                            element={
+                                                <ProtectedRoute allowedRoles={['doctor']}>
+                                                    <AppLayout>
+                                                        <DoctorPracticeLocations />
+                                                    </AppLayout>
+                                                </ProtectedRoute>
+                                            }
+                                        />
+                                        <Route
+                                            path="/doctor/referrals"
+                                            element={
+                                                <ProtectedRoute allowedRoles={['doctor']}>
+                                                    <AppLayout>
+                                                        <DoctorReferralsPage />
+                                                    </AppLayout>
+                                                </ProtectedRoute>
+                                            }
+                                        />
+                                        <Route
+                                            path="/doctor/leaderboard"
+                                            element={
+                                                <ProtectedRoute allowedRoles={['doctor']}>
+                                                    <AppLayout>
+                                                        <LeaderboardView />
+                                                    </AppLayout>
+                                                </ProtectedRoute>
+                                            }
+                                        />
+                                        <Route
+                                            path="/doctor/heatmap"
+                                            element={
+                                                <ProtectedRoute allowedRoles={['doctor']}>
+                                                    <AppLayout>
+                                                        <HeatmapView />
+                                                    </AppLayout>
+                                                </ProtectedRoute>
+                                            }
+                                        />
 
+                                        <Route path="/health-worker/dashboard" element={<ProtectedRoute allowedRoles={['health_worker']}><AppLayout><HealthWorkerDashboard /></AppLayout></ProtectedRoute>} />
+                                        <Route path="/health-worker/patients" element={<ProtectedRoute allowedRoles={['health_worker']}><AppLayout><AssignedPatients /></AppLayout></ProtectedRoute>} />
+                                        <Route path="/health-worker/patients/:patientId" element={<ProtectedRoute allowedRoles={['health_worker']}><AppLayout><HealthWorkerPatientDetails /></AppLayout></ProtectedRoute>} />
+                                        <Route path="/health-worker/referrals" element={<ProtectedRoute allowedRoles={['health_worker']}><AppLayout><HealthWorkerReferrals /></AppLayout></ProtectedRoute>} />
+                                        <Route path="/health-worker/followups" element={<ProtectedRoute allowedRoles={['health_worker']}><AppLayout><HealthWorkerFollowups /></AppLayout></ProtectedRoute>} />
+                                        <Route path="/health-worker/profile" element={<ProtectedRoute allowedRoles={['health_worker']}><AppLayout><HealthWorkerProfile /></AppLayout></ProtectedRoute>} />
 
+                                        <Route
+                                            path="/doctor/documents"
+                                            element={
+                                                <ProtectedRoute allowedRoles={['doctor']}>
+                                                    <AppLayout>
+                                                        <DocumentUpload />
+                                                    </AppLayout>
+                                                </ProtectedRoute>
+                                            }
+                                        />
 
-                                    <Route
-                                        path="/doctor/dashboard"
-                                        element={
-                                            <ProtectedRoute allowedRoles={['doctor']}>
-                                                <AppLayout>
-                                                    <DoctorDashboard />
-                                                </AppLayout>
-                                            </ProtectedRoute>
-                                        }
-                                    />
-                                    <Route
-                                        path="/doctor/profile"
-                                        element={
-                                            <ProtectedRoute allowedRoles={['doctor']}>
-                                                <AppLayout>
-                                                    <DoctorProfile />
-                                                </AppLayout>
-                                            </ProtectedRoute>
-                                        }
-                                    />
-                                    <Route
-                                        path="/doctor/clinics"
-                                        element={
-                                            <ProtectedRoute allowedRoles={['doctor']}>
-                                                <AppLayout>
-                                                    <DoctorPracticeLocations />
-                                                </AppLayout>
-                                            </ProtectedRoute>
-                                        }
-                                    />
-                                    <Route
-                                        path="/doctor/referrals"
-                                        element={
-                                            <ProtectedRoute allowedRoles={['doctor']}>
-                                                <AppLayout>
-                                                    <DoctorReferralsPage />
-                                                </AppLayout>
-                                            </ProtectedRoute>
-                                        }
-                                    />
-                                    <Route
-                                        path="/doctor/leaderboard"
-                                        element={
-                                            <ProtectedRoute allowedRoles={['doctor']}>
-                                                <AppLayout>
-                                                    <LeaderboardView />
-                                                </AppLayout>
-                                            </ProtectedRoute>
-                                        }
-                                    />
-                                    <Route
-                                        path="/doctor/heatmap"
-                                        element={
-                                            <ProtectedRoute allowedRoles={['doctor']}>
-                                                <AppLayout>
-                                                    <HeatmapView />
-                                                </AppLayout>
-                                            </ProtectedRoute>
-                                        }
-                                    />
+                                        <Route
+                                            path="/doctor/consultation/:id/room"
+                                            element={
+                                                <ProtectedRoute allowedRoles={['doctor']}>
+                                                    <AppLayout>
+                                                        <TeleconsultationRoom />
+                                                    </AppLayout>
+                                                </ProtectedRoute>
+                                            }
+                                        />
 
-                                    <Route path="/health-worker/dashboard" element={<ProtectedRoute allowedRoles={['health_worker']}><AppLayout><HealthWorkerDashboard /></AppLayout></ProtectedRoute>} />
-                                    <Route path="/health-worker/patients" element={<ProtectedRoute allowedRoles={['health_worker']}><AppLayout><AssignedPatients /></AppLayout></ProtectedRoute>} />
-                                    <Route path="/health-worker/patients/:patientId" element={<ProtectedRoute allowedRoles={['health_worker']}><AppLayout><HealthWorkerPatientDetails /></AppLayout></ProtectedRoute>} />
-                                    <Route path="/health-worker/referrals" element={<ProtectedRoute allowedRoles={['health_worker']}><AppLayout><HealthWorkerReferrals /></AppLayout></ProtectedRoute>} />
-                                    <Route path="/health-worker/followups" element={<ProtectedRoute allowedRoles={['health_worker']}><AppLayout><HealthWorkerFollowups /></AppLayout></ProtectedRoute>} />
-                                    <Route path="/health-worker/profile" element={<ProtectedRoute allowedRoles={['health_worker']}><AppLayout><HealthWorkerProfile /></AppLayout></ProtectedRoute>} />
+                                        <Route
+                                            path="/patient/dashboard"
+                                            element={
+                                                <ProtectedRoute allowedRoles={['patient']}>
+                                                    <AppLayout>
+                                                        <PatientDashboard />
+                                                    </AppLayout>
+                                                </ProtectedRoute>
+                                            }
+                                        />
 
-                                    <Route
-                                        path="/doctor/documents"
-                                        element={
-                                            <ProtectedRoute allowedRoles={['doctor']}>
-                                                <AppLayout>
-                                                    <DocumentUpload />
-                                                </AppLayout>
-                                            </ProtectedRoute>
-                                        }
-                                    />
+                                        <Route
+                                            path="/patient/profile"
+                                            element={
+                                                <ProtectedRoute allowedRoles={['patient']}>
+                                                    <AppLayout>
+                                                        <PatientProfile />
+                                                    </AppLayout>
+                                                </ProtectedRoute>
+                                            }
+                                        />
 
-                                    <Route
-                                        path="/doctor/consultation/:id/room"
-                                        element={
-                                            <ProtectedRoute allowedRoles={['doctor']}>
-                                                <AppLayout>
-                                                    <TeleconsultationRoom />
-                                                </AppLayout>
-                                            </ProtectedRoute>
-                                        }
-                                    />
+                                        <Route
+                                            path="/patient/doctors"
+                                            element={
+                                                <ProtectedRoute allowedRoles={['patient']}>
+                                                    <AppLayout>
+                                                        <DoctorSearchAndReviews />
+                                                    </AppLayout>
+                                                </ProtectedRoute>
+                                            }
+                                        />
 
-                                    <Route
-                                        path="/patient/dashboard"
-                                        element={
-                                            <ProtectedRoute allowedRoles={['patient']}>
-                                                <AppLayout>
-                                                    <PatientDashboard />
-                                                </AppLayout>
-                                            </ProtectedRoute>
-                                        }
-                                    />
+                                        <Route
+                                            path="/patient/leaderboard"
+                                            element={
+                                                <ProtectedRoute allowedRoles={['patient']}>
+                                                    <AppLayout>
+                                                        <LeaderboardView />
+                                                    </AppLayout>
+                                                </ProtectedRoute>
+                                            }
+                                        />
 
-                                    <Route
-                                        path="/patient/profile"
-                                        element={
-                                            <ProtectedRoute allowedRoles={['patient']}>
-                                                <AppLayout>
-                                                    <PatientProfile />
-                                                </AppLayout>
-                                            </ProtectedRoute>
-                                        }
-                                    />
+                                        <Route
+                                            path="/patient/book-appointment"
+                                            element={
+                                                <ProtectedRoute allowedRoles={['patient']}>
+                                                    <AppLayout>
+                                                        <BookAppointment />
+                                                    </AppLayout>
+                                                </ProtectedRoute>
+                                            }
+                                        />
 
-                                    <Route
-                                        path="/patient/doctors"
-                                        element={
-                                            <ProtectedRoute allowedRoles={['patient']}>
-                                                <AppLayout>
-                                                    <DoctorSearchAndReviews />
-                                                </AppLayout>
-                                            </ProtectedRoute>
-                                        }
-                                    />
+                                        <Route
+                                            path="/patient/ai-triage"
+                                            element={
+                                                <ProtectedRoute allowedRoles={['patient']}>
+                                                    <AppLayout>
+                                                        <AiTriage />
+                                                    </AppLayout>
+                                                </ProtectedRoute>
+                                            }
+                                        />
 
-                                    <Route
-                                        path="/patient/leaderboard"
-                                        element={
-                                            <ProtectedRoute allowedRoles={['patient']}>
-                                                <AppLayout>
-                                                    <LeaderboardView />
-                                                </AppLayout>
-                                            </ProtectedRoute>
-                                        }
-                                    />
+                                        <Route
+                                            path="/patient/consultations"
+                                            element={
+                                                <ProtectedRoute allowedRoles={['patient']}>
+                                                    <AppLayout>
+                                                        <PatientConsultations />
+                                                    </AppLayout>
+                                                </ProtectedRoute>
+                                            }
+                                        />
 
-                                    <Route
-                                        path="/patient/book-appointment"
-                                        element={
-                                            <ProtectedRoute allowedRoles={['patient']}>
-                                                <AppLayout>
-                                                    <BookAppointment />
-                                                </AppLayout>
-                                            </ProtectedRoute>
-                                        }
-                                    />
+                                        <Route
+                                            path="/patient/requests"
+                                            element={
+                                                <ProtectedRoute allowedRoles={['patient']}>
+                                                    <AppLayout>
+                                                        <PatientRequests />
+                                                    </AppLayout>
+                                                </ProtectedRoute>
+                                            }
+                                        />
 
-                                    <Route
-                                        path="/patient/ai-triage"
-                                        element={
-                                            <ProtectedRoute allowedRoles={['patient']}>
-                                                <AppLayout>
-                                                    <AiTriage />
-                                                </AppLayout>
-                                            </ProtectedRoute>
-                                        }
-                                    />
+                                        <Route
+                                            path="/patient/subsidy"
+                                            element={
+                                                <ProtectedRoute allowedRoles={['patient']}>
+                                                    <AppLayout>
+                                                        <PatientSubsidy />
+                                                    </AppLayout>
+                                                </ProtectedRoute>
+                                            }
+                                        />
 
-                                    <Route
-                                        path="/patient/consultations"
-                                        element={
-                                            <ProtectedRoute allowedRoles={['patient']}>
-                                                <AppLayout>
-                                                    <PatientConsultations />
-                                                </AppLayout>
-                                            </ProtectedRoute>
-                                        }
-                                    />
+                                        <Route
+                                            path="/patient/heatmap"
+                                            element={
+                                                <ProtectedRoute allowedRoles={['patient']}>
+                                                    <AppLayout>
+                                                        <HeatmapView />
+                                                    </AppLayout>
+                                                </ProtectedRoute>
+                                            }
+                                        />
 
-                                    <Route
-                                        path="/patient/requests"
-                                        element={
-                                            <ProtectedRoute allowedRoles={['patient']}>
-                                                <AppLayout>
-                                                    <PatientRequests />
-                                                </AppLayout>
-                                            </ProtectedRoute>
-                                        }
-                                    />
+                                        <Route
+                                            path="/patient/medicine-availability"
+                                            element={
+                                                <ProtectedRoute allowedRoles={['patient']}>
+                                                    <AppLayout>
+                                                        <MedicineAvailability />
+                                                    </AppLayout>
+                                                </ProtectedRoute>
+                                            }
+                                        />
 
-                                    <Route
-                                        path="/patient/subsidy"
-                                        element={
-                                            <ProtectedRoute allowedRoles={['patient']}>
-                                                <AppLayout>
-                                                    <PatientSubsidy />
-                                                </AppLayout>
-                                            </ProtectedRoute>
-                                        }
-                                    />
+                                        <Route
+                                            path="/patient/consultation/:id/room"
+                                            element={
+                                                <ProtectedRoute allowedRoles={['patient']}>
+                                                    <AppLayout>
+                                                        <TeleconsultationRoom />
+                                                    </AppLayout>
+                                                </ProtectedRoute>
+                                            }
+                                        />
 
-                                    <Route
-                                        path="/patient/heatmap"
-                                        element={
-                                            <ProtectedRoute allowedRoles={['patient']}>
-                                                <AppLayout>
-                                                    <HeatmapView />
-                                                </AppLayout>
-                                            </ProtectedRoute>
-                                        }
-                                    />
-                                    <Route
-                                        path="/patient/medicine-availability"
-                                        element={
-                                            <ProtectedRoute allowedRoles={['patient']}>
-                                                <AppLayout>
-                                                    <MedicineAvailability />
-                                                </AppLayout>
-                                            </ProtectedRoute>
-                                        }
-                                    />
+                                        {/* Public: Prescription Blockchain Verification (no auth needed) */}
+                                        <Route path="/verify/:consultationId" element={<VerifyPrescription />} />
+                                        <Route path="/verify" element={<VerifyPrescriptionUpload />} />
 
-                                    <Route
-                                        path="/patient/heatmap"
-                                        element={
-                                            <ProtectedRoute allowedRoles={['patient']}>
-                                                <AppLayout>
-                                                    <HeatmapView />
-                                                </AppLayout>
-                                            </ProtectedRoute>
-                                        }
-                                    />
-
-                                    <Route
-                                        path="/patient/consultation/:id/room"
-                                        element={
-                                            <ProtectedRoute allowedRoles={['patient']}>
-                                                <AppLayout>
-                                                    <TeleconsultationRoom />
-                                                </AppLayout>
-                                            </ProtectedRoute>
-                                        }
-                                    />
-
-                                    {/* Public: Prescription Blockchain Verification (no auth needed) */}
-                                    <Route path="/verify/:consultationId" element={<VerifyPrescription />} />
-                                    <Route path="/verify" element={<VerifyPrescriptionUpload />} />
-
-                                    {/* Catch-all navigation */}
-                                    <Route path="*" element={<Navigate to="/login" replace />} />
-                                </Routes>
-                            </LanguageProvider>
-                        </div>
-                    </NotificationProvider>
-                </SocketProvider>
-            </AuthProvider>
+                                        {/* Catch-all navigation */}
+                                        <Route path="*" element={<Navigate to="/login" replace />} />
+                                    </Routes>
+                                </LanguageProvider>
+                            </div>
+                        </NotificationProvider>
+                    </SocketProvider>
+                </AuthProvider>
+            </ThemeProvider>
         </BrowserRouter>
     );
 };
