@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import subsidyService from '../../services/subsidyService';
-import { 
-    IndianRupee, 
-    ShieldCheck, 
-    Percent, 
-    CheckCircle2, 
-    Clock, 
-    AlertCircle, 
-    FileText, 
-    ArrowRight, 
-    Sparkles, 
+import {
+    IndianRupee,
+    ShieldCheck,
+    Percent,
+    CheckCircle2,
+    Clock,
+    AlertCircle,
+    FileText,
+    ArrowRight,
+    Sparkles,
     Building2,
     HeartHandshake,
     Loader2
@@ -28,7 +28,7 @@ function EligibilityBadge({ status, enrolled }) {
     if (enrolled) {
         return (
             <Badge variant="mint" dot>
-                Eligible & Enrolled
+                Eligible &amp; Enrolled
             </Badge>
         );
     }
@@ -81,14 +81,15 @@ function ApplyForm({ onSuccess, onCancel }) {
     return (
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
-                <label htmlFor="income-bracket" className="text-xs font-bold text-[#4a3c45] uppercase tracking-wider">
+                <label htmlFor="income-bracket" className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
                     Annual Household Income Bracket <span className="text-rose-500">*</span>
                 </label>
                 <select
                     id="income-bracket"
                     value={incomeBracket}
                     onChange={(e) => setIncomeBracket(e.target.value)}
-                    className="w-full text-xs md:text-sm border border-[#f5e4ec] bg-white rounded-2xl p-3 focus:outline-none focus:ring-2 focus:ring-[#e13b68]/30 font-medium text-[#2d2329]"
+                    className="w-full text-xs md:text-sm rounded-2xl p-3 focus:outline-none focus:ring-2 font-medium transition"
+                    style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
                     required
                 >
                     <option value="">Select your household annual income range…</option>
@@ -99,7 +100,7 @@ function ApplyForm({ onSuccess, onCancel }) {
             </div>
 
             <div className="flex flex-col gap-1.5">
-                <label htmlFor="pincode" className="text-xs font-bold text-[#4a3c45] uppercase tracking-wider">
+                <label htmlFor="pincode" className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
                     Residential Area Pincode <span className="text-rose-500">*</span>
                 </label>
                 <input
@@ -110,17 +111,18 @@ function ApplyForm({ onSuccess, onCancel }) {
                     value={pincode}
                     onChange={(e) => setPincode(e.target.value)}
                     placeholder="e.g. 831001"
-                    className="w-full text-xs md:text-sm border border-[#f5e4ec] bg-white rounded-2xl p-3 focus:outline-none focus:ring-2 focus:ring-[#e13b68]/30 font-medium text-[#2d2329]"
+                    className="w-full text-xs md:text-sm rounded-2xl p-3 focus:outline-none focus:ring-2 font-medium transition"
+                    style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
                     required
                 />
-                <p className="text-[11px] text-[#7d6974] font-medium mt-0.5">
+                <p className="text-[11px] font-medium mt-0.5" style={{ color: 'var(--text-secondary)' }}>
                     Patients residing in designated underserved or rural blocks automatically receive an additional 10% coverage benefit.
                 </p>
             </div>
 
             <div className="flex flex-col gap-1.5">
-                <label htmlFor="id-proof" className="text-xs font-bold text-[#4a3c45] uppercase tracking-wider">
-                    Income Certificate / Ration / BPL Card Proof <span className="font-normal normal-case text-[#7d6974]">(Optional)</span>
+                <label htmlFor="id-proof" className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
+                    Income Certificate / Ration / BPL Card Proof <span className="font-normal normal-case opacity-70">(Optional)</span>
                 </label>
                 <input
                     id="id-proof"
@@ -130,22 +132,27 @@ function ApplyForm({ onSuccess, onCancel }) {
                         const file = e.target.files?.[0];
                         if (file) setIdProofUrl(file.name);
                     }}
-                    className="w-full text-xs text-[#7d6974] file:mr-3 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-[#ffe6ee] file:text-[#8e1d41] hover:file:bg-[#f5c6d6]"
+                    className="w-full text-xs file:mr-3 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold transition"
+                    style={{ color: 'var(--text-secondary)', '--tw-file-bg': 'var(--accent-light)', '--tw-file-text': 'var(--accent)' }}
                 />
             </div>
 
             {error && (
-                <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold flex items-center gap-2">
-                    <AlertCircle className="w-4 h-4 text-rose-600 flex-shrink-0" />
+                <div
+                    className="p-3.5 rounded-2xl text-xs font-bold flex items-center gap-2"
+                    style={{ background: 'var(--pastel-pink-bg)', border: '1px solid var(--accent)', color: 'var(--accent)' }}
+                >
+                    <AlertCircle className="w-4 h-4 flex-shrink-0" />
                     <span>{error}</span>
                 </div>
             )}
 
-            <div className="flex items-center gap-3 pt-3 border-t border-[#f5e4ec]">
+            <div className="flex items-center gap-3 pt-3" style={{ borderTop: '1px solid var(--border-subtle)' }}>
                 <button
                     type="submit"
                     disabled={submitting}
-                    className="px-6 py-2.5 text-xs font-bold bg-[#e13b68] hover:bg-[#c92a55] text-white rounded-full transition shadow-xs disabled:opacity-50 flex items-center gap-2"
+                    className="px-6 py-2.5 text-xs font-bold rounded-full transition shadow-xs disabled:opacity-50 flex items-center gap-2 text-white"
+                    style={{ background: 'var(--accent)' }}
                 >
                     {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
                     <span>{submitting ? 'Submitting Application…' : 'Submit Subsidy Application'}</span>
@@ -154,7 +161,8 @@ function ApplyForm({ onSuccess, onCancel }) {
                     <button
                         type="button"
                         onClick={onCancel}
-                        className="px-4 py-2.5 text-xs font-bold border border-[#f5e4ec] bg-white hover:bg-zinc-50 text-[#7d6974] rounded-full transition"
+                        className="px-4 py-2.5 text-xs font-bold rounded-full transition cursor-pointer"
+                        style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', color: 'var(--text-secondary)' }}
                     >
                         Cancel
                     </button>
@@ -191,57 +199,84 @@ export default function PatientSubsidy() {
     return (
         <div className="w-full flex flex-col gap-6 text-left animate-fade-in-up pb-12">
             {/* Header Title */}
-            <div className="bg-white border border-[#f5e4ec] rounded-3xl p-6 md:p-8 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div
+                className="rounded-3xl p-6 md:p-8 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6"
+                style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}
+            >
                 <div>
                     <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs font-bold uppercase tracking-wider text-[#e13b68] bg-[#ffe6ee] px-2.5 py-0.5 rounded-full">
-                            Ayushman & State Healthcare Aid
+                        <span
+                            className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full"
+                            style={{ background: 'var(--accent-light)', color: 'var(--accent)' }}
+                        >
+                            Ayushman &amp; State Healthcare Aid
                         </span>
                         <Badge variant="mint" dot>
                             Verified Benefit
                         </Badge>
                     </div>
-                    <h1 className="text-2xl md:text-3xl font-black text-[#2d2329] font-heading">
-                        Healthcare Subsidy & Assistance
+                    <h1 className="text-2xl md:text-3xl font-black font-heading" style={{ color: 'var(--text-primary)' }}>
+                        Healthcare Subsidy &amp; Assistance
                     </h1>
-                    <p className="text-xs font-semibold text-[#7d6974] mt-1">
+                    <p className="text-xs font-semibold mt-1" style={{ color: 'var(--text-secondary)' }}>
                         Check your income-based medical fee waiver, medicine discounts, and total platform savings.
                     </p>
                 </div>
 
-                <div className="w-12 h-12 rounded-2xl bg-[#ffe6ee] text-[#e13b68] flex items-center justify-center font-bold flex-shrink-0">
+                <div
+                    className="w-12 h-12 rounded-2xl flex items-center justify-center font-bold flex-shrink-0"
+                    style={{ background: 'var(--accent-light)', color: 'var(--accent)', border: '1px solid var(--notif-unread-border)' }}
+                >
                     <HeartHandshake className="w-6 h-6" />
                 </div>
             </div>
 
             {/* Scheme Highlights Banner */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-white border border-[#f5e4ec] rounded-3xl p-5 shadow-xs flex flex-col gap-1.5">
-                    <div className="w-9 h-9 rounded-2xl bg-[#ffe6ee] text-[#e13b68] flex items-center justify-center mb-1">
+                <div
+                    className="rounded-3xl p-5 shadow-xs flex flex-col gap-1.5"
+                    style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}
+                >
+                    <div
+                        className="w-9 h-9 rounded-2xl flex items-center justify-center mb-1"
+                        style={{ background: 'var(--accent-light)', color: 'var(--accent)' }}
+                    >
                         <Percent className="w-4 h-4" />
                     </div>
-                    <span className="text-sm font-black text-[#2d2329]">Up to 70% Fee Coverage</span>
-                    <span className="text-xs text-[#7d6974] font-medium leading-relaxed">
+                    <span className="text-sm font-black" style={{ color: 'var(--text-primary)' }}>Up to 70% Fee Coverage</span>
+                    <span className="text-xs font-medium leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
                         Automatic reduction on doctor teleconsultation and clinic OPD visit charges.
                     </span>
                 </div>
 
-                <div className="bg-white border border-[#f5e4ec] rounded-3xl p-5 shadow-xs flex flex-col gap-1.5">
-                    <div className="w-9 h-9 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-1">
+                <div
+                    className="rounded-3xl p-5 shadow-xs flex flex-col gap-1.5"
+                    style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}
+                >
+                    <div
+                        className="w-9 h-9 rounded-2xl flex items-center justify-center mb-1"
+                        style={{ background: 'var(--pastel-mint-bg)', color: 'var(--pastel-mint-text)' }}
+                    >
                         <ShieldCheck className="w-4 h-4" />
                     </div>
-                    <span className="text-sm font-black text-[#2d2329]">100% Free Generic Meds</span>
-                    <span className="text-xs text-[#7d6974] font-medium leading-relaxed">
+                    <span className="text-sm font-black" style={{ color: 'var(--text-primary)' }}>100% Free Generic Meds</span>
+                    <span className="text-xs font-medium leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
                         Full subsidy on essential medications when dispensed at registered Sanjeevani clinics.
                     </span>
                 </div>
 
-                <div className="bg-white border border-[#f5e4ec] rounded-3xl p-5 shadow-xs flex flex-col gap-1.5">
-                    <div className="w-9 h-9 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center mb-1">
+                <div
+                    className="rounded-3xl p-5 shadow-xs flex flex-col gap-1.5"
+                    style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}
+                >
+                    <div
+                        className="w-9 h-9 rounded-2xl flex items-center justify-center mb-1"
+                        style={{ background: 'var(--pastel-sky-bg)', color: 'var(--pastel-sky-text)' }}
+                    >
                         <Sparkles className="w-4 h-4" />
                     </div>
-                    <span className="text-sm font-black text-[#2d2329]">Instant ABDM Sync</span>
-                    <span className="text-xs text-[#7d6974] font-medium leading-relaxed">
+                    <span className="text-sm font-black" style={{ color: 'var(--text-primary)' }}>Instant ABDM Sync</span>
+                    <span className="text-xs font-medium leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
                         Directly linked with your ABHA digital health card for seamless claim processing.
                     </span>
                 </div>
@@ -249,64 +284,88 @@ export default function PatientSubsidy() {
 
             {/* Loading */}
             {loading && (
-                <div className="bg-white border border-[#f5e4ec] rounded-3xl p-12 text-center text-[#7d6974] text-xs font-bold flex flex-col items-center justify-center gap-3">
-                    <Loader2 className="w-6 h-6 text-[#e13b68] animate-spin" />
+                <div
+                    className="rounded-3xl p-12 text-center text-xs font-bold flex flex-col items-center justify-center gap-3"
+                    style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', color: 'var(--text-secondary)' }}
+                >
+                    <Loader2 className="w-6 h-6 animate-spin" style={{ color: 'var(--accent)' }} />
                     <span>Loading subsidy and eligibility details…</span>
                 </div>
             )}
 
             {/* Error */}
             {error && (
-                <div className="bg-white border border-rose-200 rounded-3xl p-6 text-center text-rose-600 text-xs font-bold">
+                <div
+                    className="border rounded-3xl p-6 text-center text-xs font-bold"
+                    style={{ background: 'var(--pastel-pink-bg)', border: '1px solid var(--accent)', color: 'var(--accent)' }}
+                >
                     {error}
                 </div>
             )}
 
             {/* Enrolled View */}
             {!loading && !error && data?.enrolled && (
-                <div className="bg-white border border-[#f5e4ec] rounded-3xl p-6 md:p-8 flex flex-col gap-6 shadow-xs">
-                    <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#fdf0f4] pb-4">
+                <div
+                    className="rounded-3xl p-6 md:p-8 flex flex-col gap-6 shadow-xs"
+                    style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}
+                >
+                    <div className="flex flex-wrap items-center justify-between gap-3 pb-4" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                            <div
+                                className="w-10 h-10 rounded-2xl flex items-center justify-center"
+                                style={{ background: 'var(--pastel-mint-bg)', color: 'var(--pastel-mint-text)' }}
+                            >
                                 <CheckCircle2 className="w-5 h-5" />
                             </div>
                             <div>
-                                <h3 className="text-base font-black text-[#2d2329] font-heading">Active Subsidy Enrollment</h3>
-                                <p className="text-xs text-[#7d6974] font-medium">Your account is active for government medical assistance.</p>
+                                <h3 className="text-base font-black font-heading" style={{ color: 'var(--text-primary)' }}>Active Subsidy Enrollment</h3>
+                                <p className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>Your account is active for government medical assistance.</p>
                             </div>
                         </div>
                         <EligibilityBadge status={data.status} enrolled={data.enrolled} />
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div className="bg-[#fffcfd] border border-[#f5e4ec] rounded-2xl p-4 flex flex-col gap-1">
-                            <span className="text-xs text-[#7d6974] font-bold uppercase tracking-wider">Subsidy Coverage</span>
-                            <span className="text-2xl md:text-3xl font-black text-[#e13b68] font-heading">
+                        <div
+                            className="rounded-2xl p-4 flex flex-col gap-1"
+                            style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)' }}
+                        >
+                            <span className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>Subsidy Coverage</span>
+                            <span className="text-2xl md:text-3xl font-black font-heading" style={{ color: 'var(--accent)' }}>
                                 {data.subsidyPercent}%
                             </span>
-                            <span className="text-[11px] text-[#7d6974]">Applied automatically at checkout</span>
+                            <span className="text-[11px]" style={{ color: 'var(--text-secondary)' }}>Applied automatically at checkout</span>
                         </div>
 
-                        <div className="bg-[#fffcfd] border border-[#f5e4ec] rounded-2xl p-4 flex flex-col gap-1">
-                            <span className="text-xs text-[#7d6974] font-bold uppercase tracking-wider">Total Amount Saved</span>
-                            <span className="text-2xl md:text-3xl font-black text-emerald-600 font-heading">
+                        <div
+                            className="rounded-2xl p-4 flex flex-col gap-1"
+                            style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)' }}
+                        >
+                            <span className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>Total Amount Saved</span>
+                            <span className="text-2xl md:text-3xl font-black font-heading" style={{ color: 'var(--pastel-mint-text)' }}>
                                 ₹{Number(data.totalSaved || 0).toLocaleString('en-IN', { minimumFractionDigits: 0 })}
                             </span>
-                            <span className="text-[11px] text-[#7d6974]">Saved across consultations & meds</span>
+                            <span className="text-[11px]" style={{ color: 'var(--text-secondary)' }}>Saved across consultations &amp; meds</span>
                         </div>
 
                         {data.application?.incomeBracket && (
-                            <div className="bg-[#fffcfd] border border-[#f5e4ec] rounded-2xl p-4 flex flex-col gap-1">
-                                <span className="text-xs text-[#7d6974] font-bold uppercase tracking-wider">Registered Income Bracket</span>
-                                <span className="text-sm font-bold text-[#2d2329] mt-1">
+                            <div
+                                className="rounded-2xl p-4 flex flex-col gap-1"
+                                style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)' }}
+                            >
+                                <span className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>Registered Income Bracket</span>
+                                <span className="text-sm font-bold mt-1" style={{ color: 'var(--text-primary)' }}>
                                     {INCOME_BRACKET_LABELS[data.application.incomeBracket] || data.application.incomeBracket}
                                 </span>
-                                <span className="text-[11px] text-[#7d6974]">Pincode: {data.application.pincode || 'Verified'}</span>
+                                <span className="text-[11px]" style={{ color: 'var(--text-secondary)' }}>Pincode: {data.application.pincode || 'Verified'}</span>
                             </div>
                         )}
                     </div>
 
-                    <div className="p-4 rounded-2xl bg-[#fffcfd] border border-[#f5e4ec] text-xs text-[#7d6974] font-medium leading-relaxed">
+                    <div
+                        className="p-4 rounded-2xl text-xs font-medium leading-relaxed"
+                        style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', color: 'var(--text-secondary)' }}
+                    >
                         Subsidy benefits are automatically deducted when you book a teleconsultation or purchase prescribed medicines from partner network clinics.
                     </div>
                 </div>
@@ -314,20 +373,26 @@ export default function PatientSubsidy() {
 
             {/* Pending Review View */}
             {!loading && !error && !data?.enrolled && data?.status === 'pending' && (
-                <div className="bg-white border border-[#f5e4ec] rounded-3xl p-6 md:p-8 flex flex-col gap-4 shadow-xs">
-                    <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#fdf0f4] pb-4">
+                <div
+                    className="rounded-3xl p-6 md:p-8 flex flex-col gap-4 shadow-xs"
+                    style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}
+                >
+                    <div className="flex flex-wrap items-center justify-between gap-3 pb-4" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                            <div
+                                className="w-10 h-10 rounded-2xl flex items-center justify-center"
+                                style={{ background: 'var(--pastel-peach-bg)', color: 'var(--pastel-peach-text)' }}
+                            >
                                 <Clock className="w-5 h-5" />
                             </div>
                             <div>
-                                <h3 className="text-base font-black text-[#2d2329] font-heading">Application Under Review</h3>
-                                <p className="text-xs text-[#7d6974] font-medium">Our verification desk is currently processing your subsidy eligibility documents.</p>
+                                <h3 className="text-base font-black font-heading" style={{ color: 'var(--text-primary)' }}>Application Under Review</h3>
+                                <p className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>Our verification desk is currently processing your subsidy eligibility documents.</p>
                             </div>
                         </div>
                         <EligibilityBadge status="pending" enrolled={false} />
                     </div>
-                    <p className="text-xs text-[#4a3c45] font-medium leading-relaxed">
+                    <p className="text-xs font-medium leading-relaxed" style={{ color: 'var(--text-primary)' }}>
                         Your subsidy application has been submitted and is undergoing automated cross-verification with regional health authority databases. This typically takes 24 hours.
                     </p>
                 </div>
@@ -335,15 +400,21 @@ export default function PatientSubsidy() {
 
             {/* Not Enrolled / Application Drawer View */}
             {!loading && !error && !data?.enrolled && data?.status !== 'pending' && (
-                <div className="bg-white border border-[#f5e4ec] rounded-3xl p-6 md:p-8 flex flex-col gap-6 shadow-xs">
-                    <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#fdf0f4] pb-4">
+                <div
+                    className="rounded-3xl p-6 md:p-8 flex flex-col gap-6 shadow-xs"
+                    style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}
+                >
+                    <div className="flex flex-wrap items-center justify-between gap-3 pb-4" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-2xl bg-[#ffe6ee] text-[#e13b68] flex items-center justify-center">
+                            <div
+                                className="w-10 h-10 rounded-2xl flex items-center justify-center"
+                                style={{ background: 'var(--accent-light)', color: 'var(--accent)' }}
+                            >
                                 <HeartHandshake className="w-5 h-5" />
                             </div>
                             <div>
-                                <h3 className="text-base font-black text-[#2d2329] font-heading">Subsidy Eligibility & Application</h3>
-                                <p className="text-xs text-[#7d6974] font-medium">Apply for government and Sanjeevani health subsidy coverage.</p>
+                                <h3 className="text-base font-black font-heading" style={{ color: 'var(--text-primary)' }}>Subsidy Eligibility &amp; Application</h3>
+                                <p className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>Apply for government and Sanjeevani health subsidy coverage.</p>
                             </div>
                         </div>
                         {data?.status === 'rejected' && (
@@ -353,13 +424,14 @@ export default function PatientSubsidy() {
 
                     {!showForm ? (
                         <div className="flex flex-col gap-4">
-                            <p className="text-xs md:text-sm text-[#4a3c45] font-medium leading-relaxed max-w-2xl">
+                            <p className="text-xs md:text-sm font-medium leading-relaxed max-w-2xl" style={{ color: 'var(--text-secondary)' }}>
                                 You are not currently enrolled in the Sanjeevani healthcare subsidy program. Apply below in under 2 minutes to check your eligibility based on annual household income and locality pincode.
                             </p>
                             <button
                                 type="button"
                                 onClick={() => setShowForm(true)}
-                                className="self-start px-6 py-3 text-xs font-bold bg-[#e13b68] hover:bg-[#c92a55] text-white rounded-full transition shadow-xs flex items-center gap-2 cursor-pointer"
+                                className="self-start px-6 py-3 text-xs font-bold rounded-full transition shadow-xs flex items-center gap-2 cursor-pointer text-white"
+                                style={{ background: 'var(--accent)' }}
                             >
                                 <span>Apply for Healthcare Subsidy</span>
                                 <ArrowRight className="w-3.5 h-3.5" />

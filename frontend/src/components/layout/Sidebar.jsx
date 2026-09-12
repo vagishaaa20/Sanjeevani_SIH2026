@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import useAuth from '../../hooks/useAuth';
 import SanjeevaniLogo from '../common/SanjeevaniLogo';
+import TranslatedText from '../common/TranslatedText';
 
 export const Sidebar = () => {
     const { user } = useAuth();
@@ -77,7 +78,13 @@ export const Sidebar = () => {
     const userName = profile.fullName || user.email?.split('@')[0] || user.phone || 'User';
 
     return (
-        <aside className="w-full md:w-64 bg-[#fdf0f4] border-b md:border-b-0 md:border-r border-[#f3dce5] p-5 flex flex-col justify-between min-h-[calc(100vh-61px)]">
+        <aside
+            className="w-full md:w-64 p-5 flex flex-col justify-between min-h-[calc(100vh-61px)] border-b md:border-b-0 md:border-r"
+            style={{
+                background: 'var(--sidebar-bg)',
+                borderColor: 'var(--border)',
+            }}
+        >
             <div className="flex flex-col gap-6">
                 {/* Brand Logo in Sidebar (Desktop) */}
                 <div className="hidden md:flex flex-col items-start gap-1 pb-4 border-b border-[#f3dce5]">
@@ -86,10 +93,10 @@ export const Sidebar = () => {
                             <SanjeevaniLogo variant="emblem" size={40} />
                         </div>
                         <div className="flex flex-col text-left">
-                            <span className="text-xl font-black text-[#2d2329] font-heading tracking-tight leading-none">
+                            <span className="text-xl font-black font-heading tracking-tight leading-none" style={{ color: 'var(--text-primary)' }}>
                                 Sanjeevani
                             </span>
-                            <span className="text-[10px] font-extrabold text-[#e13b68] tracking-widest uppercase mt-1">
+                            <span className="text-[10px] font-extrabold tracking-widest uppercase mt-1" style={{ color: 'var(--accent)' }}>
                                 Clinical Platform
                             </span>
                         </div>
@@ -104,15 +111,28 @@ export const Sidebar = () => {
                             <NavLink
                                 key={link.path}
                                 to={link.path}
-                                className={({ isActive }) =>
-                                    `whitespace-nowrap px-4 py-3 rounded-2xl text-xs md:text-sm font-bold transition-all duration-150 flex items-center gap-3 flex-shrink-0 ${isActive
-                                        ? 'bg-[#ffe6ee] text-[#e13b68] shadow-xs font-black'
-                                        : 'text-[#4a3c45] hover:text-[#e13b68] hover:bg-white/60'
-                                    }`
-                                }
+                                className="whitespace-nowrap px-4 py-3 rounded-2xl text-xs md:text-sm font-bold transition-all duration-150 flex items-center gap-3 flex-shrink-0"
+                                style={({ isActive }) => ({
+                                    background: isActive ? 'var(--accent-light)' : 'transparent',
+                                    color: isActive ? 'var(--accent)' : 'var(--text-secondary)',
+                                    fontWeight: isActive ? '900' : '700',
+                                    boxShadow: isActive ? '0 1px 4px rgba(0,0,0,0.06)' : 'none',
+                                })}
+                                onMouseEnter={(e) => {
+                                    if (!e.currentTarget.getAttribute('aria-current')) {
+                                        e.currentTarget.style.color = 'var(--accent)';
+                                        e.currentTarget.style.background = 'var(--bg-hover)';
+                                    }
+                                }}
+                                onMouseLeave={(e) => {
+                                    if (!e.currentTarget.getAttribute('aria-current')) {
+                                        e.currentTarget.style.color = 'var(--text-secondary)';
+                                        e.currentTarget.style.background = 'transparent';
+                                    }
+                                }}
                             >
                                 {IconComponent && <IconComponent className="w-4 h-4 flex-shrink-0" />}
-                                <span>{link.label}</span>
+                                <span><TranslatedText text={link.label} /></span>
                             </NavLink>
                         );
                     })}
@@ -120,19 +140,32 @@ export const Sidebar = () => {
             </div>
 
             {/* Bottom User Profile Card */}
-            <div className="hidden md:flex items-center justify-between p-3 rounded-2xl bg-white border border-[#f5e4ec] shadow-xs mt-6">
+            <div
+                className="hidden md:flex items-center justify-between p-3 rounded-2xl shadow-xs mt-6"
+                style={{
+                    background: 'var(--card-bg)',
+                    border: '1px solid var(--border)',
+                }}
+            >
                 <div className="flex items-center gap-2.5 overflow-hidden">
-                    <div className="w-9 h-9 rounded-full bg-[#ffe6ee] border border-[#f8c8d8] flex items-center justify-center text-xs font-black text-[#e13b68] flex-shrink-0">
+                    <div
+                        className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-black flex-shrink-0"
+                        style={{
+                            background: 'var(--accent-light)',
+                            border: '1px solid var(--notif-unread-border)',
+                            color: 'var(--accent)',
+                        }}
+                    >
                         {(userName || 'U').charAt(0)}
                     </div>
                     <div className="flex flex-col text-left overflow-hidden">
-                        <span className="text-xs font-black text-[#2d2329] truncate">{userName}</span>
-                        <span className="text-[10px] font-bold text-[#7d6974] capitalize truncate">
+                        <span className="text-xs font-black truncate" style={{ color: 'var(--text-primary)' }}>{userName}</span>
+                        <span className="text-[10px] font-bold capitalize truncate" style={{ color: 'var(--text-secondary)' }}>
                             {user.role?.replace('_', ' ')}
                         </span>
                     </div>
                 </div>
-                <ChevronDown className="w-4 h-4 text-[#7d6974] flex-shrink-0" />
+                <ChevronDown className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--text-secondary)' }} />
             </div>
         </aside>
     );

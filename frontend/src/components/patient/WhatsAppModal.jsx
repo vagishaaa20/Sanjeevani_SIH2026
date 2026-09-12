@@ -32,12 +32,16 @@ export default function WhatsAppModal({ isOpen, onClose }) {
             aria-label="WhatsApp Connect"
             onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
         >
-            <div className="bg-white border-2 border-ink-black rounded-3xl p-8 w-full max-w-sm shadow-2xl flex flex-col gap-6 relative animate-scale-in">
+            <div
+                className="rounded-3xl p-8 w-full max-w-sm shadow-2xl flex flex-col gap-6 relative animate-scale-in"
+                style={{ background: 'var(--card-bg)', border: '2px solid var(--border)' }}
+            >
                 {/* Close */}
                 <button
                     type="button"
                     onClick={onClose}
-                    className="absolute top-4 right-4 text-ink-muted hover:text-ink-black text-xl font-bold leading-none"
+                    className="absolute top-4 right-4 text-xl font-bold leading-none cursor-pointer transition-opacity hover:opacity-70"
+                    style={{ color: 'var(--text-secondary)' }}
                     aria-label="Close"
                 >
                     ×
@@ -52,8 +56,8 @@ export default function WhatsAppModal({ isOpen, onClose }) {
                     >
                         💬
                     </div>
-                    <h3 className="text-xl font-black text-ink-black">Connect on WhatsApp</h3>
-                    <p className="text-sm text-ink-charcoal">
+                    <h3 className="text-xl font-black font-heading" style={{ color: 'var(--text-primary)' }}>Connect on WhatsApp</h3>
+                    <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                         Get instant updates, find nearby doctors, book appointments, and run AI symptom checks — all from WhatsApp.
                     </p>
                 </div>
@@ -64,7 +68,7 @@ export default function WhatsAppModal({ isOpen, onClose }) {
                         <button
                             type="button"
                             onClick={handleSend}
-                            className="w-full py-3 rounded-xl font-bold text-white text-sm transition-all hover:opacity-90 active:scale-95"
+                            className="w-full py-3 rounded-xl font-bold text-white text-sm transition-all hover:opacity-90 active:scale-95 cursor-pointer"
                             style={{ backgroundColor: '#25D366' }}
                         >
                             Send me a message →
@@ -83,32 +87,39 @@ export default function WhatsAppModal({ isOpen, onClose }) {
                     )}
 
                     {status === 'success' && (
-                        <div className="bg-emerald-50 border border-emerald-300 rounded-xl p-4 text-center flex flex-col gap-1">
-                            <p className="font-bold text-emerald-700 text-sm flex items-center justify-center gap-1.5">
-                                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                        <div
+                            className="rounded-xl p-4 text-center flex flex-col gap-1"
+                            style={{ background: 'var(--pastel-mint-bg)', border: '1px solid var(--pastel-mint-text)' }}
+                        >
+                            <p className="font-bold text-sm flex items-center justify-center gap-1.5" style={{ color: 'var(--pastel-mint-text)' }}>
+                                <CheckCircle2 className="w-4 h-4" />
                                 <span>Message sent!</span>
                             </p>
-                            <p className="text-xs text-emerald-600">
+                            <p className="text-xs" style={{ color: 'var(--pastel-mint-text)' }}>
                                 Check WhatsApp — a message from Sanjeevani will arrive shortly. Reply *MENU* to get started.
                             </p>
                         </div>
                     )}
 
                     {status === 'error' && (
-                        <div className="bg-red-50 border border-red-300 rounded-xl p-4 flex flex-col gap-2">
-                            <p className="text-xs text-red-600 font-semibold">{errorMsg}</p>
+                        <div
+                            className="rounded-xl p-4 flex flex-col gap-2"
+                            style={{ background: 'var(--pastel-pink-bg)', border: '1px solid var(--accent)' }}
+                        >
+                            <p className="text-xs font-semibold" style={{ color: 'var(--accent)' }}>{errorMsg}</p>
                             <a
                                 href={`https://wa.me/${WA_BUSINESS_NUMBER}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-xs font-bold text-emerald-700 underline hover:no-underline"
+                                className="text-xs font-bold underline hover:no-underline cursor-pointer"
+                                style={{ color: 'var(--pastel-mint-text)' }}
                             >
                                 Open WhatsApp directly →
                             </a>
                         </div>
                     )}
 
-                    <p className="text-center text-[10px] text-ink-muted">
+                    <p className="text-center text-[10px]" style={{ color: 'var(--text-muted)' }}>
                         A WhatsApp message will be sent to your registered phone number.
                     </p>
                 </div>

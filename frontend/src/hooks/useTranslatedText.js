@@ -16,7 +16,7 @@ function useTranslatedText(defaultEnglishText) {
             return;
         }
 
-        const cacheKey = `bhashini_${currentLang}_${defaultEnglishText}`;
+        const cacheKey = `bhashini_v2_${currentLang}_${defaultEnglishText}`;
         const locallyCached = localStorage.getItem(cacheKey);
 
         if (locallyCached) {

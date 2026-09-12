@@ -50,16 +50,22 @@ export default function TodaysMedicationsWidget() {
     };
 
     return (
-        <div className="bg-white border border-[#f5e4ec] rounded-3xl p-6 md:p-8 flex flex-col gap-4 shadow-xs">
+        <div
+            className="rounded-3xl p-6 md:p-8 flex flex-col gap-4 shadow-xs"
+            style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}
+        >
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-[#fdf0f4] pb-4">
+            <div className="flex items-center justify-between pb-4" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-2xl bg-[#ffe6ee] text-[#e13b68] flex items-center justify-center">
+                    <div
+                        className="w-10 h-10 rounded-2xl flex items-center justify-center"
+                        style={{ background: 'var(--accent-light)', color: 'var(--accent)', border: '1px solid var(--notif-unread-border)' }}
+                    >
                         <Pill className="w-5 h-5" />
                     </div>
                     <div>
-                        <h3 className="text-lg font-black text-[#2d2329] font-heading">Today's Medications</h3>
-                        <p className="text-xs text-[#7d6974] font-medium">
+                        <h3 className="text-lg font-black font-heading" style={{ color: 'var(--text-primary)' }}>Today's Medications</h3>
+                        <p className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
                             {new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' })}
                         </p>
                     </div>
@@ -74,15 +80,18 @@ export default function TodaysMedicationsWidget() {
             {loading && (
                 <div className="flex flex-col gap-2.5 animate-pulse">
                     {[1, 2].map((i) => (
-                        <div key={i} className="h-16 bg-[#fffcfd] border border-[#f5e4ec] rounded-2xl" />
+                        <div key={i} className="h-16 rounded-2xl" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)' }} />
                     ))}
                 </div>
             )}
 
             {/* Error */}
             {error && (
-                <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold flex items-center gap-2">
-                    <AlertCircle className="w-4 h-4 text-rose-600 flex-shrink-0" />
+                <div
+                    className="p-4 rounded-2xl text-xs font-bold flex items-center gap-2"
+                    style={{ background: 'var(--pastel-pink-bg)', border: '1px solid var(--accent)', color: 'var(--accent)' }}
+                >
+                    <AlertCircle className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--accent)' }} />
                     <span>{error}</span>
                 </div>
             )}
@@ -90,11 +99,14 @@ export default function TodaysMedicationsWidget() {
             {/* Empty state */}
             {!loading && !error && doses.length === 0 && (
                 <div className="py-6 text-center flex flex-col items-center justify-center gap-2">
-                    <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-1">
+                    <div
+                        className="w-12 h-12 rounded-2xl flex items-center justify-center mb-1"
+                        style={{ background: 'var(--pastel-mint-bg)', color: 'var(--pastel-mint-text)' }}
+                    >
                         <CheckCircle2 className="w-6 h-6" />
                     </div>
-                    <p className="text-sm font-bold text-[#2d2329]">No medications scheduled today</p>
-                    <p className="text-xs text-[#7d6974] font-medium max-w-sm">
+                    <p className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>No medications scheduled today</p>
+                    <p className="text-xs font-medium max-w-sm" style={{ color: 'var(--text-secondary)' }}>
                         Medication doses prescribed during consultations will appear here automatically with time reminders.
                     </p>
                 </div>
@@ -109,18 +121,22 @@ export default function TodaysMedicationsWidget() {
                         return (
                             <div
                                 key={key}
-                                className="flex items-center justify-between gap-3 bg-[#fffcfd] border border-[#f5e4ec] hover:border-[#f5c6d6] rounded-2xl px-4 py-3.5 transition shadow-2xs"
+                                className="flex items-center justify-between gap-3 rounded-2xl px-4 py-3.5 transition shadow-2xs hover:border-[var(--border-hover)]"
+                                style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)' }}
                             >
                                 <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-xl bg-[#ffe6ee] text-[#e13b68] flex items-center justify-center flex-shrink-0">
+                                    <div
+                                        className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
+                                        style={{ background: 'var(--accent-light)', color: 'var(--accent)', border: '1px solid var(--notif-unread-border)' }}
+                                    >
                                         <Pill className="w-4 h-4" />
                                     </div>
-                                    <div className="flex flex-col gap-0.5">
-                                        <p className="font-bold text-xs md:text-sm text-[#2d2329]">
+                                    <div className="flex flex-col gap-1">
+                                        <p className="font-black text-xs md:text-sm" style={{ color: 'var(--text-primary)' }}>
                                             {dose.medicineName}
                                         </p>
-                                        <p className="text-[11px] text-[#7d6974] font-medium flex items-center gap-1">
-                                            <Clock className="w-3 h-3 text-[#7d6974]" />
+                                        <p className="text-[11px] font-medium flex items-center gap-1" style={{ color: 'var(--text-secondary)' }}>
+                                            <Clock className="w-3 h-3" />
                                             <span>{dose.dosage || 'Standard dose'} · {dose.time}</span>
                                         </p>
                                     </div>
@@ -136,7 +152,8 @@ export default function TodaysMedicationsWidget() {
                                             type="button"
                                             onClick={() => handleMarkTaken(dose)}
                                             disabled={marking[key]}
-                                            className="px-3.5 py-1.5 text-xs font-bold bg-[#e13b68] hover:bg-[#c92a55] text-white rounded-full transition shadow-xs disabled:opacity-50 flex items-center gap-1"
+                                            className="px-3.5 py-1.5 text-xs font-bold rounded-full transition shadow-xs disabled:opacity-50 flex items-center gap-1 cursor-pointer text-white"
+                                            style={{ background: 'var(--accent)' }}
                                         >
                                             <CheckCircle2 className="w-3.5 h-3.5" />
                                             <span>{marking[key] ? 'Saving…' : 'Mark taken'}</span>

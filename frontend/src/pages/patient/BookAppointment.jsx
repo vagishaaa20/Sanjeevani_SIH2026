@@ -70,39 +70,49 @@ const BookAppointment = () => {
                 <button
                     type="button"
                     onClick={() => navigate('/patient/dashboard')}
-                    className="text-ink-muted hover:text-ink-black font-semibold text-sm flex items-center gap-1 cursor-pointer transition-colors"
+                    className="font-semibold text-sm flex items-center gap-1 cursor-pointer transition-colors hover:opacity-80"
+                    style={{ color: 'var(--text-secondary)' }}
                 >
                     ← Back
                 </button>
-                <h2 className="text-2xl font-black text-ink-black">Book an Appointment</h2>
+                <h2 className="text-2xl font-black font-heading" style={{ color: 'var(--text-primary)' }}>Book an Appointment</h2>
             </div>
 
             {/* Status messages */}
             {geoLoading && (
-                <p className="text-sm text-ink-charcoal">Getting your location…</p>
+                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Getting your location…</p>
             )}
             {permissionDenied && (
-                <div className="p-4 bg-red-50 border border-red-300 rounded-xl text-sm text-red-700 font-semibold">
+                <div
+                    className="p-4 rounded-xl text-sm font-semibold"
+                    style={{ background: 'var(--pastel-pink-bg)', border: '1px solid var(--accent)', color: 'var(--accent)' }}
+                >
                     Location access denied. Enable location permission to see nearby doctors.
                 </div>
             )}
             {doctorsLoading && (
-                <p className="text-sm text-ink-charcoal">Finding doctors near you…</p>
+                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Finding doctors near you…</p>
             )}
             {doctorsError && (
-                <p className="text-sm text-red-500">{doctorsError}</p>
+                <p className="text-sm" style={{ color: 'var(--accent)' }}>{doctorsError}</p>
             )}
 
             {!doctorsLoading && !doctorsError && coords && doctors.length === 0 && (
-                <div className="p-6 bg-white border-2 border-ink-black rounded-2xl text-center text-sm text-ink-charcoal">
+                <div
+                    className="p-6 rounded-2xl text-center text-sm"
+                    style={{ background: 'var(--card-bg)', border: '2px solid var(--border)', color: 'var(--text-secondary)' }}
+                >
                     No verified doctors found nearby. Try increasing the search radius.
                 </div>
             )}
 
             {/* Doctor list */}
             {doctors.length > 0 && (
-                <div className="bg-white border-2 border-ink-black rounded-2xl p-6 flex flex-col gap-4">
-                    <h3 className="text-lg font-bold text-ink-black">
+                <div
+                    className="rounded-2xl p-6 flex flex-col gap-4 shadow-xs"
+                    style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}
+                >
+                    <h3 className="text-lg font-bold font-heading" style={{ color: 'var(--text-primary)' }}>
                         {doctors.length} Doctor{doctors.length !== 1 ? 's' : ''} Available Nearby
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -126,11 +136,14 @@ const BookAppointment = () => {
             >
                 {bookingSuccess ? (
                     <div className="flex flex-col gap-4">
-                        <div className="p-4 bg-emerald-50 border border-emerald-300 rounded-xl">
-                            <p className="font-bold text-emerald-800 text-sm">
+                        <div
+                            className="p-4 rounded-xl"
+                            style={{ background: 'var(--pastel-mint-bg)', border: '1px solid var(--pastel-mint-text)' }}
+                        >
+                            <p className="font-bold text-sm" style={{ color: 'var(--pastel-mint-text)' }}>
                                 ✓ You're in the queue — Token #{bookingSuccess.queue?.tokenNumber}
                             </p>
-                            <p className="text-xs text-emerald-700 mt-1">
+                            <p className="text-xs mt-1" style={{ color: 'var(--pastel-mint-text)' }}>
                                 Your consultation request with {selectedDoctor?.fullName} has been submitted.
                                 Please arrive on time.
                             </p>
@@ -138,31 +151,32 @@ const BookAppointment = () => {
                         <button
                             type="button"
                             onClick={closeModal}
-                            className="w-full py-2.5 rounded-xl border-2 border-ink-black bg-ink-black text-white font-bold text-sm hover:bg-white hover:text-ink-black transition-all cursor-pointer"
+                            className="w-full py-2.5 rounded-xl font-bold text-sm transition-all cursor-pointer text-white"
+                            style={{ background: 'var(--accent)' }}
                         >
                             Done
                         </button>
                     </div>
                 ) : (
                     <div className="flex flex-col gap-4">
-                        <div className="p-4 bg-cream-surface rounded-xl flex flex-col gap-1">
-                            <p className="font-bold text-ink-black">{selectedDoctor?.fullName}</p>
-                            <p className="text-xs font-semibold text-cerulean-dark uppercase tracking-wide">
+                        <div className="p-4 rounded-xl flex flex-col gap-1" style={{ background: 'var(--bg-surface)' }}>
+                            <p className="font-bold" style={{ color: 'var(--text-primary)' }}>{selectedDoctor?.fullName}</p>
+                            <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--accent)' }}>
                                 {selectedDoctor?.specialization}
                             </p>
-                            <p className="text-xs text-ink-muted mt-1">
+                            <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
                                 {selectedDoctor?.clinicName} · {selectedDoctor?.clinicCity}
                             </p>
-                            <p className="text-xs font-semibold text-ink-charcoal mt-1">
+                            <p className="text-xs font-semibold mt-1" style={{ color: 'var(--text-secondary)' }}>
                                 Consultation Fee: ₹{selectedDoctor?.consultationFee}
                             </p>
                         </div>
 
                         {bookingError && (
-                            <p className="text-sm text-red-600 font-semibold">{bookingError}</p>
+                            <p className="text-sm font-semibold" style={{ color: 'var(--accent)' }}>{bookingError}</p>
                         )}
 
-                        <p className="text-xs text-ink-muted">
+                        <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
                             Clicking "Request Consultation" will add you to this doctor's queue.
                             You'll receive a token number.
                         </p>
@@ -171,7 +185,8 @@ const BookAppointment = () => {
                             <button
                                 type="button"
                                 onClick={closeModal}
-                                className="flex-1 py-2.5 rounded-xl border-2 border-ink-black text-ink-black font-bold text-sm hover:bg-cream-surface transition-all cursor-pointer"
+                                className="flex-1 py-2.5 rounded-xl font-bold text-sm transition-all cursor-pointer hover:opacity-80"
+                                style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
                             >
                                 Cancel
                             </button>
@@ -179,7 +194,8 @@ const BookAppointment = () => {
                                 type="button"
                                 onClick={handleConfirmBook}
                                 disabled={bookingLoading}
-                                className="flex-1 py-2.5 rounded-xl border-2 border-ink-black bg-ink-black text-white font-bold text-sm hover:bg-white hover:text-ink-black transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                                className="flex-1 py-2.5 rounded-xl font-bold text-sm transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed hover:opacity-90 text-white"
+                                style={{ background: 'var(--accent)' }}
                             >
                                 {bookingLoading ? 'Submitting…' : 'Request Consultation'}
                             </button>

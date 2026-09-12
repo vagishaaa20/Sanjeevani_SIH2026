@@ -76,18 +76,26 @@ export default function ActiveQueueBanner({ onStateChange }) {
                 <PreCallDocumentSubmit consultationId={activeQueue.consultation.id} />
             )}
 
-            <div className={`w-full rounded-2xl border-2 border-ink-black overflow-hidden shadow-sm flex flex-col md:flex-row items-center justify-between p-4 gap-4 
-                ${activeQueue.status === 'WAITING' ? 'bg-amber-100' : isRejoinable ? 'bg-blue-100' : 'bg-emerald-100'}`}>
+            <div
+                className="w-full rounded-2xl overflow-hidden shadow-sm flex flex-col md:flex-row items-center justify-between p-4 gap-4"
+                style={{
+                    background: activeQueue.status === 'WAITING' ? 'var(--pastel-peach-bg)' : isRejoinable ? 'rgba(59, 130, 246, 0.1)' : 'var(--pastel-mint-bg)',
+                    border: activeQueue.status === 'WAITING' ? '1px solid var(--pastel-peach-text)' : isRejoinable ? '1px solid rgb(59, 130, 246)' : '1px solid var(--pastel-mint-text)'
+                }}
+            >
                 <div className="flex items-center gap-3">
-                    <div className="flex flex-col items-center justify-center bg-white border-2 border-ink-black rounded-lg w-12 h-12">
-                        <span className="text-[10px] font-black uppercase text-ink-muted leading-none mt-1">Token</span>
-                        <span className="text-xl font-black text-ink-black leading-none">{activeQueue.tokenNumber}</span>
+                    <div
+                        className="flex flex-col items-center justify-center rounded-lg w-12 h-12"
+                        style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}
+                    >
+                        <span className="text-[10px] font-black uppercase leading-none mt-1" style={{ color: 'var(--text-secondary)' }}>Token</span>
+                        <span className="text-xl font-black leading-none" style={{ color: 'var(--text-primary)' }}>{activeQueue.tokenNumber}</span>
                     </div>
                     <div className="flex flex-col">
-                        <h4 className="font-bold text-ink-black text-sm uppercase tracking-wide">
+                        <h4 className="font-bold text-sm uppercase tracking-wide" style={{ color: 'var(--text-primary)' }}>
                             {activeQueue.status === 'WAITING' ? 'Waiting in Queue' : isRejoinable ? 'Call Disconnected' : 'Doctor is Ready!'}
                         </h4>
-                        <p className="text-sm font-semibold text-ink-charcoal">
+                        <p className="text-sm font-semibold" style={{ color: 'var(--text-secondary)' }}>
                             {activeQueue.status === 'WAITING'
                                 ? `Waiting for ${activeQueue.doctorId ? 'doctor' : 'next available doctor'} to accept your request...`
                                 : isRejoinable
@@ -100,12 +108,13 @@ export default function ActiveQueueBanner({ onStateChange }) {
                 {activeQueue.status === 'WAITING' && (
                     <div className="flex items-center gap-4">
                         <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
-                            <span className="text-xs font-bold text-amber-800 uppercase tracking-widest">Polling</span>
+                            <div className="w-2 h-2 rounded-full animate-ping" style={{ background: 'var(--pastel-peach-text)' }} />
+                            <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--pastel-peach-text)' }}>Polling</span>
                         </div>
                         <button
                             onClick={handleCancelRequest}
-                            className="px-4 py-2 text-rose-700 bg-rose-100 rounded-lg border border-rose-300 font-bold uppercase tracking-wide hover:bg-rose-200 transition-colors text-xs"
+                            className="px-4 py-2 rounded-lg font-bold uppercase tracking-wide hover:opacity-80 transition-colors text-xs cursor-pointer"
+                            style={{ background: 'var(--pastel-pink-bg)', border: '1px solid var(--accent)', color: 'var(--accent)' }}
                         >
                             Cancel Request
                         </button>
@@ -115,7 +124,11 @@ export default function ActiveQueueBanner({ onStateChange }) {
                 {activeQueue.status === 'SERVING' && (
                     <button
                         onClick={handleJoinClick}
-                        className={`px-6 py-2 text-white rounded-xl border-2 border-ink-black font-black uppercase tracking-wide shadow-[2px_2px_0px_#111] hover:shadow-[4px_4px_0px_#111] hover:-translate-y-0.5 active:translate-y-0 active:shadow-none transition-all ${isRejoinable ? 'bg-blue-600' : 'bg-emerald-600'}`}
+                        className="px-6 py-2 text-white rounded-xl font-black uppercase tracking-wide shadow-[2px_2px_0px_#111] hover:shadow-[4px_4px_0px_#111] hover:-translate-y-0.5 active:translate-y-0 active:shadow-none transition-all cursor-pointer"
+                        style={{
+                            background: isRejoinable ? 'rgb(37, 99, 235)' : 'var(--accent)',
+                            border: '2px solid var(--border)'
+                        }}
                     >
                         {isRejoinable ? 'Rejoin Call' : 'Join Now'}
                     </button>

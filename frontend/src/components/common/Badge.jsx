@@ -2,41 +2,37 @@ import React from 'react';
 
 export const Badge = ({ children, variant = 'info', dot = false, pulse = false, className = '' }) => {
     const styles = {
-        info: 'bg-[#ffe6ee] text-[#e13b68] border-[#f8c8d8]',
-        pink: 'bg-[#ffe6ee] text-[#e13b68] border-[#f8c8d8]',
-        success: 'bg-[#e6f9f0] text-[#10b981] border-[#b6f0d4]',
-        mint: 'bg-[#e6f9f0] text-[#10b981] border-[#b6f0d4]',
-        warning: 'bg-[#fff0e6] text-[#e07a38] border-[#ffd5bf]',
-        peach: 'bg-[#fff0e6] text-[#e07a38] border-[#ffd5bf]',
-        danger: 'bg-[#f3e8ff] text-[#7c3aed] border-[#e0c4ff]',
-        lavender: 'bg-[#f3e8ff] text-[#7c3aed] border-[#e0c4ff]',
-        emergency: 'bg-[#e13b68] text-white border-transparent shadow-xs',
-        muted: 'bg-[#fdf0f4] text-[#7d6974] border-[#f3dce5]',
+        info: { bg: 'var(--pastel-pink-bg)', color: 'var(--pastel-pink-text)', border: 'var(--notif-unread-border)' },
+        pink: { bg: 'var(--pastel-pink-bg)', color: 'var(--pastel-pink-text)', border: 'var(--notif-unread-border)' },
+        success: { bg: 'var(--pastel-mint-bg)', color: 'var(--pastel-mint-text)', border: 'var(--pastel-mint-bg)' },
+        mint: { bg: 'var(--pastel-mint-bg)', color: 'var(--pastel-mint-text)', border: 'var(--pastel-mint-bg)' },
+        warning: { bg: 'var(--pastel-peach-bg)', color: 'var(--pastel-peach-text)', border: 'var(--pastel-peach-bg)' },
+        peach: { bg: 'var(--pastel-peach-bg)', color: 'var(--pastel-peach-text)', border: 'var(--pastel-peach-bg)' },
+        danger: { bg: 'var(--pastel-lavender-bg)', color: 'var(--pastel-lavender-text)', border: 'var(--pastel-lavender-bg)' },
+        lavender: { bg: 'var(--pastel-lavender-bg)', color: 'var(--pastel-lavender-text)', border: 'var(--pastel-lavender-bg)' },
+        emergency: { bg: 'var(--accent)', color: '#ffffff', border: 'transparent' },
+        muted: { bg: 'var(--bg-surface)', color: 'var(--text-secondary)', border: 'var(--border)' },
     };
 
-    const dotColors = {
-        info: 'bg-[#e13b68]',
-        pink: 'bg-[#e13b68]',
-        success: 'bg-[#10b981]',
-        mint: 'bg-[#10b981]',
-        warning: 'bg-[#e07a38]',
-        peach: 'bg-[#e07a38]',
-        danger: 'bg-[#7c3aed]',
-        lavender: 'bg-[#7c3aed]',
-        emergency: 'bg-white',
-        muted: 'bg-[#7d6974]',
-    };
+    const s = styles[variant] || styles.info;
 
     return (
         <span
-            className={`inline-flex items-center gap-1.5 px-3 py-1 text-[11px] font-bold rounded-full border tracking-tight ${styles[variant] || styles.info} ${className}`}
+            className={`inline-flex items-center gap-1.5 px-3 py-1 text-[11px] font-bold rounded-full border tracking-tight ${className}`}
+            style={{ background: s.bg, color: s.color, borderColor: s.border }}
         >
             {dot && (
                 <span className="relative flex h-2 w-2">
                     {pulse && (
-                        <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${dotColors[variant] || 'bg-[#e13b68]'}`} />
+                        <span
+                            className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
+                            style={{ background: s.color }}
+                        />
                     )}
-                    <span className={`relative inline-flex rounded-full h-2 w-2 ${dotColors[variant] || 'bg-[#e13b68]'}`} />
+                    <span
+                        className="relative inline-flex rounded-full h-2 w-2"
+                        style={{ background: s.color }}
+                    />
                 </span>
             )}
             {children}

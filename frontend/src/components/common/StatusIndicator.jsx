@@ -8,34 +8,40 @@ export const StatusIndicator = ({
 }) => {
     const statuses = {
         active: {
-            bg: 'bg-emerald-500',
-            text: 'text-emerald-800',
-            wrapper: 'bg-emerald-50 border-emerald-300',
+            bg: 'var(--pastel-mint-text)',
+            text: 'var(--pastel-mint-text)',
+            wrapperBg: 'var(--pastel-mint-bg)',
+            wrapperBorder: 'var(--pastel-mint-text)',
         },
         online: {
-            bg: 'bg-emerald-500',
-            text: 'text-emerald-800',
-            wrapper: 'bg-emerald-50 border-emerald-300',
+            bg: 'var(--pastel-mint-text)',
+            text: 'var(--pastel-mint-text)',
+            wrapperBg: 'var(--pastel-mint-bg)',
+            wrapperBorder: 'var(--pastel-mint-text)',
         },
         waiting: {
-            bg: 'bg-amber-500',
-            text: 'text-amber-800',
-            wrapper: 'bg-amber-50 border-amber-300',
+            bg: 'var(--pastel-peach-text)',
+            text: 'var(--pastel-peach-text)',
+            wrapperBg: 'var(--pastel-peach-bg)',
+            wrapperBorder: 'var(--pastel-peach-text)',
         },
         in_progress: {
-            bg: 'bg-cerulean',
-            text: 'text-cerulean-dark',
-            wrapper: 'bg-sky-50 border-sky-300',
+            bg: 'rgb(59, 130, 246)',
+            text: 'rgb(59, 130, 246)',
+            wrapperBg: 'rgba(59, 130, 246, 0.1)',
+            wrapperBorder: 'rgb(59, 130, 246)',
         },
         urgent: {
-            bg: 'bg-rose-500',
-            text: 'text-rose-800',
-            wrapper: 'bg-rose-50 border-rose-300',
+            bg: 'var(--accent)',
+            text: 'var(--accent)',
+            wrapperBg: 'var(--pastel-pink-bg)',
+            wrapperBorder: 'var(--accent)',
         },
         offline: {
-            bg: 'bg-gray-400',
-            text: 'text-gray-700',
-            wrapper: 'bg-gray-100 border-gray-300',
+            bg: 'var(--text-muted)',
+            text: 'var(--text-muted)',
+            wrapperBg: 'var(--bg-surface)',
+            wrapperBorder: 'var(--text-muted)',
         },
     };
 
@@ -43,17 +49,19 @@ export const StatusIndicator = ({
 
     return (
         <span
-            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-bold tracking-tight ${current.wrapper} ${className}`}
+            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-bold tracking-tight ${className}`}
+            style={{ background: current.wrapperBg, borderColor: current.wrapperBorder }}
         >
             <span className="relative flex h-2 w-2">
                 {pulse && (
                     <span
-                        className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${current.bg}`}
+                        className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
+                        style={{ background: current.bg }}
                     />
                 )}
-                <span className={`relative inline-flex rounded-full h-2 w-2 ${current.bg}`} />
+                <span className="relative inline-flex rounded-full h-2 w-2" style={{ background: current.bg }} />
             </span>
-            {label && <span className={current.text}>{label}</span>}
+            {label && <span style={{ color: current.text }}>{label}</span>}
         </span>
     );
 };

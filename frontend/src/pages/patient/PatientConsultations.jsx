@@ -25,11 +25,11 @@ import MedicationReminderPanel from '../../components/patient/MedicationReminder
 
 // ── Status badge config ────────────────────────────────────────────────────────
 const STATUS_CONFIG = {
-    queued: { label: 'Queued', bg: 'bg-amber-50 text-amber-800 border-amber-200' },
-    assigned: { label: 'Assigned', bg: 'bg-sky-50 text-sky-800 border-sky-200' },
-    in_progress: { label: 'In Progress', bg: 'bg-emerald-50 text-emerald-800 border-emerald-300 animate-pulse' },
-    completed: { label: 'Completed', bg: 'bg-teal-50 text-teal-800 border-teal-200' },
-    cancelled: { label: 'Cancelled', bg: 'bg-rose-50 text-rose-700 border-rose-200' },
+    queued: { label: 'Queued', bgToken: 'var(--pastel-peach-bg)', textToken: 'var(--pastel-peach-text)' },
+    assigned: { label: 'Assigned', bgToken: 'var(--pastel-sky-bg)', textToken: 'var(--pastel-sky-text)' },
+    in_progress: { label: 'In Progress', bgToken: 'var(--pastel-mint-bg)', textToken: 'var(--pastel-mint-text)', pulse: true },
+    completed: { label: 'Completed', bgToken: 'var(--pastel-lavender-bg)', textToken: 'var(--pastel-lavender-text)' },
+    cancelled: { label: 'Cancelled', bgToken: 'var(--bg-surface)', textToken: 'var(--text-secondary)' },
 };
 
 // ── Star Rating Widget ─────────────────────────────────────────────────────────
@@ -55,12 +55,15 @@ function StarRating({ consultationId, doctorId, onSubmitted }) {
     };
 
     return (
-        <div className="bg-[#fffbf0] border border-[#fde68a] rounded-2xl p-4 sm:p-5 flex flex-col gap-3 shadow-2xs">
+        <div
+            className="rounded-2xl p-4 sm:p-5 flex flex-col gap-3 shadow-2xs"
+            style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)' }}
+        >
             <div className="flex items-center justify-between">
-                <p className="text-xs font-black text-amber-900 uppercase tracking-wider">
+                <p className="text-xs font-black uppercase tracking-wider" style={{ color: 'var(--text-primary)' }}>
                     Rate Your Consultation Experience
                 </p>
-                <span className="text-[11px] font-semibold text-amber-800">
+                <span className="text-[11px] font-semibold" style={{ color: 'var(--text-secondary)' }}>
                     {selected > 0 ? `${selected} of 5 Stars` : 'Select a rating'}
                 </span>
             </div>
@@ -77,11 +80,10 @@ function StarRating({ consultationId, doctorId, onSubmitted }) {
                         onClick={() => setSelected(star)}
                     >
                         <Star
-                            className={`w-6 h-6 transition-colors ${
-                                star <= (hovered || selected)
-                                    ? 'fill-[#f59e0b] text-[#f59e0b]'
-                                    : 'text-[#e2d6dc] fill-none'
-                            }`}
+                            className={`w-6 h-6 transition-colors ${star <= (hovered || selected)
+                                    ? 'fill-amber-400 text-amber-400'
+                                    : 'text-gray-400 fill-none'
+                                }`}
                         />
                     </button>
                 ))}
@@ -92,16 +94,18 @@ function StarRating({ consultationId, doctorId, onSubmitted }) {
                 onChange={(e) => setComment(e.target.value)}
                 placeholder="Share doctor feedback (e.g. empathy, clarity of advice, prescription accuracy)..."
                 rows={2}
-                className="w-full text-xs border border-[#f5e4ec] rounded-xl p-3 resize-none focus:outline-none focus:ring-2 focus:ring-[#e13b68]/20 focus:border-[#e13b68] bg-white text-[#1c1218]"
+                className="w-full text-xs rounded-xl p-3 resize-none focus:outline-none focus:ring-2 transition"
+                style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
             />
 
-            {error && <p className="text-xs text-rose-600 font-bold">{error}</p>}
+            {error && <p className="text-xs font-bold" style={{ color: 'var(--accent)' }}>{error}</p>}
 
             <button
                 type="button"
                 disabled={!selected || submitting}
                 onClick={handleSubmit}
-                className="self-start px-5 py-2 text-xs font-black bg-[#e13b68] text-white hover:bg-[#c92a55] rounded-full disabled:opacity-40 transition-all shadow-xs cursor-pointer"
+                className="self-start px-5 py-2 text-xs font-black rounded-full disabled:opacity-40 transition-all shadow-xs cursor-pointer text-white"
+                style={{ background: 'var(--accent)' }}
             >
                 {submitting ? 'Submitting Review...' : 'Submit Verified Review'}
             </button>
@@ -169,31 +173,39 @@ function ConsultationCard({ consultation, highlighted, cardRef }) {
         <div
             ref={cardRef}
             id={`consultation-${consultation.id}`}
-            className={`bg-white border rounded-3xl p-6 sm:p-7 flex flex-col gap-5 transition-all shadow-xs ${
-                highlighted ? 'border-[#e13b68] ring-2 ring-[#e13b68]/20 shadow-md' : 'border-[#f5e4ec]'
-            }`}
+            className="rounded-3xl p-6 sm:p-7 flex flex-col gap-5 transition-all shadow-xs"
+            style={{
+                background: 'var(--card-bg)',
+                border: highlighted ? '2px solid var(--accent)' : '1px solid var(--border)'
+            }}
         >
             {/* Header row */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#fdf0f4] pb-4">
+            <div
+                className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4"
+                style={{ borderBottom: '1px solid var(--border-subtle)' }}
+            >
                 <div className="flex items-center gap-3.5">
-                    <div className="w-12 h-12 rounded-2xl bg-[#ffe6ee] border border-[#f8c8d8] flex items-center justify-center text-base font-black text-[#e13b68] shrink-0">
+                    <div
+                        className="w-12 h-12 rounded-2xl flex items-center justify-center text-base font-black shrink-0"
+                        style={{ background: 'var(--accent-light)', border: '1px solid var(--notif-unread-border)', color: 'var(--accent)' }}
+                    >
                         {(doctor.fullName ? doctor.fullName.replace('Dr. ', '').charAt(0) : 'D')}
                     </div>
                     <div>
                         <div className="flex items-center gap-2">
-                            <h3 className="font-black text-base text-[#1c1218]">
+                            <h3 className="font-black text-base" style={{ color: 'var(--text-primary)' }}>
                                 {doctor.fullName || 'Assigned Clinical Doctor'}
                             </h3>
-                            <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                            <ShieldCheck className="w-4 h-4 text-emerald-500" />
                         </div>
                         {doctor.specialization && (
-                            <p className="text-xs font-bold text-[#e13b68] mt-0.5">
+                            <p className="text-xs font-bold mt-0.5" style={{ color: 'var(--accent)' }}>
                                 {doctor.specialization}
                             </p>
                         )}
                         {clinic.clinicName && (
-                            <p className="text-xs font-semibold text-[#7d6974] flex items-center gap-1 mt-0.5">
-                                <Building2 className="w-3 h-3 text-[#7d6974]" />
+                            <p className="text-xs font-semibold flex items-center gap-1 mt-0.5" style={{ color: 'var(--text-secondary)' }}>
+                                <Building2 className="w-3 h-3" />
                                 <span>{clinic.clinicName}{clinic.city ? `, ${clinic.city}` : ''}</span>
                             </p>
                         )}
@@ -201,33 +213,40 @@ function ConsultationCard({ consultation, highlighted, cardRef }) {
                 </div>
 
                 <div className="flex items-center gap-3 self-start sm:self-center">
-                    <span className={`px-3 py-1 text-xs font-black rounded-full border whitespace-nowrap ${badge.bg}`}>
+                    <span
+                        className={`px-3 py-1 text-xs font-black rounded-full border whitespace-nowrap ${badge.pulse ? 'animate-pulse' : ''}`}
+                        style={{ background: badge.bgToken, color: badge.textToken, borderColor: badge.textToken }}
+                    >
                         {badge.label}
                     </span>
                 </div>
             </div>
 
-            <div className="flex items-center gap-2 text-xs font-semibold text-[#7d6974]">
-                <Clock className="w-3.5 h-3.5 text-[#e13b68]" />
+            <div className="flex items-center gap-2 text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>
+                <Clock className="w-3.5 h-3.5" style={{ color: 'var(--accent)' }} />
                 <span>{scheduledAt}</span>
             </div>
 
             {/* In-progress: rejoin call */}
             {consultation.status === 'in_progress' && (
-                <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-200 flex flex-col gap-2">
+                <div
+                    className="p-4 rounded-2xl flex flex-col gap-2"
+                    style={{ background: 'var(--pastel-mint-bg)', border: '1px solid var(--pastel-mint-text)' }}
+                >
                     <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-emerald-900">Live Teleconsultation Active</span>
+                        <span className="text-xs font-bold" style={{ color: 'var(--pastel-mint-text)' }}>Live Teleconsultation Active</span>
                         <button
                             type="button"
                             disabled={joining}
                             onClick={handleRejoin}
-                            className="px-4 py-2 text-xs font-black bg-emerald-600 hover:bg-emerald-700 text-white rounded-full transition shadow-xs disabled:opacity-50 flex items-center gap-1.5 cursor-pointer"
+                            className="px-4 py-2 text-xs font-black rounded-full transition shadow-xs disabled:opacity-50 flex items-center gap-1.5 cursor-pointer text-white"
+                            style={{ background: 'var(--pastel-mint-text)' }}
                         >
                             <Video className="w-3.5 h-3.5" />
                             <span>{joining ? 'Connecting...' : 'Rejoin Video Consultation'}</span>
                         </button>
                     </div>
-                    {joinError && <p className="text-xs text-rose-600 font-bold">{joinError}</p>}
+                    {joinError && <p className="text-xs font-bold" style={{ color: 'var(--accent)' }}>{joinError}</p>}
                 </div>
             )}
 
@@ -237,7 +256,7 @@ function ConsultationCard({ consultation, highlighted, cardRef }) {
                     {/* Prescription download + blockchain badge */}
                     <div className="flex flex-wrap items-center gap-3 pt-1">
                         {prescLoading && (
-                            <p className="text-xs text-[#7d6974] animate-pulse">Loading prescription data...</p>
+                            <p className="text-xs animate-pulse" style={{ color: 'var(--text-secondary)' }}>Loading prescription data...</p>
                         )}
 
                         {prescInfo?.prescriptionUrl ? (
@@ -246,7 +265,8 @@ function ConsultationCard({ consultation, highlighted, cardRef }) {
                                 download={`Prescription_${consultation.id}.pdf`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex items-center gap-2 px-4 py-2 text-xs font-black bg-[#fdf5f7] border border-[#f8c8d8] text-[#e13b68] hover:bg-[#ffe6ee] rounded-full transition shadow-2xs"
+                                className="inline-flex items-center gap-2 px-4 py-2 text-xs font-black rounded-full transition shadow-2xs"
+                                style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', color: 'var(--accent)' }}
                             >
                                 <Download className="w-3.5 h-3.5" />
                                 <span>Download Prescription (PDF)</span>
@@ -255,7 +275,8 @@ function ConsultationCard({ consultation, highlighted, cardRef }) {
                             <button
                                 type="button"
                                 disabled
-                                className="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold bg-[#faf5f8] border border-[#eedde6] text-[#a895a0] rounded-full cursor-not-allowed"
+                                className="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-full cursor-not-allowed opacity-50"
+                                style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', color: 'var(--text-secondary)' }}
                             >
                                 <Download className="w-3.5 h-3.5" />
                                 <span>Prescription Generating...</span>
@@ -264,15 +285,18 @@ function ConsultationCard({ consultation, highlighted, cardRef }) {
 
                         {/* Blockchain badge */}
                         {prescInfo?.blockchainStatus === 'verified' && (
-                            <div className="flex items-center gap-1.5 bg-teal-50 border border-teal-200 rounded-full px-3 py-1 text-[11px] font-bold text-teal-800">
-                                <ShieldCheck className="w-3.5 h-3.5 text-teal-600" />
+                            <div
+                                className="flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-bold"
+                                style={{ background: 'var(--pastel-sky-bg)', color: 'var(--pastel-sky-text)', border: '1px solid var(--pastel-sky-text)' }}
+                            >
+                                <ShieldCheck className="w-3.5 h-3.5" />
                                 <span>Blockchain Verified</span>
                                 {prescInfo.explorerUrl && (
                                     <a
                                         href={prescInfo.explorerUrl}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="text-teal-700 underline flex items-center gap-0.5 ml-1"
+                                        className="underline flex items-center gap-0.5 ml-1"
                                     >
                                         <span>Tx</span>
                                         <ExternalLink className="w-2.5 h-2.5" />
@@ -285,7 +309,8 @@ function ConsultationCard({ consultation, highlighted, cardRef }) {
                         {prescInfo && (
                             <Link
                                 to={`/verify/${consultation.id}`}
-                                className="text-xs font-bold text-[#e13b68] hover:underline flex items-center gap-1"
+                                className="text-xs font-bold hover:underline flex items-center gap-1"
+                                style={{ color: 'var(--accent)' }}
                             >
                                 <Search className="w-3 h-3" />
                                 <span>Verify Authenticity</span>
@@ -317,8 +342,11 @@ function ConsultationCard({ consultation, highlighted, cardRef }) {
                         />
                     )}
                     {reviewed && (
-                        <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center gap-2 text-xs font-bold text-emerald-800">
-                            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                        <div
+                            className="p-3 rounded-2xl flex items-center gap-2 text-xs font-bold"
+                            style={{ background: 'var(--pastel-mint-bg)', border: '1px solid var(--pastel-mint-text)', color: 'var(--pastel-mint-text)' }}
+                        >
+                            <CheckCircle2 className="w-4 h-4" />
                             <span>Review submitted successfully. Thank you for your feedback!</span>
                         </div>
                     )}
@@ -380,27 +408,35 @@ export default function PatientConsultations() {
     return (
         <div className="w-full flex flex-col gap-6 text-left relative max-w-5xl mx-auto pb-16 animate-fade-in-up">
             {/* Header Welcome Bar */}
-            <div className="bg-white border border-[#f5e4ec] rounded-3xl p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-xs">
+            <div
+                className="rounded-3xl p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-xs"
+                style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}
+            >
                 <div>
-                    <h1 className="text-2xl md:text-3xl font-black text-[#1c1218] font-heading tracking-tight">
+                    <h1 className="text-2xl md:text-3xl font-black font-heading tracking-tight" style={{ color: 'var(--text-primary)' }}>
                         My Consultations
                     </h1>
-                    <p className="text-xs sm:text-sm font-semibold text-[#7d6974] mt-1">
+                    <p className="text-xs sm:text-sm font-semibold mt-1" style={{ color: 'var(--text-secondary)' }}>
                         View your appointment history, digital prescriptions, and symptom progress timeline.
                     </p>
                 </div>
 
-                <div className="flex items-center gap-2 bg-[#fdf0f4] p-1.5 rounded-2xl border border-[#f5e4ec]">
+                <div
+                    className="flex items-center gap-2 p-1.5 rounded-2xl"
+                    style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)' }}
+                >
                     {TABS.map((tab) => (
                         <button
                             key={tab.id}
                             type="button"
                             onClick={() => setActiveTab(tab.id)}
-                            className={`px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
+                            className={`px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${activeTab === tab.id ? 'shadow-xs font-black' : ''
+                                }`}
+                            style={
                                 activeTab === tab.id
-                                    ? 'bg-white text-[#e13b68] shadow-xs font-black'
-                                    : 'text-[#7d6974] hover:text-[#2d2329]'
-                            }`}
+                                    ? { background: 'var(--card-bg)', color: 'var(--accent)' }
+                                    : { color: 'var(--text-secondary)' }
+                            }
                         >
                             {tab.label}
                         </button>
@@ -410,37 +446,53 @@ export default function PatientConsultations() {
 
             {/* Error banner */}
             {error && (
-                <div className="p-4 bg-rose-50 border border-rose-200 rounded-2xl text-xs font-semibold text-rose-700">
+                <div
+                    className="p-4 rounded-2xl text-xs font-semibold"
+                    style={{ background: 'var(--pastel-pink-bg)', border: '1px solid var(--accent)', color: 'var(--accent)' }}
+                >
                     {error}
                 </div>
             )}
 
             {/* Content Tabs */}
             {activeTab === 'timeline' ? (
-                <div className="bg-white border border-[#f5e4ec] rounded-3xl p-6 sm:p-8 shadow-xs">
+                <div
+                    className="rounded-3xl p-6 sm:p-8 shadow-xs"
+                    style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}
+                >
                     <SymptomTimeline onSelectEntry={handleSelectTimelineEntry} />
                 </div>
             ) : (
                 <div className="flex flex-col gap-5">
                     {loading ? (
-                        <div className="p-16 text-center text-xs font-bold text-[#7d6974] bg-white border border-[#f5e4ec] rounded-3xl animate-pulse">
+                        <div
+                            className="p-16 text-center text-xs font-bold rounded-3xl animate-pulse"
+                            style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', color: 'var(--text-secondary)' }}
+                        >
                             Loading your consultation records...
                         </div>
                     ) : consultations.length === 0 ? (
-                        <div className="bg-white border border-[#f5e4ec] rounded-3xl p-12 text-center flex flex-col items-center gap-4 shadow-xs">
-                            <div className="w-16 h-16 rounded-2xl bg-[#ffe6ee] border border-[#f8c8d8] flex items-center justify-center text-[#e13b68]">
+                        <div
+                            className="rounded-3xl p-12 text-center flex flex-col items-center gap-4 shadow-xs"
+                            style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}
+                        >
+                            <div
+                                className="w-16 h-16 rounded-2xl flex items-center justify-center"
+                                style={{ background: 'var(--accent-light)', border: '1px solid var(--notif-unread-border)', color: 'var(--accent)' }}
+                            >
                                 <Calendar className="w-8 h-8" />
                             </div>
                             <div className="flex flex-col gap-1 max-w-sm">
-                                <h3 className="font-black text-lg text-[#1c1218]">No Consultations Yet</h3>
-                                <p className="text-xs font-semibold text-[#7d6974]">
+                                <h3 className="font-black text-lg" style={{ color: 'var(--text-primary)' }}>No Consultations Yet</h3>
+                                <p className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>
                                     Start an AI Clinical Triage to be routed to verified doctor care.
                                 </p>
                             </div>
                             <button
                                 type="button"
                                 onClick={() => navigate('/patient/ai-triage')}
-                                className="px-6 py-3 rounded-full bg-[#e13b68] text-white font-black text-xs hover:bg-[#c92a55] transition shadow-md flex items-center gap-2 cursor-pointer"
+                                className="px-6 py-3 rounded-full font-black text-xs transition shadow-md flex items-center gap-2 cursor-pointer text-white"
+                                style={{ background: 'var(--accent)' }}
                             >
                                 <span>Start Clinical Triage</span>
                                 <ArrowRight className="w-4 h-4" />
@@ -466,18 +518,20 @@ export default function PatientConsultations() {
                                 type="button"
                                 disabled={page <= 1}
                                 onClick={() => setPage((p) => p - 1)}
-                                className="px-4 py-2 text-xs font-bold border border-[#f5e4ec] rounded-full bg-white disabled:opacity-40 hover:bg-[#fff0f4] transition"
+                                className="px-4 py-2 text-xs font-bold rounded-full disabled:opacity-40 transition cursor-pointer"
+                                style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
                             >
                                 Previous
                             </button>
-                            <span className="text-xs font-bold text-[#7d6974]">
+                            <span className="text-xs font-bold" style={{ color: 'var(--text-secondary)' }}>
                                 Page {page} of {totalPages}
                             </span>
                             <button
                                 type="button"
                                 disabled={page >= totalPages}
                                 onClick={() => setPage((p) => p + 1)}
-                                className="px-4 py-2 text-xs font-bold border border-[#f5e4ec] rounded-full bg-white disabled:opacity-40 hover:bg-[#fff0f4] transition"
+                                className="px-4 py-2 text-xs font-bold rounded-full disabled:opacity-40 transition cursor-pointer"
+                                style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
                             >
                                 Next
                             </button>
