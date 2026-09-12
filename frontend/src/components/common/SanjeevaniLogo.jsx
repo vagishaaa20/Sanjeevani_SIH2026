@@ -151,8 +151,8 @@ export const SanjeevaniLogo = ({
         return (
             <div className={`inline-flex items-center gap-3 ${className}`}>
                 <div
-                    className="flex items-center justify-center rounded-2xl bg-gradient-to-tr from-[#ffe6ee] to-white border border-[#f5c6d6] shadow-xs flex-shrink-0"
-                    style={{ width: size, height: size, padding: size * 0.05 }}
+                    className="flex items-center justify-center rounded-2xl border shadow-xs flex-shrink-0"
+                    style={{ width: size, height: size, padding: size * 0.05, background: 'var(--logo-gradient)', borderColor: 'var(--border)' }}
                 >
                     <SanjeevaniLogo variant="emblem" size={size * 0.9} />
                 </div>
