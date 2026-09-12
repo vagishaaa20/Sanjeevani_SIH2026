@@ -25,6 +25,7 @@ import {
 import api from '../../services/api';
 import useAuth from '../../hooks/useAuth';
 import Badge from '../../components/common/Badge';
+import MinimalistAvatar from '../../components/common/MinimalistAvatar';
 import { INDIAN_MEDICAL_SPECIALIZATIONS } from '../auth/Register';
 
 const DOCTOR_DOC_TYPES = [
@@ -221,9 +222,13 @@ export const DoctorProfile = () => {
                 <div className="absolute top-0 right-0 -mr-16 -mt-16 w-48 h-48 bg-radial from-[#ffe6ee] to-transparent rounded-full pointer-events-none opacity-60" />
 
                 <div className="flex items-start gap-4 md:gap-6 z-10">
-                    <div className="w-18 h-18 md:w-20 md:h-20 rounded-3xl bg-linear-to-tr from-[#ffe6ee] to-[#fffcfd] border-2 border-[#f5c6d6] text-[#e13b68] flex items-center justify-center font-heading text-2xl md:text-3xl font-black shadow-xs flex-shrink-0">
-                        {profile?.fullName ? profile.fullName.charAt(0) : 'D'}
-                    </div>
+                    <MinimalistAvatar
+                        name={profile?.fullName || 'Doctor'}
+                        role="doctor"
+                        size={72}
+                        showStatus={true}
+                        status="online"
+                    />
 
                     <div className="flex flex-col gap-1.5">
                         <div className="flex flex-wrap items-center gap-2.5">

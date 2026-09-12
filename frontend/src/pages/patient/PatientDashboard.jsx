@@ -36,6 +36,9 @@ import Badge from '../../components/common/Badge';
 import { SocketContext } from '../../context/SocketContext';
 import ngeohash from 'ngeohash';
 
+import MinimalistAvatar from '../../components/common/MinimalistAvatar';
+import SanjeevaniLogo from '../../components/common/SanjeevaniLogo';
+
 export const PatientDashboard = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
@@ -52,8 +55,6 @@ export const PatientDashboard = () => {
     const [waModalOpen, setWaModalOpen] = useState(false);
     const [acceptedConsultationId, setAcceptedConsultationId] = useState(null);
     const { socket } = useContext(SocketContext);
-
-
 
     useEffect(() => {
         if (!socket) return;
@@ -101,8 +102,6 @@ export const PatientDashboard = () => {
         ? ngeohash.encode(coords.lat, coords.lng, 5)
         : null;
 
-
-
     return (
         <div className="w-full flex flex-col gap-6 text-left relative animate-fade-in-up pb-12 max-w-7xl mx-auto">
             {acceptedConsultationId && <PreCallDocumentSubmit consultationId={acceptedConsultationId} />}
@@ -112,17 +111,24 @@ export const PatientDashboard = () => {
             {userRegionGeohash && <OutbreakBanner userRegionGeohash={userRegionGeohash} />}
 
             {/* Patient Header Bar */}
-            <div className="bg-white/80 backdrop-blur-md border border-[#f3dce5] rounded-3xl p-6 md:p-8 flex flex-col md:flex-row md:justify-between md:items-center gap-6 shadow-xs">
+            <div className="bg-white/85 backdrop-blur-md border border-[#f3dce5] rounded-3xl p-6 md:p-8 flex flex-col md:flex-row md:justify-between md:items-center gap-6 shadow-xs">
                 <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#ffe6ee] to-white border border-[#f5c6d6] flex items-center justify-center text-xl font-black text-[#e13b68] shadow-xs flex-shrink-0">
-                        {(profile.fullName || 'P').charAt(0).toUpperCase()}
-                    </div>
+                    <MinimalistAvatar
+                        name={profile.fullName || user.phone}
+                        role="patient"
+                        size={64}
+                        showStatus={true}
+                        status="online"
+                    />
                     <div>
-                        <h2 className="text-2xl md:text-3xl font-black text-[#1c1218] font-heading tracking-tight">
-                            {profile.fullName || 'Welcome, Patient'}
+                        <h2 className="text-2xl md:text-3xl font-black text-[#1c1218] font-heading tracking-tight flex items-center gap-2">
+                            <span>{profile.fullName || 'Welcome, Patient'}</span>
                         </h2>
                         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-medium text-[#7d6974] mt-1">
-                            <span>ABDM Health ID: <strong className="text-[#2d2329] font-bold">{profile.abhaNumber || 'Pending Verification'}</strong></span>
+                            <span className="flex items-center gap-1">
+                                <ShieldCheck className="w-3.5 h-3.5 text-[#e13b68]" />
+                                ABDM Health ID: <strong className="text-[#2d2329] font-bold">{profile.abhaNumber || 'Pending Verification'}</strong>
+                            </span>
                             {user.phone && (
                                 <>
                                     <span className="text-[#d8c2cc]">•</span>

@@ -4,6 +4,7 @@ import { Search, Bell, Globe, LogOut, Menu, X, Heart, User, ShieldCheck, Chevron
 import useAuth from '../../hooks/useAuth';
 import { useLanguage } from '../../hooks/LanguageContext';
 import SanjeevaniLogo from '../common/SanjeevaniLogo';
+import MinimalistAvatar from '../common/MinimalistAvatar';
 
 const INDIAN_LANGUAGES = [
     { code: 'en', label: 'English', native: 'English' },
@@ -274,23 +275,27 @@ export const Navbar = () => {
                         <button
                             type="button"
                             onClick={() => setProfileMenuOpen(!profileMenuOpen)}
-                            className="flex items-center gap-2 p-0.5 rounded-full hover:bg-[#fff0f5] border border-transparent hover:border-[#f5c6d6] transition-all cursor-pointer group"
+                            className="flex items-center gap-2 p-0.5 rounded-full hover:bg-[#fff0f5] transition-all cursor-pointer group"
                         >
-                            <div className="relative">
-                                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-tr from-[#ffe6ee] via-white to-[#ffeef3] border border-[#f5c6d6] flex items-center justify-center text-xs font-black text-[#e13b68] uppercase shadow-xs group-hover:scale-105 transition-transform">
-                                    {(userName || 'P').charAt(0)}
-                                </div>
-                                <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white" />
-                            </div>
+                            <MinimalistAvatar
+                                name={userName}
+                                role={user.role}
+                                size={36}
+                                showStatus={true}
+                                status="online"
+                            />
                             <ChevronDown className="w-3.5 h-3.5 text-[#7d6974] group-hover:text-[#e13b68] hidden sm:block transition-colors" />
                         </button>
 
                         {profileMenuOpen && (
                             <div className="absolute right-0 mt-2 w-64 bg-white border border-[#f5e4ec] rounded-3xl shadow-xl p-4 z-50 animate-fade-in-up text-left flex flex-col gap-3">
                                 <div className="flex items-center gap-3 pb-3 border-b border-[#fdf0f4]">
-                                    <div className="w-11 h-11 rounded-2xl bg-[#ffe6ee] border border-[#f8c8d8] flex items-center justify-center text-base font-black text-[#e13b68]">
-                                        {(userName || 'P').charAt(0)}
-                                    </div>
+                                    <MinimalistAvatar
+                                        name={userName}
+                                        role={user.role}
+                                        size={44}
+                                        showStatus={false}
+                                    />
                                     <div className="flex flex-col overflow-hidden">
                                         <span className="text-xs font-black text-[#2d2329] truncate">{userName}</span>
                                         <span className="text-[10px] font-bold text-[#e13b68] uppercase tracking-wider">
