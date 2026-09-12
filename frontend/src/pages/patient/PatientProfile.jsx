@@ -97,17 +97,12 @@ export const PatientProfile = () => {
                         {(formData.fullName || 'P').charAt(0).toUpperCase()}
                     </div>
                     <div>
-                        <div className="flex items-center gap-2">
-                            <h1 className="text-2xl md:text-3xl font-black text-[#2d2329] font-heading">
-                                {formData.fullName || 'Patient Profile'}
-                            </h1>
-                            <Badge variant="pink" dot pulse>
-                                {profile.accountStatus || 'ACTIVE'}
-                            </Badge>
-                        </div>
-                        <p className="text-xs font-semibold text-[#7d6974] mt-1 flex items-center gap-3">
-                            <span>Phone: {user?.phone || 'Not set'}</span>
-                            {user?.email && <span>• Email: {user.email}</span>}
+                        <h1 className="text-2xl md:text-3xl font-black text-[#1c1218] font-heading tracking-tight">
+                            {formData.fullName || 'Patient Profile'}
+                        </h1>
+                        <p className="text-xs font-medium text-[#7d6974] mt-1 flex items-center gap-3">
+                            <span>Phone: <strong className="text-[#2d2329] font-bold">{user?.phone || 'Not set'}</strong></span>
+                            {user?.email && <span>• Email: <strong className="text-[#2d2329] font-bold">{user.email}</strong></span>}
                         </p>
                     </div>
                 </div>
