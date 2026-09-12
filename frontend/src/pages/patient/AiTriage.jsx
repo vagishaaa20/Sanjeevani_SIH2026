@@ -250,20 +250,27 @@ export const AiTriage = () => {
     return (
         <div className="w-full flex flex-col gap-6 text-left relative max-w-3xl mx-auto pb-16 animate-fade-in-up">
             {/* Subtle Sanjeevani ambient background glow */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-2xl h-64 bg-[radial-gradient(ellipse_60%_60%_at_50%_0%,rgba(255,225,235,0.45),transparent)] pointer-events-none -z-10" />
+            <div
+                className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-2xl h-64 pointer-events-none -z-10"
+                style={{ background: 'radial-gradient(ellipse 60% 60% at 50% 0%, var(--hover-bg), transparent)' }}
+            />
 
             {/* Top Navigation & Back */}
             <div className="flex items-center justify-between">
                 <button
                     type="button"
                     onClick={() => navigate('/patient/dashboard')}
-                    className="inline-flex items-center gap-2 text-xs font-bold text-[#7d6974] hover:text-[#e13b68] transition cursor-pointer px-3.5 py-1.5 rounded-full bg-white border border-[#f5e4ec] shadow-2xs hover:shadow-xs"
+                    className="inline-flex items-center gap-2 text-xs font-bold transition cursor-pointer px-3.5 py-1.5 rounded-full shadow-2xs hover:shadow-xs"
+                    style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', color: 'var(--text-secondary)' }}
                 >
                     <ArrowLeft className="w-3.5 h-3.5" />
                     <span>Return to Dashboard</span>
                 </button>
 
-                <div className="flex items-center gap-1.5 text-[11px] font-bold text-[#e13b68] bg-[#fff0f4] border border-[#f8c8d8] px-3.5 py-1.5 rounded-full shadow-2xs">
+                <div
+                    className="flex items-center gap-1.5 text-[11px] font-bold px-3.5 py-1.5 rounded-full shadow-2xs"
+                    style={{ background: 'var(--accent-light)', border: '1px solid var(--notif-unread-border)', color: 'var(--accent)' }}
+                >
                     <ShieldCheck className="w-3.5 h-3.5" />
                     <span>Clinical AI Triage Gateway</span>
                 </div>
@@ -271,29 +278,32 @@ export const AiTriage = () => {
 
             {/* Header Section */}
             <div className="flex flex-col gap-1.5">
-                <span className="text-[11px] font-black uppercase tracking-widest text-[#e13b68]">
+                <span className="text-[11px] font-black uppercase tracking-widest" style={{ color: 'var(--accent)' }}>
                     CLINICAL TRIAGE
                 </span>
-                <h1 className="text-2xl sm:text-3xl font-black text-[#1c1218] font-heading tracking-tight">
+                <h1 className="text-2xl sm:text-3xl font-black font-heading tracking-tight" style={{ color: 'var(--text-primary)' }}>
                     What are you experiencing?
                 </h1>
-                <p className="text-xs sm:text-sm font-semibold text-[#66525f] max-w-2xl leading-relaxed">
+                <p className="text-xs sm:text-sm font-semibold max-w-2xl leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
                     Describe your symptoms in your own words. Sanjeevani will help determine the appropriate next step.
                 </p>
             </div>
 
             {/* Main Clinical Card Container */}
-            <div className="bg-white border border-[#f5e4ec] rounded-3xl p-6 sm:p-8 shadow-xs flex flex-col gap-8 relative">
+            <div
+                className="rounded-3xl p-6 sm:p-8 shadow-xs flex flex-col gap-8 relative"
+                style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}
+            >
                 {!result ? (
                     <form onSubmit={handleCheck} className="flex flex-col gap-8">
                         {/* Section 1: Describe Symptoms */}
                         <div className="flex flex-col gap-3">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <h2 className="text-xs font-black tracking-wider text-[#2d2329] uppercase">
-                                        1. Describe your symptoms <span className="text-[#e13b68]">*</span>
+                                    <h2 className="text-xs font-black tracking-wider uppercase" style={{ color: 'var(--text-primary)' }}>
+                                        1. Describe your symptoms <span className="text-rose-500">*</span>
                                     </h2>
-                                    <p className="text-[11px] font-medium text-[#7d6974]">
+                                    <p className="text-[11px] font-medium" style={{ color: 'var(--text-secondary)' }}>
                                         Mention where it hurts, how it feels, or any specific discomfort.
                                     </p>
                                 </div>
@@ -303,18 +313,19 @@ export const AiTriage = () => {
                                     type="button"
                                     onClick={isRecording ? stopRecording : startRecording}
                                     disabled={transcribing || loading}
-                                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
-                                        isRecording
-                                            ? 'bg-rose-50 border border-rose-300 text-rose-600 animate-pulse'
-                                            : transcribing
-                                            ? 'bg-[#ffe6ee] text-[#e13b68] border border-[#f8c8d8]'
-                                            : 'bg-[#fffafc] border border-[#f5e4ec] hover:border-[#f8c8d8] text-[#2d2329] hover:text-[#e13b68]'
-                                    } disabled:opacity-50 shadow-2xs`}
+                                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer disabled:opacity-50 shadow-2xs`}
                                     aria-label="Voice input for symptoms"
+                                    style={
+                                        isRecording
+                                            ? { background: 'var(--pastel-pink-bg)', border: '1px solid var(--accent)', color: 'var(--accent)', animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite' }
+                                            : transcribing
+                                                ? { background: 'var(--accent-light)', color: 'var(--accent)', border: '1px solid var(--notif-unread-border)' }
+                                                : { background: 'var(--bg-surface)', border: '1px solid var(--border)', color: 'var(--text-primary)' }
+                                    }
                                 >
                                     {isRecording ? (
                                         <>
-                                            <span className="w-2 h-2 rounded-full bg-rose-600 animate-ping" />
+                                            <span className="w-2 h-2 rounded-full animate-ping" style={{ background: 'var(--accent)' }} />
                                             <span>Stop ({60 - recordingTime}s)</span>
                                         </>
                                     ) : transcribing ? (
@@ -324,7 +335,7 @@ export const AiTriage = () => {
                                         </>
                                     ) : (
                                         <>
-                                            <Mic className="w-3.5 h-3.5 text-[#e13b68]" />
+                                            <Mic className="w-3.5 h-3.5" style={{ color: 'var(--accent)' }} />
                                             <span>Speak</span>
                                         </>
                                     )}
@@ -341,23 +352,31 @@ export const AiTriage = () => {
                                     rows={4}
                                     required
                                     disabled={isRecording || transcribing || loading}
-                                    className="w-full px-4 py-3.5 rounded-2xl border border-[#f0d5df] bg-[#fffdfd] text-sm text-[#1c1218] placeholder-[#a895a0] resize-none focus:outline-none focus:ring-2 focus:ring-[#e13b68]/20 focus:border-[#e13b68] transition leading-relaxed disabled:opacity-60"
+                                    className="w-full px-4 py-3.5 rounded-2xl text-sm resize-none focus:outline-none focus:ring-2 transition leading-relaxed disabled:opacity-60"
+                                    style={{
+                                        background: 'var(--input-bg)',
+                                        border: '1px solid var(--border)',
+                                        color: 'var(--text-primary)',
+                                    }}
                                 />
                             </div>
                         </div>
 
                         {/* Section 2: Onset & Duration */}
-                        <div className="flex flex-col gap-3 pt-6 border-t border-[#fdf0f4]">
+                        <div className="flex flex-col gap-3 pt-6" style={{ borderTop: '1px solid var(--border-subtle)' }}>
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <h2 className="text-xs font-black tracking-wider text-[#2d2329] uppercase">
+                                    <h2 className="text-xs font-black tracking-wider uppercase" style={{ color: 'var(--text-primary)' }}>
                                         2. How long have you felt this way?
                                     </h2>
-                                    <p className="text-[11px] font-medium text-[#7d6974]">
+                                    <p className="text-[11px] font-medium" style={{ color: 'var(--text-secondary)' }}>
                                         Approximate duration of symptom onset.
                                     </p>
                                 </div>
-                                <span className="text-[11px] text-[#a895a0] font-medium bg-[#fcf8fa] px-2.5 py-0.5 rounded-full border border-[#f5e4ec]">
+                                <span
+                                    className="text-[11px] font-medium px-2.5 py-0.5 rounded-full"
+                                    style={{ background: 'var(--bg-surface)', color: 'var(--text-muted)', border: '1px solid var(--border)' }}
+                                >
                                     Optional
                                 </span>
                             </div>
@@ -370,13 +389,14 @@ export const AiTriage = () => {
                                             key={opt.value}
                                             type="button"
                                             onClick={() => setDuration(isSelected ? '' : opt.value)}
-                                            className={`py-2.5 px-3 rounded-2xl text-xs font-bold transition cursor-pointer border text-center flex items-center justify-center gap-1.5 ${
+                                            className="py-2.5 px-3 rounded-2xl text-xs font-bold transition cursor-pointer border text-center flex items-center justify-center gap-1.5"
+                                            style={
                                                 isSelected
-                                                    ? 'bg-[#ffe6ee] text-[#e13b68] border-[#f8c8d8] shadow-2xs font-black'
-                                                    : 'bg-white text-[#4a3c45] border-[#f5e4ec] hover:border-[#f0d5df] hover:bg-[#fffafc]'
-                                            }`}
+                                                    ? { background: 'var(--accent-light)', color: 'var(--accent)', borderColor: 'var(--notif-unread-border)' }
+                                                    : { background: 'var(--card-bg)', color: 'var(--text-primary)', borderColor: 'var(--border)' }
+                                            }
                                         >
-                                            <Clock className={`w-3.5 h-3.5 ${isSelected ? 'text-[#e13b68]' : 'text-[#a895a0]'}`} />
+                                            <Clock className="w-3.5 h-3.5" style={{ color: isSelected ? 'var(--accent)' : 'var(--text-muted)' }} />
                                             <span>{opt.label}</span>
                                         </button>
                                     );
@@ -385,17 +405,20 @@ export const AiTriage = () => {
                         </div>
 
                         {/* Section 3: Impact on Daily Life & Ability to Work */}
-                        <div className="flex flex-col gap-3 pt-6 border-t border-[#fdf0f4]">
+                        <div className="flex flex-col gap-3 pt-6" style={{ borderTop: '1px solid var(--border-subtle)' }}>
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <h2 className="text-xs font-black tracking-wider text-[#2d2329] uppercase">
-                                        3. How is this affecting your daily routine & ability to work?
+                                    <h2 className="text-xs font-black tracking-wider uppercase" style={{ color: 'var(--text-primary)' }}>
+                                        3. How is this affecting your daily routine &amp; ability to work?
                                     </h2>
-                                    <p className="text-[11px] font-medium text-[#7d6974]">
+                                    <p className="text-[11px] font-medium" style={{ color: 'var(--text-secondary)' }}>
                                         Select the option that best reflects your current functional state.
                                     </p>
                                 </div>
-                                <span className="text-[11px] text-[#a895a0] font-medium bg-[#fcf8fa] px-2.5 py-0.5 rounded-full border border-[#f5e4ec]">
+                                <span
+                                    className="text-[11px] font-medium px-2.5 py-0.5 rounded-full"
+                                    style={{ background: 'var(--bg-surface)', color: 'var(--text-muted)', border: '1px solid var(--border)' }}
+                                >
                                     Optional
                                 </span>
                             </div>
@@ -409,38 +432,39 @@ export const AiTriage = () => {
                                             key={opt.id}
                                             type="button"
                                             onClick={() => setSeverity(isSelected ? '' : opt.value)}
-                                            className={`p-4 rounded-2xl border text-left transition-all cursor-pointer flex items-start gap-3 relative ${
+                                            className="p-4 rounded-2xl border text-left transition-all cursor-pointer flex items-start gap-3 relative"
+                                            style={
                                                 isSelected
-                                                    ? 'bg-[#fff0f4] border-[#f8c8d8] shadow-2xs'
-                                                    : 'bg-white border-[#f5e4ec] hover:border-[#f0d5df] hover:bg-[#fffafc]'
-                                            }`}
+                                                    ? { background: 'var(--accent-light)', borderColor: 'var(--notif-unread-border)' }
+                                                    : { background: 'var(--card-bg)', borderColor: 'var(--border)' }
+                                            }
                                         >
                                             <div
-                                                className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition ${
+                                                className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition"
+                                                style={
                                                     isSelected
-                                                        ? 'bg-[#ffe6ee] text-[#e13b68] border border-[#f8c8d8]'
-                                                        : 'bg-[#faf5f8] text-[#7d6974] border border-[#f5e4ec]'
-                                                }`}
+                                                        ? { background: 'var(--accent-light)', color: 'var(--accent)', border: '1px solid var(--notif-unread-border)' }
+                                                        : { background: 'var(--bg-surface)', color: 'var(--text-secondary)', border: '1px solid var(--border)' }
+                                                }
                                             >
                                                 <Icon className="w-4 h-4" />
                                             </div>
 
                                             <div className="flex flex-col gap-0.5 pr-4">
                                                 <span
-                                                    className={`text-xs font-bold ${
-                                                        isSelected ? 'text-[#e13b68]' : 'text-[#2d2329]'
-                                                    }`}
+                                                    className="text-xs font-bold"
+                                                    style={{ color: isSelected ? 'var(--accent)' : 'var(--text-primary)' }}
                                                 >
                                                     {opt.label}
                                                 </span>
-                                                <span className="text-[11px] font-medium text-[#7d6974] leading-normal">
+                                                <span className="text-[11px] font-medium leading-normal" style={{ color: 'var(--text-secondary)' }}>
                                                     {opt.desc}
                                                 </span>
                                             </div>
 
                                             {isSelected && (
                                                 <div className="absolute top-3.5 right-3.5">
-                                                    <CheckCircle2 className="w-4 h-4 text-[#e13b68] fill-[#ffe6ee]" />
+                                                    <CheckCircle2 className="w-4 h-4" style={{ color: 'var(--accent)' }} />
                                                 </div>
                                             )}
                                         </button>
@@ -451,18 +475,22 @@ export const AiTriage = () => {
 
                         {/* Error Notice */}
                         {error && (
-                            <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-xs font-semibold text-rose-700 flex items-center gap-2">
-                                <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+                            <div
+                                className="p-3.5 rounded-2xl text-xs font-semibold flex items-center gap-2"
+                                style={{ background: 'var(--pastel-pink-bg)', border: '1px solid var(--accent)', color: 'var(--accent)' }}
+                            >
+                                <AlertTriangle className="w-4 h-4 shrink-0" />
                                 <span>{error}</span>
                             </div>
                         )}
 
                         {/* Primary CTA & Reassurance */}
-                        <div className="flex flex-col items-center gap-3 pt-6 border-t border-[#fdf0f4]">
+                        <div className="flex flex-col items-center gap-3 pt-6" style={{ borderTop: '1px solid var(--border-subtle)' }}>
                             <button
                                 type="submit"
                                 disabled={loading || !symptoms.trim()}
-                                className="w-full sm:w-auto min-w-[280px] px-8 py-3.5 rounded-full bg-[#e13b68] hover:bg-[#c92a55] text-white font-black text-sm transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 group cursor-pointer"
+                                className="w-full sm:w-auto min-w-[280px] px-8 py-3.5 rounded-full font-black text-sm transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 group cursor-pointer text-white"
+                                style={{ background: 'var(--accent)' }}
                             >
                                 {loading ? (
                                     <div className="flex items-center gap-2">
@@ -477,7 +505,7 @@ export const AiTriage = () => {
                                 )}
                             </button>
 
-                            <p className="text-xs font-semibold text-[#7d6974] text-center max-w-md">
+                            <p className="text-xs font-semibold text-center max-w-md" style={{ color: 'var(--text-secondary)' }}>
                                 You'll receive guidance on the next appropriate step. This is not a medical diagnosis.
                             </p>
                         </div>
@@ -485,12 +513,12 @@ export const AiTriage = () => {
                 ) : (
                     /* Refined Result State */
                     <div className="flex flex-col gap-6 animate-fade-in-up">
-                        <div className="flex items-center justify-between border-b border-[#f5e4ec] pb-4">
+                        <div className="flex items-center justify-between pb-4" style={{ borderBottom: '1px solid var(--border)' }}>
                             <div>
-                                <span className="text-[11px] font-black uppercase tracking-wider text-[#7d6974]">
+                                <span className="text-[11px] font-black uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
                                     TRIAGE EVALUATION
                                 </span>
-                                <h3 className="text-xl font-black text-[#1c1218] font-heading">
+                                <h3 className="text-xl font-black font-heading" style={{ color: 'var(--text-primary)' }}>
                                     Recommended next step
                                 </h3>
                             </div>
@@ -498,7 +526,8 @@ export const AiTriage = () => {
                             <button
                                 type="button"
                                 onClick={handleReset}
-                                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#fdf5f7] border border-[#f5e4ec] hover:bg-[#ffe6ee] text-xs font-bold text-[#e13b68] transition cursor-pointer"
+                                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition cursor-pointer hover:opacity-80"
+                                style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', color: 'var(--accent)' }}
                             >
                                 <RotateCcw className="w-3.5 h-3.5" />
                                 <span>New assessment</span>
@@ -507,26 +536,35 @@ export const AiTriage = () => {
 
                         {/* Emergency Result Card */}
                         {result.recommendation === 'emergency' && (
-                            <div className="bg-rose-50/70 border-2 border-rose-300 rounded-3xl p-6 sm:p-8 flex flex-col gap-5">
+                            <div
+                                className="rounded-3xl p-6 sm:p-8 flex flex-col gap-5"
+                                style={{ background: 'var(--pastel-pink-bg)', border: '2px solid var(--accent)' }}
+                            >
                                 <div className="flex items-start gap-4">
-                                    <div className="w-12 h-12 rounded-2xl bg-rose-100 border border-rose-200 flex items-center justify-center text-rose-600 shrink-0">
+                                    <div
+                                        className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0"
+                                        style={{ background: '#ffe6ee', border: '1px solid var(--accent)', color: 'var(--accent)' }}
+                                    >
                                         <AlertTriangle className="w-6 h-6" />
                                     </div>
                                     <div className="flex flex-col gap-1">
-                                        <span className="text-xs font-black uppercase tracking-wider text-rose-600">
+                                        <span className="text-xs font-black uppercase tracking-wider" style={{ color: 'var(--accent)' }}>
                                             High Urgency
                                         </span>
-                                        <h4 className="text-xl font-black text-rose-950 font-heading">
+                                        <h4 className="text-xl font-black font-heading" style={{ color: 'var(--text-primary)' }}>
                                             Emergency Care Required
                                         </h4>
-                                        <p className="text-sm font-semibold text-rose-900 leading-relaxed mt-1">
+                                        <p className="text-sm font-semibold leading-relaxed mt-1" style={{ color: 'var(--text-primary)' }}>
                                             {result.reason}
                                         </p>
                                     </div>
                                 </div>
 
-                                <div className="p-4 bg-white/80 rounded-2xl border border-rose-200 text-xs font-semibold text-rose-900 flex items-center gap-2">
-                                    <Info className="w-4 h-4 text-rose-600 shrink-0" />
+                                <div
+                                    className="p-4 rounded-2xl text-xs font-semibold flex items-center gap-2"
+                                    style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+                                >
+                                    <Info className="w-4 h-4 shrink-0" style={{ color: 'var(--accent)' }} />
                                     <span>
                                         Please seek immediate emergency medical assistance at the nearest hospital or contact your local emergency response service (108 / 112).
                                     </span>
@@ -535,7 +573,8 @@ export const AiTriage = () => {
                                 <button
                                     type="button"
                                     onClick={() => handleCtaAction('emergency')}
-                                    className="w-full py-3.5 rounded-full bg-rose-600 hover:bg-rose-700 text-white font-black text-sm transition shadow-md flex items-center justify-center gap-2 cursor-pointer"
+                                    className="w-full py-3.5 rounded-full font-black text-sm transition shadow-md flex items-center justify-center gap-2 cursor-pointer text-white"
+                                    style={{ background: 'var(--accent)' }}
                                 >
                                     <span>Return to Emergency Dashboard</span>
                                     <ArrowRight className="w-4 h-4" />
@@ -545,26 +584,35 @@ export const AiTriage = () => {
 
                         {/* Teleconsultation Result Card */}
                         {result.recommendation === 'teleconsultation' && (
-                            <div className="bg-[#fff8fa] border-2 border-[#f8c8d8] rounded-3xl p-6 sm:p-8 flex flex-col gap-5">
+                            <div
+                                className="rounded-3xl p-6 sm:p-8 flex flex-col gap-5"
+                                style={{ background: 'var(--accent-light)', border: '2px solid var(--notif-unread-border)' }}
+                            >
                                 <div className="flex items-start gap-4">
-                                    <div className="w-12 h-12 rounded-2xl bg-[#ffe6ee] border border-[#f8c8d8] flex items-center justify-center text-[#e13b68] shrink-0">
+                                    <div
+                                        className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0"
+                                        style={{ background: 'var(--bg-surface)', border: '1px solid var(--notif-unread-border)', color: 'var(--accent)' }}
+                                    >
                                         <Video className="w-6 h-6" />
                                     </div>
                                     <div className="flex flex-col gap-1">
-                                        <span className="text-xs font-black uppercase tracking-wider text-[#e13b68]">
+                                        <span className="text-xs font-black uppercase tracking-wider" style={{ color: 'var(--accent)' }}>
                                             Appropriate Next Step
                                         </span>
-                                        <h4 className="text-xl font-black text-[#1c1218] font-heading">
+                                        <h4 className="text-xl font-black font-heading" style={{ color: 'var(--text-primary)' }}>
                                             Teleconsultation Recommended
                                         </h4>
-                                        <p className="text-sm font-semibold text-[#4a3c45] leading-relaxed mt-1">
+                                        <p className="text-sm font-semibold leading-relaxed mt-1" style={{ color: 'var(--text-primary)' }}>
                                             {result.reason}
                                         </p>
                                     </div>
                                 </div>
 
-                                <div className="p-4 bg-white rounded-2xl border border-[#f5e4ec] text-xs font-semibold text-[#66525f] flex items-center gap-2">
-                                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                                <div
+                                    className="p-4 rounded-2xl text-xs font-semibold flex items-center gap-2"
+                                    style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', color: 'var(--text-secondary)' }}
+                                >
+                                    <CheckCircle2 className="w-4 h-4 shrink-0" style={{ color: 'var(--pastel-mint-text)' }} />
                                     <span>
                                         A qualified doctor can review your symptoms remotely and prescribe medication or arrange a follow-up.
                                     </span>
@@ -573,7 +621,8 @@ export const AiTriage = () => {
                                 <button
                                     type="button"
                                     onClick={() => handleCtaAction('teleconsultation')}
-                                    className="w-full py-3.5 rounded-full bg-[#e13b68] hover:bg-[#c92a55] text-white font-black text-sm transition shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer"
+                                    className="w-full py-3.5 rounded-full font-black text-sm transition shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer text-white"
+                                    style={{ background: 'var(--accent)' }}
                                 >
                                     <span>Book Teleconsultation</span>
                                     <ArrowRight className="w-4 h-4" />
@@ -583,26 +632,35 @@ export const AiTriage = () => {
 
                         {/* Doctor Visit / In-Person Result Card */}
                         {result.recommendation === 'doctor_visit' && (
-                            <div className="bg-[#fffbf5] border-2 border-[#fed7aa] rounded-3xl p-6 sm:p-8 flex flex-col gap-5">
+                            <div
+                                className="rounded-3xl p-6 sm:p-8 flex flex-col gap-5"
+                                style={{ background: 'var(--pastel-peach-bg)', border: '2px solid var(--pastel-peach-text)' }}
+                            >
                                 <div className="flex items-start gap-4">
-                                    <div className="w-12 h-12 rounded-2xl bg-[#ffedd5] border border-[#fed7aa] flex items-center justify-center text-amber-700 shrink-0">
+                                    <div
+                                        className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0"
+                                        style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', color: 'var(--pastel-peach-text)' }}
+                                    >
                                         <Building2 className="w-6 h-6" />
                                     </div>
                                     <div className="flex flex-col gap-1">
-                                        <span className="text-xs font-black uppercase tracking-wider text-amber-700">
+                                        <span className="text-xs font-black uppercase tracking-wider" style={{ color: 'var(--pastel-peach-text)' }}>
                                             In-Person Evaluation
                                         </span>
-                                        <h4 className="text-xl font-black text-[#1c1218] font-heading">
+                                        <h4 className="text-xl font-black font-heading" style={{ color: 'var(--text-primary)' }}>
                                             Doctor Visit Recommended
                                         </h4>
-                                        <p className="text-sm font-semibold text-[#4a3c45] leading-relaxed mt-1">
+                                        <p className="text-sm font-semibold leading-relaxed mt-1" style={{ color: 'var(--text-primary)' }}>
                                             {result.reason}
                                         </p>
                                     </div>
                                 </div>
 
-                                <div className="p-4 bg-white rounded-2xl border border-[#f5e4ec] text-xs font-semibold text-[#66525f] flex items-center gap-2">
-                                    <Info className="w-4 h-4 text-amber-600 shrink-0" />
+                                <div
+                                    className="p-4 rounded-2xl text-xs font-semibold flex items-center gap-2"
+                                    style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', color: 'var(--text-secondary)' }}
+                                >
+                                    <Info className="w-4 h-4 shrink-0" style={{ color: 'var(--pastel-peach-text)' }} />
                                     <span>
                                         An in-person clinical examination at a verified clinic or hospital is suggested for comprehensive diagnostic evaluation.
                                     </span>
@@ -611,16 +669,17 @@ export const AiTriage = () => {
                                 <button
                                     type="button"
                                     onClick={() => handleCtaAction('doctor_visit')}
-                                    className="w-full py-3.5 rounded-full bg-[#e13b68] hover:bg-[#c92a55] text-white font-black text-sm transition shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer"
+                                    className="w-full py-3.5 rounded-full font-black text-sm transition shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer text-white"
+                                    style={{ background: 'var(--accent)' }}
                                 >
-                                    <span>Find Nearby Clinics & Verified Doctors</span>
+                                    <span>Find Nearby Clinics &amp; Verified Doctors</span>
                                     <ArrowRight className="w-4 h-4" />
                                 </button>
                             </div>
                         )}
 
                         <div className="p-3 text-center">
-                            <p className="text-xs font-medium text-[#7d6974]">
+                            <p className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
                                 This clinical assessment is for informational guidance and does not constitute a binding diagnosis.
                             </p>
                         </div>

@@ -1,21 +1,21 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { 
-    Bot, 
-    Stethoscope, 
-    HeartPulse, 
-    Pill, 
-    Hourglass, 
-    ArrowRight, 
-    MessageSquare, 
-    Building2, 
-    Sparkles, 
-    Mic, 
-    Star, 
-    ShieldCheck, 
-    Search, 
-    ChevronRight, 
-    User, 
+import {
+    Bot,
+    Stethoscope,
+    HeartPulse,
+    Pill,
+    Hourglass,
+    ArrowRight,
+    MessageSquare,
+    Building2,
+    Sparkles,
+    Mic,
+    Star,
+    ShieldCheck,
+    Search,
+    ChevronRight,
+    User,
     Heart,
     Flame,
     Activity,
@@ -111,7 +111,10 @@ export const PatientDashboard = () => {
             {userRegionGeohash && <OutbreakBanner userRegionGeohash={userRegionGeohash} />}
 
             {/* Patient Header Bar */}
-            <div className="bg-white/85 backdrop-blur-md border border-[#f3dce5] rounded-3xl p-6 md:p-8 flex flex-col md:flex-row md:justify-between md:items-center gap-6 shadow-xs">
+            <div
+                className="backdrop-blur-md rounded-3xl p-6 md:p-8 flex flex-col md:flex-row md:justify-between md:items-center gap-6 shadow-xs"
+                style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}
+            >
                 <div className="flex items-center gap-4">
                     <MinimalistAvatar
                         name={profile.fullName || user.phone}
@@ -121,18 +124,18 @@ export const PatientDashboard = () => {
                         status="online"
                     />
                     <div>
-                        <h2 className="text-2xl md:text-3xl font-black text-[#1c1218] font-heading tracking-tight flex items-center gap-2">
+                        <h2 className="text-2xl md:text-3xl font-black font-heading tracking-tight flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
                             <span>{profile.fullName || 'Welcome, Patient'}</span>
                         </h2>
-                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-medium text-[#7d6974] mt-1">
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-medium mt-1" style={{ color: 'var(--text-secondary)' }}>
                             <span className="flex items-center gap-1">
-                                <ShieldCheck className="w-3.5 h-3.5 text-[#e13b68]" />
-                                ABDM Health ID: <strong className="text-[#2d2329] font-bold">{profile.abhaNumber || 'Pending Verification'}</strong>
+                                <ShieldCheck className="w-3.5 h-3.5" style={{ color: 'var(--accent)' }} />
+                                ABDM Health ID: <strong className="font-bold" style={{ color: 'var(--text-primary)' }}>{profile.abhaNumber || 'Pending Verification'}</strong>
                             </span>
                             {user.phone && (
                                 <>
-                                    <span className="text-[#d8c2cc]">•</span>
-                                    <span>Phone: <strong className="text-[#2d2329] font-bold">{user.phone}</strong></span>
+                                    <span style={{ color: 'var(--border)' }}>•</span>
+                                    <span>Phone: <strong className="font-bold" style={{ color: 'var(--text-primary)' }}>{user.phone}</strong></span>
                                 </>
                             )}
                         </div>
@@ -143,7 +146,8 @@ export const PatientDashboard = () => {
                     <button
                         type="button"
                         onClick={() => setWaModalOpen(true)}
-                        className="flex items-center gap-2 px-5 py-2.5 rounded-full font-bold text-xs md:text-sm cursor-pointer transition-all bg-[#25D366] hover:bg-[#20bd5a] text-white shadow-xs hover:shadow hover:scale-[1.02]"
+                        className="flex items-center gap-2 px-5 py-2.5 rounded-full font-bold text-xs md:text-sm cursor-pointer transition-all shadow-xs hover:shadow hover:scale-[1.02]"
+                        style={{ background: '#25D366', color: '#ffffff' }}
                     >
                         <MessageSquare className="w-4 h-4 fill-white text-[#25D366]" />
                         <span>WhatsApp Health Desk</span>
@@ -151,9 +155,14 @@ export const PatientDashboard = () => {
                     <button
                         type="button"
                         onClick={() => navigate('/patient/profile')}
-                        className="px-5 py-2.5 rounded-full bg-white hover:bg-[#fff0f5] border border-[#f0d0dc] hover:border-[#e13b68]/40 text-xs md:text-sm font-bold text-[#2d2329] hover:text-[#e13b68] transition-all shadow-xs hover:shadow flex items-center gap-2 cursor-pointer hover:scale-[1.02]"
+                        className="px-5 py-2.5 rounded-full text-xs md:text-sm font-bold transition-all shadow-xs hover:shadow flex items-center gap-2 cursor-pointer hover:scale-[1.02]"
+                        style={{
+                            background: 'var(--bg-surface)',
+                            border: '1px solid var(--border)',
+                            color: 'var(--text-primary)'
+                        }}
                     >
-                        <User className="w-4 h-4 text-[#e13b68]" />
+                        <User className="w-4 h-4" style={{ color: 'var(--accent)' }} />
                         <span>My Profile</span>
                     </button>
                 </div>
@@ -162,17 +171,23 @@ export const PatientDashboard = () => {
             <WhatsAppModal isOpen={waModalOpen} onClose={() => setWaModalOpen(false)} />
 
             {/* AI Clinical Triage & Symptom Checker Card */}
-            <div className="relative overflow-hidden bg-gradient-to-br from-white via-[#fff5f8] to-[#ffedf3] border border-[#f5c6d6] rounded-3xl p-6 md:p-8 shadow-xs hover:shadow-md transition-shadow flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div
+                className="relative overflow-hidden rounded-3xl p-6 md:p-8 shadow-xs hover:shadow-md transition-shadow flex flex-col md:flex-row md:items-center justify-between gap-6"
+                style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}
+            >
                 <div className="flex flex-col gap-2.5 max-w-2xl">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#ffe6ee] border border-[#f8c8d8] text-[#e13b68] text-[11px] font-bold tracking-wide w-fit">
-                        <Sparkles className="w-3.5 h-3.5 text-[#e13b68]" />
+                    <div
+                        className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-bold tracking-wide w-fit"
+                        style={{ background: 'var(--pastel-pink-bg)', color: 'var(--pastel-pink-text)', border: '1px solid var(--border)' }}
+                    >
+                        <Sparkles className="w-3.5 h-3.5" style={{ color: 'var(--accent)' }} />
                         <span>AI Clinical Intelligence</span>
                     </div>
 
-                    <h3 className="text-2xl sm:text-3xl font-black text-[#1c1218] font-heading tracking-tight leading-tight">
+                    <h3 className="text-2xl sm:text-3xl font-black font-heading tracking-tight leading-tight" style={{ color: 'var(--text-primary)' }}>
                         AI Clinical Triage & Symptom Assessment
                     </h3>
-                    <p className="text-xs sm:text-sm font-medium text-[#5c4a55] leading-relaxed">
+                    <p className="text-xs sm:text-sm font-medium leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
                         Describe your symptoms using voice or text. Our clinical AI model analyzes severity, checks for emergency flags, and routes your case directly to verified healthcare specialists.
                     </p>
                 </div>
@@ -180,7 +195,8 @@ export const PatientDashboard = () => {
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-shrink-0">
                     <button
                         onClick={() => navigate('/patient/ai-triage')}
-                        className="px-7 py-3.5 bg-gradient-to-r from-[#e13b68] to-[#d81b60] hover:from-[#d81b60] hover:to-[#c2185b] text-white rounded-full font-bold text-xs sm:text-sm transition-all duration-200 shadow-md hover:shadow-lg hover:scale-[1.02] flex items-center justify-center gap-2.5 group cursor-pointer"
+                        className="px-7 py-3.5 text-white rounded-full font-bold text-xs sm:text-sm transition-all duration-200 shadow-md hover:shadow-lg hover:scale-[1.02] flex items-center justify-center gap-2.5 group cursor-pointer"
+                        style={{ background: 'var(--accent)' }}
                     >
                         <Bot className="w-4 h-4 group-hover:scale-110 transition-transform" />
                         <span>Start AI Clinical Triage</span>
@@ -218,17 +234,17 @@ export const PatientDashboard = () => {
             <TodaysMedicationsWidget />
 
             {/* 🔍 Find Doctors & Patient Reviews Spotlight */}
-            <div className="bg-white border border-[#f5e4ec] rounded-3xl p-6 md:p-8 shadow-xs flex flex-col gap-6">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#fdf0f4] pb-4">
+            <div className="rounded-3xl p-6 md:p-8 shadow-xs flex flex-col gap-6" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
                     <div className="flex items-center gap-2.5">
-                        <div className="w-9 h-9 rounded-2xl bg-[#fdf0f4] border border-[#f8c8d8] flex items-center justify-center text-[#e13b68]">
+                        <div className="w-9 h-9 rounded-2xl flex items-center justify-center" style={{ background: 'var(--bg-surface)', border: '1px solid var(--notif-unread-border)', color: 'var(--accent)' }}>
                             <Stethoscope className="w-5 h-5" />
                         </div>
                         <div>
-                            <h3 className="text-lg font-black text-[#2d2329] font-heading">
+                            <h3 className="text-lg font-black font-heading" style={{ color: 'var(--text-primary)' }}>
                                 Search Doctors & Verified Patient Feedback
                             </h3>
-                            <p className="text-xs font-semibold text-[#7d6974]">
+                            <p className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>
                                 Read verified ratings and practitioner reviews before booking your clinical consultation.
                             </p>
                         </div>
@@ -236,17 +252,18 @@ export const PatientDashboard = () => {
 
                     <Link
                         to="/patient/doctors"
-                        className="text-xs font-black text-[#e13b68] hover:underline flex items-center gap-1"
+                        className="text-xs font-black flex items-center gap-1"
+                        style={{ color: 'var(--accent)' }}
                     >
                         <span>Search All Doctors & Reviews</span>
                         <ChevronRight className="w-3.5 h-3.5" />
                     </Link>
                 </div>
 
-                {doctorsLoading && <p className="text-xs font-semibold text-[#7d6974]">Finding nearby doctors...</p>}
-                {doctorsError && <p className="text-xs font-semibold text-rose-600">{doctorsError}</p>}
+                {doctorsLoading && <p className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>Finding nearby doctors...</p>}
+                {doctorsError && <p className="text-xs font-semibold" style={{ color: 'var(--accent)' }}>{doctorsError}</p>}
                 {!doctorsLoading && !doctorsError && coords && doctors.length === 0 && (
-                    <p className="text-xs font-semibold text-[#7d6974]">No verified doctors found nearby.</p>
+                    <p className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>No verified doctors found nearby.</p>
                 )}
 
                 {doctors.length > 0 && (
@@ -259,27 +276,27 @@ export const PatientDashboard = () => {
             </div>
 
             {/* 🏥 Nearby Verified Clinics */}
-            <div className="bg-white border border-[#f5e4ec] rounded-3xl p-6 md:p-8 flex flex-col gap-4 shadow-xs">
-                <div className="flex items-center justify-between border-b border-[#fdf0f4] pb-3">
-                    <h3 className="text-lg font-black text-[#2d2329] font-heading flex items-center gap-2">
-                        <Building2 className="w-5 h-5 text-[#e13b68]" />
+            <div className="rounded-3xl p-6 md:p-8 flex flex-col gap-4 shadow-xs" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+                <div className="flex items-center justify-between pb-3" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+                    <h3 className="text-lg font-black font-heading flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
+                        <Building2 className="w-5 h-5" style={{ color: 'var(--accent)' }} />
                         <span>Nearby Partner Clinics</span>
                     </h3>
-                    <Link to="/patient/medicine-availability" className="text-xs font-bold text-[#e13b68] hover:underline">
+                    <Link to="/patient/medicine-availability" className="text-xs font-bold" style={{ color: 'var(--accent)' }}>
                         Check Clinic Medicines →
                     </Link>
                 </div>
 
-                {geoLoading && <p className="text-xs font-semibold text-[#7d6974]">Getting your location...</p>}
+                {geoLoading && <p className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>Getting your location...</p>}
                 {permissionDenied && (
-                    <p className="text-xs font-semibold text-[#7d6974]">
+                    <p className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>
                         Location access denied. Enable location permission to view clinics near you.
                     </p>
                 )}
-                {clinicsLoading && <p className="text-xs font-semibold text-[#7d6974]">Finding clinics near you...</p>}
-                {clinicsError && <p className="text-xs font-semibold text-rose-600">{clinicsError}</p>}
+                {clinicsLoading && <p className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>Finding clinics near you...</p>}
+                {clinicsError && <p className="text-xs font-semibold" style={{ color: 'var(--accent)' }}>{clinicsError}</p>}
                 {!clinicsLoading && !clinicsError && coords && clinics.length === 0 && (
-                    <p className="text-xs font-semibold text-[#7d6974]">No verified clinics found nearby.</p>
+                    <p className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>No verified clinics found nearby.</p>
                 )}
 
                 {clinics.length > 0 && (
@@ -287,14 +304,15 @@ export const PatientDashboard = () => {
                         {clinics.map((clinic) => (
                             <div
                                 key={clinic.userId}
-                                className="border border-[#f5e4ec] bg-[#fdf5f7] rounded-2xl p-4 flex flex-col gap-2"
+                                className="rounded-2xl p-4 flex flex-col gap-2"
+                                style={{ border: '1px solid var(--border)', background: 'var(--bg-surface)' }}
                             >
                                 <div className="flex justify-between items-start gap-2">
-                                    <h4 className="font-black text-xs md:text-sm text-[#2d2329]">{clinic.clinicName}</h4>
+                                    <h4 className="font-black text-xs md:text-sm" style={{ color: 'var(--text-primary)' }}>{clinic.clinicName}</h4>
                                     <Badge variant="pink">{Number(clinic.distanceKm).toFixed(1)} km</Badge>
                                 </div>
-                                <p className="text-xs text-[#7d6974] font-medium">{clinic.address}</p>
-                                <p className="text-xs font-bold text-[#4a3c45]">
+                                <p className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>{clinic.address}</p>
+                                <p className="text-xs font-bold" style={{ color: 'var(--text-primary)' }}>
                                     {Number(clinic.doctorCount || 0)} doctor{Number(clinic.doctorCount || 0) !== 1 ? 's' : ''} available
                                 </p>
                             </div>

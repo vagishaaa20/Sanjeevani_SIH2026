@@ -20,13 +20,13 @@
   /* Pastel Chip Colors */
   --pastel-pink-bg: #ffe6ee;
   --pastel-pink-text: #e13b68;
-  
+
   --pastel-mint-bg: #e6f9f0;
   --pastel-mint-text: #10b981;
-  
+
   --pastel-peach-bg: #fff0e6;
   --pastel-peach-text: #e07a38;
-  
+
   --pastel-lavender-bg: #f3e8ff;
   --pastel-lavender-text: #7c3aed;
 
@@ -45,12 +45,93 @@
 
   --sans: "Inter", system-ui, sans-serif;
   --heading: "DM Sans", system-ui, sans-serif;
+
+  /* ── Theme Semantic Tokens (Light) ── */
+  --bg-primary: #fdf5f7;
+  --bg-secondary: #ffffff;
+  --bg-surface: #fdf0f4;
+  --bg-hover: #ffe6ee;
+  --text-primary: #2d2329;
+  --text-secondary: #7d6974;
+  --text-muted: #9c8491;
+  --accent: #e13b68;
+  --accent-hover: #c92a55;
+  --accent-light: #ffe6ee;
+  --border: #f5e4ec;
+  --border-subtle: #fdf0f4;
+  --card-bg: #ffffff;
+  --input-bg: #fdf5f7;
+  --notif-unread-bg: #fff5f8;
+  --notif-unread-border: #f8c8d8;
+  --sidebar-bg: #fdf0f4;
+  --sidebar-border: #f3dce5;
+  --navbar-bg: rgba(255, 255, 255, 0.8);
+}
+
+/* ─────────────────────────────────────────
+   DARK MODE — [data-theme="dark"] on <html>
+──────────────────────────────────────────*/
+[data-theme="dark"] {
+  --bg-primary: #090406;
+  --bg-secondary: #12090d;
+  --bg-surface: #1b0e14;
+  --bg-hover: #26151c;
+
+  --text-primary: #fdf5f7;
+  --text-secondary: #e5c3cf;
+  --text-muted: #967a86;
+
+  --accent: #f43f5e;
+  --accent-hover: #e11d48;
+  --accent-light: rgba(244, 63, 94, 0.12);
+
+  --border: rgba(244, 63, 94, 0.15);
+  --border-subtle: rgba(244, 63, 94, 0.08);
+
+  --card-bg: #12090d;
+  --input-bg: #1b0e14;
+  --notif-unread-bg: rgba(244, 63, 94, 0.08);
+  --notif-unread-border: rgba(244, 63, 94, 0.3);
+
+  --sidebar-bg: #12090d;
+  --sidebar-border: rgba(244, 63, 94, 0.15);
+  --navbar-bg: rgba(9, 4, 6, 0.85);
+
+  /* Re-map legacy tokens for dark mode */
+  --rose-primary: #f43f5e;
+  --rose-primary-hover: #e11d48;
+  --rose-light: rgba(244, 63, 94, 0.05);
+  --rose-soft-bg: rgba(244, 63, 94, 0.1);
+  --rose-active-pill: rgba(244, 63, 94, 0.2);
+  --rose-card-border: rgba(244, 63, 94, 0.15);
+
+  --cream-bg: #090406;
+  --cream-card: #12090d;
+  --cream-surface: #1b0e14;
+
+  --ink-black: #fdf5f7;
+  --ink-charcoal: #e5c3cf;
+  --ink-muted: #967a86;
+
+  /* Dark pastel chips - keep these sleek */
+  --pastel-pink-bg: rgba(244, 63, 94, 0.15);
+  --pastel-pink-text: #fda4af;
+  --pastel-mint-bg: rgba(16, 185, 129, 0.15);
+  --pastel-mint-text: #6ee7b7;
+  --pastel-peach-bg: rgba(249, 115, 22, 0.15);
+  --pastel-peach-text: #fdba74;
+  --pastel-lavender-bg: rgba(139, 92, 246, 0.15);
+  --pastel-lavender-text: #d8b4fe;
+  --pastel-sky-bg: rgba(59, 130, 246, 0.15);
+  --pastel-sky-text: #93c5fd;
 }
 
 /* ─────────────────────────────────────────
    Reset & Body
 ──────────────────────────────────────────*/
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
@@ -59,8 +140,8 @@ body {
   font-family: var(--sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: var(--cream-bg);
-  color: var(--ink-black);
+  background: var(--bg-primary);
+  color: var(--text-primary);
 }
 
 #root {
@@ -76,13 +157,18 @@ body {
 /* ─────────────────────────────────────────
    Typography
 ──────────────────────────────────────────*/
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--heading);
   margin: 0;
   font-weight: 700;
   line-height: 1.15;
   letter-spacing: -0.02em;
-  color: var(--ink-black);
+  color: var(--text-primary);
 }
 
 p {
@@ -98,6 +184,7 @@ p {
     opacity: 0;
     transform: translateY(16px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -105,8 +192,29 @@ p {
 }
 
 @keyframes pulseSoft {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.03); opacity: 0.9; }
+
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.03);
+    opacity: 0.9;
+  }
+}
+
+@keyframes darkGlow {
+
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+
+  50% {
+    opacity: 1;
+  }
 }
 
 /* ─────────────────────────────────────────
@@ -117,19 +225,27 @@ p {
 }
 
 .inspo-card {
-  background: #ffffff;
-  border: 1px solid var(--rose-card-border);
+  background: var(--card-bg);
+  border: 1px solid var(--border);
   border-radius: 20px;
   box-shadow: 0 4px 16px -2px rgba(225, 59, 104, 0.05);
   transition: all 0.2s ease;
+}
+
+[data-theme="dark"] .inspo-card {
+  box-shadow: 0 4px 24px -4px rgba(255, 26, 117, 0.12);
 }
 
 .inspo-card:hover {
   box-shadow: 0 8px 24px -4px rgba(225, 59, 104, 0.1);
 }
 
+[data-theme="dark"] .inspo-card:hover {
+  box-shadow: 0 8px 32px -4px rgba(255, 26, 117, 0.22);
+}
+
 .inspo-btn-primary {
-  background: var(--rose-primary);
+  background: var(--accent);
   color: #ffffff;
   border: none;
   border-radius: 9999px;
@@ -138,24 +254,29 @@ p {
   box-shadow: 0 4px 12px rgba(225, 59, 104, 0.25);
 }
 
+[data-theme="dark"] .inspo-btn-primary {
+  box-shadow: 0 4px 20px rgba(255, 26, 117, 0.4),
+    0 0 0 1px rgba(255, 26, 117, 0.2);
+}
+
 .inspo-btn-primary:hover {
-  background: var(--rose-primary-hover);
+  background: var(--accent-hover);
   transform: translateY(-1px);
   box-shadow: 0 6px 16px rgba(225, 59, 104, 0.35);
 }
 
 .inspo-btn-secondary {
-  background: #ffffff;
-  color: var(--ink-black);
-  border: 1px solid var(--rose-card-border);
+  background: var(--card-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
   border-radius: 9999px;
   font-weight: 700;
   transition: all 0.2s ease;
 }
 
 .inspo-btn-secondary:hover {
-  background: var(--rose-light);
-  color: var(--rose-primary);
+  background: var(--bg-hover);
+  color: var(--accent);
 }
 
 .section-padding {
@@ -166,4 +287,33 @@ p {
   .section-padding {
     padding: 32px 16px;
   }
+}
+
+/* ─────────────────────────────────────────
+   Dark Mode Hero Glow (Landing)
+──────────────────────────────────────────*/
+.hero-dark-glow {
+  display: none;
+}
+
+[data-theme="dark"] .hero-dark-glow {
+  display: block;
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 70% 60% at 50% 30%,
+      rgba(244, 63, 94, 0.12) 0%,
+      rgba(9, 4, 6, 0) 70%);
+  pointer-events: none;
+  animation: darkGlow 4s ease-in-out infinite;
+}
+
+/* ─────────────────────────────────────────
+   Global smooth theme transition
+──────────────────────────────────────────*/
+*,
+*::before,
+*::after {
+  transition-property: background-color, border-color, color, box-shadow;
+  transition-duration: 0.2s;
+  transition-timing-function: ease;
 }

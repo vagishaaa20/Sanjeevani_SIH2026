@@ -36,47 +36,51 @@ export const UnderstandSection = ({ onEnterPlatform }) => {
         <section className="relative w-full py-16 md:py-24 px-6 md:px-12 max-w-6xl mx-auto z-20">
             {/* Header with minimal, confident copy */}
             <div className="flex flex-col items-start gap-3 mb-10 max-w-xl">
-                <div className="flex items-center gap-2 text-[11px] font-black tracking-[0.2em] text-[#e13b68] uppercase font-mono">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#e13b68]" />
+                <div className="flex items-center gap-2 text-[11px] font-black tracking-[0.2em] uppercase font-mono" style={{ color: 'var(--accent)' }}>
+                    <span className="w-1.5 h-1.5 rounded-full" style={{ background: 'var(--accent)' }} />
                     02 — Intelligent Intake
                 </div>
-                <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#1c1218] tracking-tight leading-[1.12]">
+                <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight leading-[1.12]" style={{ color: 'var(--text-primary)' }}>
                     Clinical triage, <br />
-                    <span className="font-serif italic font-normal text-[#c4325c]">
+                    <span className="font-serif italic font-normal" style={{ color: 'var(--accent-hover)' }}>
                         structured in seconds.
                     </span>
                 </h2>
-                <p className="text-sm md:text-base text-[#7d6974] font-medium leading-relaxed">
+                <p className="text-sm md:text-base font-medium leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
                     Select a concern below to see how Sanjeevani translates symptoms into structured clinical context.
                 </p>
             </div>
 
             {/* Interactive Symptom Chips */}
             <div className="flex flex-wrap gap-2.5 mb-8">
-                {TRIAGE_CHIPS.map((chip, idx) => (
-                    <button
-                        key={chip.id}
-                        onClick={() => setActiveIdx(idx)}
-                        className={`px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer ${
-                            activeIdx === idx
-                                ? 'bg-[#1c1218] text-white shadow-xs'
-                                : 'bg-white/80 hover:bg-white text-[#5c4b54] border border-[#f2dde5]'
-                        }`}
-                    >
-                        {chip.label}
-                    </button>
-                ))}
+                {TRIAGE_CHIPS.map((chip, idx) => {
+                    const isActive = activeIdx === idx;
+                    return (
+                        <button
+                            key={chip.id}
+                            onClick={() => setActiveIdx(idx)}
+                            className="px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer"
+                            style={{
+                                background: isActive ? 'var(--text-primary)' : 'var(--bg-surface)',
+                                color: isActive ? 'var(--bg-primary)' : 'var(--text-secondary)',
+                                border: isActive ? '1px solid transparent' : '1px solid var(--border)'
+                            }}
+                        >
+                            {chip.label}
+                        </button>
+                    )
+                })}
             </div>
 
             {/* Interactive Preview Canvas */}
-            <div className="w-full bg-white/90 backdrop-blur-xl border border-[#f5e4ec] rounded-3xl p-6 md:p-8 shadow-xs">
+            <div className="w-full backdrop-blur-xl rounded-3xl p-6 md:p-8 shadow-xs" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
                     {/* Patient Input Box */}
                     <div className="md:col-span-6 flex flex-col gap-3">
-                        <span className="text-[11px] font-mono font-bold text-[#8f7d87] uppercase tracking-wider">
+                        <span className="text-[11px] font-mono font-bold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
                             Patient Description
                         </span>
-                        <div className="bg-[#fff9fb] border border-[#f5e4ec] rounded-2xl p-4 text-sm font-medium text-[#1c1218] leading-relaxed">
+                        <div className="rounded-2xl p-4 text-sm font-medium leading-relaxed" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', color: 'var(--text-primary)' }}>
                             "{active.patientQuery}"
                         </div>
                     </div>
@@ -84,22 +88,22 @@ export const UnderstandSection = ({ onEnterPlatform }) => {
                     {/* Structured Clinical Output */}
                     <div className="md:col-span-6 flex flex-col gap-3">
                         <div className="flex items-center justify-between">
-                            <span className="text-[11px] font-mono font-bold text-[#8f7d87] uppercase tracking-wider">
+                            <span className="text-[11px] font-mono font-bold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
                                 Structured Output
                             </span>
-                            <span className="text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                            <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full border" style={{ color: 'var(--pastel-mint-text)', background: 'var(--pastel-mint-bg)', borderColor: 'var(--pastel-mint-text)' }}>
                                 {active.level}
                             </span>
                         </div>
 
-                        <div className="bg-[#fffcfd] border border-[#f2dde5] rounded-2xl p-4 flex flex-col gap-3">
-                            <div className="text-xs sm:text-sm font-bold text-[#1c1218]">
+                        <div className="rounded-2xl p-4 flex flex-col gap-3" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)' }}>
+                            <div className="text-xs sm:text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
                                 {active.triageSummary}
                             </div>
-                            <div className="flex flex-col gap-1.5 pt-2 border-t border-[#faeef2]">
+                            <div className="flex flex-col gap-1.5 pt-2 border-t" style={{ borderColor: 'var(--border-subtle)' }}>
                                 {active.markers.map((m, i) => (
-                                    <div key={i} className="flex items-center gap-2 text-xs text-[#5c4b54] font-medium">
-                                        <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                                    <div key={i} className="flex items-center gap-2 text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
+                                        <Check className="w-3.5 h-3.5 shrink-0" style={{ color: 'var(--pastel-mint-text)' }} />
                                         <span>{m}</span>
                                     </div>
                                 ))}
@@ -108,11 +112,12 @@ export const UnderstandSection = ({ onEnterPlatform }) => {
                     </div>
                 </div>
 
-                <div className="mt-6 pt-5 border-t border-[#faeef2] flex items-center justify-between">
-                    <span className="text-xs text-[#8f7d87]">Available across English, हिन्दी & বাংলা</span>
+                <div className="mt-6 pt-5 border-t flex items-center justify-between" style={{ borderColor: 'var(--border-subtle)' }}>
+                    <span className="text-xs" style={{ color: 'var(--text-muted)' }}>Available across English, हिन्दी &amp; বাংলা</span>
                     <button
                         onClick={onEnterPlatform}
-                        className="text-xs font-bold text-[#e13b68] hover:text-[#c4325c] flex items-center gap-1.5 transition cursor-pointer"
+                        className="text-xs font-bold hover:opacity-80 flex items-center gap-1.5 transition cursor-pointer"
+                        style={{ color: 'var(--accent)' }}
                     >
                         <span>Experience Full Triage</span>
                         <ArrowRight className="w-3.5 h-3.5" />

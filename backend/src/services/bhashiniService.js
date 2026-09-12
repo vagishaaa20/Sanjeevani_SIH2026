@@ -137,7 +137,7 @@ class BhashiniService {
             }
         } catch (error) {
             console.warn(`[Bhashini] Translation failed for [${sourceLang}->${targetLang}]:`, error.message);
-            return text; // Graceful fallback
+            throw new Error(`Bhashini API error: ${error.message}`);
         }
     }
 }
