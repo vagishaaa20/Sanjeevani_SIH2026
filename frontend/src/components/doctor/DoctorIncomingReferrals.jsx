@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Check, XCircle, Stethoscope, FileText, RefreshCw, AlertCircle, Clock, User, ArrowUpRight } from 'lucide-react';
-import doctorService from '../../services/doctorService';
+import doctorService from "../../services/doctorService";
 import Badge from '../common/Badge';
 
 const DoctorIncomingReferrals = () => {

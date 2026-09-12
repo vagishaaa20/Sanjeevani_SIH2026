@@ -25,6 +25,7 @@ const HealthWorkerAssignment = require('./healthWorkerAssignmentModel');
 const HealthWorkerFollowup = require('./healthWorkerFollowupModel');
 const HealthWorkerReferral = require('./healthWorkerReferralModel');
 const VerificationDocument = require('./verificationDocumentModel');
+const DiagnosticRequest = require('./diagnosticRequestModel');
 
 // ── User → profile associations (1:1, cascade delete) ────────────────────────
 User.hasOne(PatientProfile, { foreignKey: 'userId', as: 'patientProfile', onDelete: 'CASCADE' });
@@ -112,6 +113,11 @@ HealthWorkerReferral.belongsTo(User, { foreignKey: 'fromClinicId', as: 'fromClin
 HealthWorkerReferral.belongsTo(User, { foreignKey: 'toClinicId', as: 'toClinic' });
 HealthWorkerReferral.belongsTo(User, { foreignKey: 'toDoctorId', as: 'toDoctor' });
 
+// ── Diagnostic Request associations ──────────────────────────────────────
+DiagnosticRequest.belongsTo(User, { foreignKey: 'patientId', as: 'patient' });
+DiagnosticRequest.belongsTo(User, { foreignKey: 'requesterId', as: 'requester' });
+DiagnosticRequest.belongsTo(User, { foreignKey: 'clinicId', as: 'clinic' });
+
 module.exports = {
   User,
   AdminProfile,
@@ -140,4 +146,5 @@ module.exports = {
   HealthWorkerFollowup,
   HealthWorkerReferral,
   VerificationDocument,
+  DiagnosticRequest,
 };
