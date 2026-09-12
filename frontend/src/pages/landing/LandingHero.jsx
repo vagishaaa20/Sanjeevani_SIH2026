@@ -9,6 +9,7 @@ import HealthRecordsSection from '../../components/landing/HealthRecordsSection'
 import ReturnDnaSection from '../../components/landing/ReturnDnaSection';
 import useAuth from '../../hooks/useAuth';
 import { useLanguage } from '../../hooks/LanguageContext';
+import SanjeevaniLogo from '../../components/common/SanjeevaniLogo';
 
 export const LandingHero = () => {
     const { user } = useAuth();
@@ -47,12 +48,15 @@ export const LandingHero = () => {
                     {/* Brand Mark */}
                     <Link
                         to="/"
-                        className="flex items-center gap-2.5 text-lg font-black tracking-tight text-[#1c1218] group"
+                        className="flex items-center gap-3.5 text-lg font-black tracking-tight text-[#1c1218] group"
                     >
-                        <div className="w-8 h-8 rounded-full bg-[#ffe8ee] border border-[#f8c8d8] flex items-center justify-center text-[#e13b68] shadow-xs group-hover:scale-105 transition-transform">
-                            <Heart className="w-4 h-4 fill-[#e13b68]" />
+                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#ffe6ee] to-white border-2 border-[#f5c6d6] flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform p-1">
+                            <SanjeevaniLogo variant="emblem" size={42} />
                         </div>
-                        <span className="font-heading tracking-tight font-black text-xl">Sanjeevani</span>
+                        <div className="flex flex-col text-left">
+                            <span className="font-heading tracking-tight font-black text-2xl leading-none text-[#1c1218]">SANJEEVANI</span>
+                            <span className="text-[10px] font-extrabold text-[#e13b68] tracking-widest uppercase mt-1">Intelligent Clinical Platform</span>
+                        </div>
                     </Link>
 
                     {/* Right Actions */}

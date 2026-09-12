@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import BiomolecularOrb3D from './BiomolecularOrb3D';
 import MagneticButton from './MagneticButton';
 import useAuth from '../../hooks/useAuth';
+import SanjeevaniLogo from '../common/SanjeevaniLogo';
 
 export const ReturnDnaSection = ({ onEnterPlatform }) => {
     const { user } = useAuth();
@@ -49,11 +50,11 @@ export const ReturnDnaSection = ({ onEnterPlatform }) => {
 
             {/* Minimal Brand Footer */}
             <div className="mt-20 pt-8 border-t border-[#f5e4ec] w-full flex flex-col sm:flex-row items-center justify-between text-xs text-[#7d6974] gap-4 font-semibold">
-                <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-full bg-[#ffe8ee] border border-[#f8c8d8] flex items-center justify-center text-[#e13b68]">
-                        <Heart className="w-3.5 h-3.5 fill-[#e13b68]" />
+                <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-xl bg-white border border-[#f5c6d6] flex items-center justify-center p-0.5 shadow-2xs">
+                        <SanjeevaniLogo variant="emblem" size={24} />
                     </div>
-                    <span className="font-heading font-black text-sm text-[#1c1218]">Sanjeevani</span>
+                    <span className="font-heading font-black text-sm text-[#1c1218]">SANJEEVANI</span>
                 </div>
 
                 <p>© 2026 Sanjeevani Health Network.</p>

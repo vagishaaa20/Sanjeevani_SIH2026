@@ -5,6 +5,7 @@ import api from '../../services/api';
 import Input from '../../components/common/Input';
 import Button from '../../components/common/Button';
 import Badge from '../../components/common/Badge';
+import MinimalistAvatar from '../../components/common/MinimalistAvatar';
 
 export const PatientProfile = () => {
     const { user, refreshProfile } = useAuth();
@@ -93,21 +94,20 @@ export const PatientProfile = () => {
             {/* Header Title Card */}
             <div className="bg-white border border-[#f5e4ec] rounded-3xl p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-xs">
                 <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 rounded-3xl bg-[#ffe6ee] border-2 border-[#f8c8d8] flex items-center justify-center text-2xl font-black text-[#e13b68] shadow-xs">
-                        {(formData.fullName || 'P').charAt(0).toUpperCase()}
-                    </div>
+                    <MinimalistAvatar
+                        name={formData.fullName || user?.phone}
+                        role="patient"
+                        size={64}
+                        showStatus={true}
+                        status="online"
+                    />
                     <div>
-                        <div className="flex items-center gap-2">
-                            <h1 className="text-2xl md:text-3xl font-black text-[#2d2329] font-heading">
-                                {formData.fullName || 'Patient Profile'}
-                            </h1>
-                            <Badge variant="pink" dot pulse>
-                                {profile.accountStatus || 'ACTIVE'}
-                            </Badge>
-                        </div>
-                        <p className="text-xs font-semibold text-[#7d6974] mt-1 flex items-center gap-3">
-                            <span>Phone: {user?.phone || 'Not set'}</span>
-                            {user?.email && <span>• Email: {user.email}</span>}
+                        <h1 className="text-2xl md:text-3xl font-black text-[#1c1218] font-heading tracking-tight">
+                            {formData.fullName || 'Patient Profile'}
+                        </h1>
+                        <p className="text-xs font-medium text-[#7d6974] mt-1 flex items-center gap-3">
+                            <span>Phone: <strong className="text-[#2d2329] font-bold">{user?.phone || 'Not set'}</strong></span>
+                            {user?.email && <span>• Email: <strong className="text-[#2d2329] font-bold">{user.email}</strong></span>}
                         </p>
                     </div>
                 </div>

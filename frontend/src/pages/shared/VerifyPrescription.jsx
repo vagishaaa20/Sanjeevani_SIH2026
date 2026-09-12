@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import axios from 'axios';
+import SanjeevaniLogo from '../../components/common/SanjeevaniLogo';
 
 const API_BASE = import.meta.env.VITE_API_URL || '';
 
@@ -53,9 +55,23 @@ export default function VerifyPrescription() {
             padding: '24px',
         }}>
             {/* Header */}
-            <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-                <div style={{ fontSize: '28px', fontWeight: '900', color: '#0d9488' }}>Sanjeevani</div>
-                <div style={{ fontSize: '13px', color: '#6b7280', marginTop: '4px' }}>
+            <div style={{ textAlign: 'center', marginBottom: '32px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <div style={{
+                    width: '56px',
+                    height: '56px',
+                    borderRadius: '16px',
+                    background: 'linear-gradient(135deg, #ffe6ee 0%, #ffffff 100%)',
+                    border: '2px solid #f5c6d6',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginBottom: '12px',
+                    boxShadow: '0 4px 12px rgba(216, 27, 96, 0.12)'
+                }}>
+                    <SanjeevaniLogo variant="emblem" size={42} />
+                </div>
+                <div style={{ fontSize: '26px', fontWeight: '900', color: '#1c1218', letterSpacing: '-0.5px' }}>SANJEEVANI</div>
+                <div style={{ fontSize: '13px', color: '#e13b68', fontWeight: '700', marginTop: '2px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                     Blockchain Prescription Verification
                 </div>
             </div>

@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Search, Bell, Globe, LogOut, Menu, X, Heart, User, ShieldCheck, ChevronDown, Check, Clock, Calendar, Pill, CheckCheck } from 'lucide-react';
 import useAuth from '../../hooks/useAuth';
 import { useLanguage } from '../../hooks/LanguageContext';
+import SanjeevaniLogo from '../common/SanjeevaniLogo';
+import MinimalistAvatar from '../common/MinimalistAvatar';
 
 const INDIAN_LANGUAGES = [
     { code: 'en', label: 'English', native: 'English' },
@@ -112,11 +114,11 @@ export const Navbar = () => {
         <header className="bg-white/80 backdrop-blur-md border-b border-[#f5e4ec] py-3 px-4 md:px-8 flex justify-between items-center sticky top-0 z-40">
             {/* Left: Mobile Brand & Greeting */}
             <div className="flex items-center gap-3">
-                <Link to="/" className="text-xl font-black tracking-tight text-[#2d2329] flex items-center gap-2 font-heading md:hidden">
-                    <span className="w-8 h-8 rounded-full bg-[#e13b68] flex items-center justify-center text-white shadow-xs">
-                        <Heart className="w-4 h-4 fill-white" />
-                    </span>
-                    <span>Sanjeevani</span>
+                <Link to="/" className="flex items-center gap-2.5 font-heading md:hidden">
+                    <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#ffe6ee] to-white border border-[#f5c6d6] flex items-center justify-center shadow-2xs flex-shrink-0 p-1">
+                        <SanjeevaniLogo variant="emblem" size={32} />
+                    </div>
+                    <span className="text-xl font-black tracking-tight text-[#2d2329]">Sanjeevani</span>
                 </Link>
 
                 <div className="hidden md:flex flex-col text-left">
@@ -126,20 +128,6 @@ export const Navbar = () => {
                     <p className="text-xs font-semibold text-[#7d6974]">
                         Empathetic clinical care at your fingertips
                     </p>
-                </div>
-            </div>
-
-            {/* Center: Search Bar */}
-            <div className="hidden sm:flex items-center flex-1 max-w-md mx-6">
-                <div className="relative w-full">
-                    <Search className="w-4 h-4 text-[#7d6974] absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
-                    <input
-                        type="text"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="Search doctors, symptoms, medicines..."
-                        className="w-full pl-10 pr-4 py-2 text-xs font-semibold rounded-full bg-[#fdf5f7] border border-[#f5e4ec] text-[#2d2329] placeholder:text-[#7d6974]/60 focus:outline-none focus:ring-2 focus:ring-[#e13b68]/30 focus:bg-white transition"
-                    />
                 </div>
             </div>
 
@@ -287,20 +275,27 @@ export const Navbar = () => {
                         <button
                             type="button"
                             onClick={() => setProfileMenuOpen(!profileMenuOpen)}
-                            className="flex items-center gap-2 p-1 rounded-full hover:bg-[#fdf0f4] transition cursor-pointer"
+                            className="flex items-center gap-2 p-0.5 rounded-full hover:bg-[#fff0f5] transition-all cursor-pointer group"
                         >
-                            <div className="w-9 h-9 rounded-full bg-[#ffe6ee] border-2 border-[#f8c8d8] flex items-center justify-center text-xs font-black text-[#e13b68] uppercase shadow-xs">
-                                {(userName || 'P').charAt(0)}
-                            </div>
-                            <ChevronDown className="w-3.5 h-3.5 text-[#7d6974] hidden sm:block" />
+                            <MinimalistAvatar
+                                name={userName}
+                                role={user.role}
+                                size={36}
+                                showStatus={true}
+                                status="online"
+                            />
+                            <ChevronDown className="w-3.5 h-3.5 text-[#7d6974] group-hover:text-[#e13b68] hidden sm:block transition-colors" />
                         </button>
 
                         {profileMenuOpen && (
                             <div className="absolute right-0 mt-2 w-64 bg-white border border-[#f5e4ec] rounded-3xl shadow-xl p-4 z-50 animate-fade-in-up text-left flex flex-col gap-3">
                                 <div className="flex items-center gap-3 pb-3 border-b border-[#fdf0f4]">
-                                    <div className="w-11 h-11 rounded-2xl bg-[#ffe6ee] border border-[#f8c8d8] flex items-center justify-center text-base font-black text-[#e13b68]">
-                                        {(userName || 'P').charAt(0)}
-                                    </div>
+                                    <MinimalistAvatar
+                                        name={userName}
+                                        role={user.role}
+                                        size={44}
+                                        showStatus={false}
+                                    />
                                     <div className="flex flex-col overflow-hidden">
                                         <span className="text-xs font-black text-[#2d2329] truncate">{userName}</span>
                                         <span className="text-[10px] font-bold text-[#e13b68] uppercase tracking-wider">
