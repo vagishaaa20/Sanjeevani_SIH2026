@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Search, Bell, Globe, LogOut, Menu, X, Heart, User, ShieldCheck, ChevronDown, Check, Clock, Calendar, Pill, CheckCheck } from 'lucide-react';
 import useAuth from '../../hooks/useAuth';
 import { useLanguage } from '../../hooks/LanguageContext';
+import SanjeevaniLogo from '../common/SanjeevaniLogo';
 
 const INDIAN_LANGUAGES = [
     { code: 'en', label: 'English', native: 'English' },
@@ -112,11 +113,11 @@ export const Navbar = () => {
         <header className="bg-white/80 backdrop-blur-md border-b border-[#f5e4ec] py-3 px-4 md:px-8 flex justify-between items-center sticky top-0 z-40">
             {/* Left: Mobile Brand & Greeting */}
             <div className="flex items-center gap-3">
-                <Link to="/" className="text-xl font-black tracking-tight text-[#2d2329] flex items-center gap-2 font-heading md:hidden">
-                    <span className="w-8 h-8 rounded-full bg-[#e13b68] flex items-center justify-center text-white shadow-xs">
-                        <Heart className="w-4 h-4 fill-white" />
-                    </span>
-                    <span>Sanjeevani</span>
+                <Link to="/" className="flex items-center gap-2 font-heading md:hidden">
+                    <div className="w-8 h-8 rounded-xl bg-white border border-[#f5c6d6] flex items-center justify-center shadow-2xs flex-shrink-0 p-0.5">
+                        <SanjeevaniLogo variant="emblem" size={24} />
+                    </div>
+                    <span className="text-lg font-black tracking-tight text-[#2d2329]">Sanjeevani</span>
                 </Link>
 
                 <div className="hidden md:flex flex-col text-left">

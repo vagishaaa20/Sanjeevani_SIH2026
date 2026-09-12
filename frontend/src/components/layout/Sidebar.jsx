@@ -21,6 +21,7 @@ import {
     Flame,
 } from 'lucide-react';
 import useAuth from '../../hooks/useAuth';
+import SanjeevaniLogo from '../common/SanjeevaniLogo';
 
 export const Sidebar = () => {
     const { user } = useAuth();
@@ -76,17 +77,19 @@ export const Sidebar = () => {
             <div className="flex flex-col gap-6">
                 {/* Brand Logo in Sidebar (Desktop) */}
                 <div className="hidden md:flex flex-col items-start gap-1 pb-4 border-b border-[#f3dce5]">
-                    <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-full bg-[#ffe6ee] border border-[#f8c8d8] flex items-center justify-center text-[#e13b68] shadow-xs">
-                            <Heart className="w-4 h-4 fill-[#e13b68]" />
+                    <div className="flex items-center gap-2.5">
+                        <div className="w-9 h-9 rounded-2xl bg-white border border-[#f5c6d6] flex items-center justify-center shadow-2xs flex-shrink-0 p-1">
+                            <SanjeevaniLogo variant="emblem" size={28} />
                         </div>
-                        <span className="text-xl font-black text-[#2d2329] font-heading tracking-tight">
-                            Sanjeevani
-                        </span>
+                        <div className="flex flex-col text-left">
+                            <span className="text-lg font-black text-[#2d2329] font-heading tracking-tight leading-tight">
+                                Sanjeevani
+                            </span>
+                            <span className="text-[10px] font-bold text-[#e13b68] tracking-widest uppercase">
+                                Clinical Platform
+                            </span>
+                        </div>
                     </div>
-                    <span className="text-[11px] font-bold text-[#7d6974] pl-10 -mt-1">
-                        Health for All
-                    </span>
                 </div>
 
                 {/* Navigation Menu */}
