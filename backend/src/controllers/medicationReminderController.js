@@ -58,10 +58,21 @@ async function extractAndCreate(req, res) {
             return res.json({ reminders: [], reason: 'no_medications_found' });
         }
 
+        // Deduplication: prevent duplicate reminder rows for the same consultation & medicine
+        const existingReminders = await MedicationReminder.findAll({
+            where: { consultationId, patientId }
+        });
+        const existingNames = new Set(existingReminders.map(r => r.medicineName.toLowerCase().trim()));
+        const newMeds = extracted.filter(m => !existingNames.has(m.name.toLowerCase().trim()));
+
+        if (newMeds.length === 0) {
+            return res.json({ reminders: existingReminders, message: 'Reminders already up to date.' });
+        }
+
         // Default start=today, no end date; patient can edit before activation
         const today = todayDateStr();
         const created = await Promise.all(
-            extracted.map((med) =>
+            newMeds.map((med) =>
                 MedicationReminder.create({
                     patientId,
                     consultationId,
@@ -76,7 +87,7 @@ async function extractAndCreate(req, res) {
             )
         );
 
-        return res.status(201).json({ reminders: created });
+        return res.status(201).json({ reminders: [...existingReminders, ...created] });
     } catch (err) {
         console.error('[extractAndCreate] error:', err);
         return res.status(500).json({ error: 'Failed to extract medications' });

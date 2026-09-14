@@ -27,6 +27,9 @@ router.get('/active', authenticate, requireRole('doctor'), consultationControlle
 // Doctor officially completes consultation with documentation 
 router.post('/:id/complete', authenticate, requireRole('doctor'), consultationController.completeConsultation);
 
+// Reschedule consultation (accessible by doctor or patient)
+router.post('/:id/reschedule', authenticate, consultationController.rescheduleConsultation);
+
 // Patient downloads prescription PDF info (URL + blockchain status)
 router.get('/:id/prescription', ...auth, consultationController.getPrescriptionPdf);
 

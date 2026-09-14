@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../services/api';
 import {
     ArrowLeft,
     ArrowRight,
@@ -22,7 +22,6 @@ import {
     Clock,
     Flame
 } from 'lucide-react';
-import useAuth from '../../hooks/useAuth';
 import { useLanguage } from '../../hooks/LanguageContext';
 
 const DURATION_OPTIONS = [
@@ -72,7 +71,6 @@ const LOADING_PHASES = [
 
 export const AiTriage = () => {
     const navigate = useNavigate();
-    const { token } = useAuth();
     const { currentLang } = useLanguage();
 
     // Core triage state
@@ -92,12 +90,84 @@ export const AiTriage = () => {
     const mediaRecorderRef = useRef(null);
     const audioChunksRef = useRef([]);
     const timerIntervalRef = useRef(null);
+    const recognitionRef = useRef(null);
     const textareaRef = useRef(null);
+    const initialTextBeforeRecordingRef = useRef('');
+
+    const handleRecordingStop = async () => {
+        if (audioChunksRef.current.length === 0) return;
+
+        const mimeType = mediaRecorderRef.current?.mimeType || 'audio/webm';
+        const audioBlob = new Blob(audioChunksRef.current, { type: mimeType });
+        if (audioBlob.size < 100) return; // negligible audio
+
+        const formData = new FormData();
+        const ext = mimeType.includes('mp4') ? 'mp4' : 'webm';
+        formData.append('audio_file', audioBlob, `triage_voice.${ext}`);
+
+        setTranscribing(true);
+        setError('');
+
+        try {
+            const res = await api.post('/triage/voice', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            if (res.data?.transcript) {
+                const transcribed = res.data.transcript.trim();
+                const base = initialTextBeforeRecordingRef.current;
+                const combined = base ? `${base} ${transcribed}` : transcribed;
+                setSymptoms(combined);
+            }
+        } catch (err) {
+            console.error('Transcription error:', err);
+            setSymptoms((prev) => {
+                if (!prev || !prev.trim()) {
+                    setError('Voice transcription failed. Please enter your symptoms manually.');
+                }
+                return prev;
+            });
+        } finally {
+            setTranscribing(false);
+        }
+    };
+
+    const stopRecording = () => {
+        setIsRecording(false);
+        if (timerIntervalRef.current) {
+            clearInterval(timerIntervalRef.current);
+            timerIntervalRef.current = null;
+        }
+
+        if (recognitionRef.current) {
+            try {
+                recognitionRef.current.stop();
+            } catch (e) {}
+            recognitionRef.current = null;
+        }
+
+        if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+            try {
+                mediaRecorderRef.current.stop();
+            } catch (e) {}
+            // Stop all tracks on the stream to release hardware cleanly
+            mediaRecorderRef.current.stream?.getTracks().forEach((track) => track.stop());
+        }
+    };
 
     // Cleanup interval on unmount
     useEffect(() => {
         return () => {
             if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
+            if (recognitionRef.current) {
+                try { recognitionRef.current.stop(); } catch (e) {}
+            }
+            if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+                try { mediaRecorderRef.current.stop(); } catch (e) {}
+                mediaRecorderRef.current.stream?.getTracks().forEach((track) => track.stop());
+            }
         };
     }, []);
 
@@ -112,7 +182,6 @@ export const AiTriage = () => {
     useEffect(() => {
         let interval;
         if (loading) {
-            setLoadingPhaseIndex(0);
             interval = setInterval(() => {
                 setLoadingPhaseIndex((prev) => (prev < LOADING_PHASES.length - 1 ? prev + 1 : prev));
             }, 1200);
@@ -124,21 +193,81 @@ export const AiTriage = () => {
 
     const startRecording = async () => {
         setError('');
+        initialTextBeforeRecordingRef.current = symptoms ? symptoms.trim() : '';
+
+        // 1. Try Web Speech API for instant live speech recognition
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SpeechRecognition) {
+            try {
+                const recognition = new SpeechRecognition();
+                recognition.continuous = true;
+                recognition.interimResults = true;
+                recognition.lang = currentLang === 'hi' ? 'hi-IN' : (currentLang === 'bn' ? 'bn-IN' : 'en-US');
+
+                recognition.onresult = (event) => {
+                    let liveTranscript = '';
+                    for (let i = 0; i < event.results.length; ++i) {
+                        liveTranscript += event.results[i][0].transcript + ' ';
+                    }
+                    const base = initialTextBeforeRecordingRef.current;
+                    const combined = base ? `${base} ${liveTranscript.trim()}` : liveTranscript.trim();
+                    if (combined) {
+                        setSymptoms(combined);
+                    }
+                };
+
+                recognition.onerror = (event) => {
+                    console.warn('[SpeechRecognition] event:', event.error);
+                };
+
+                recognition.start();
+                recognitionRef.current = recognition;
+            } catch (srErr) {
+                console.warn('[SpeechRecognition] start error:', srErr);
+            }
+        }
+
+        // 2. Start MediaRecorder for Whisper audio stream
         try {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                if (!recognitionRef.current) {
+                    throw new Error('Microphone access is not supported by your browser.');
+                }
+                setIsRecording(true);
+                setRecordingTime(0);
+                timerIntervalRef.current = setInterval(() => {
+                    setRecordingTime((prev) => prev + 1);
+                }, 1000);
+                return;
+            }
+
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            const mediaRecorder = new MediaRecorder(stream);
+            let mimeType = 'audio/webm';
+            if (typeof MediaRecorder !== 'undefined') {
+                if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+                    mimeType = 'audio/webm;codecs=opus';
+                } else if (MediaRecorder.isTypeSupported('audio/webm')) {
+                    mimeType = 'audio/webm';
+                } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
+                    mimeType = 'audio/mp4';
+                } else {
+                    mimeType = '';
+                }
+            }
+
+            const mediaRecorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
             mediaRecorderRef.current = mediaRecorder;
             audioChunksRef.current = [];
 
             mediaRecorder.ondataavailable = (event) => {
-                if (event.data.size > 0) {
+                if (event.data && event.data.size > 0) {
                     audioChunksRef.current.push(event.data);
                 }
             };
 
             mediaRecorder.onstop = handleRecordingStop;
 
-            mediaRecorder.start();
+            mediaRecorder.start(250);
             setIsRecording(true);
             setRecordingTime(0);
 
@@ -147,51 +276,31 @@ export const AiTriage = () => {
             }, 1000);
         } catch (err) {
             console.error('Microphone error:', err);
-            setError('Microphone access denied. Please type your symptoms instead.');
-        }
-    };
-
-    const stopRecording = () => {
-        if (mediaRecorderRef.current && isRecording) {
-            mediaRecorderRef.current.stop();
-            setIsRecording(false);
-            if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
-            // Stop all tracks on the stream to release hardware cleanly
-            mediaRecorderRef.current.stream.getTracks().forEach((track) => track.stop());
-        }
-    };
-
-    const handleRecordingStop = async () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-        const formData = new FormData();
-        formData.append('audio_file', audioBlob, 'triage_voice.webm');
-
-        setTranscribing(true);
-        setError('');
-
-        try {
-            const res = await axios.post(`${import.meta.env.VITE_API_URL}/triage/voice`, formData, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
-
-            if (res.data?.transcript) {
-                setSymptoms((prev) => (prev ? `${prev.trim()} ${res.data.transcript}` : res.data.transcript));
+            if (!recognitionRef.current) {
+                setError(
+                    err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError'
+                        ? 'Microphone permission denied. Please allow microphone access in your browser or type your symptoms.'
+                        : `Microphone error: ${err.message || 'Please type your symptoms.'}`
+                );
+            } else {
+                setIsRecording(true);
+                setRecordingTime(0);
+                timerIntervalRef.current = setInterval(() => {
+                    setRecordingTime((prev) => prev + 1);
+                }, 1000);
             }
-        } catch (err) {
-            console.error('Transcription error:', err);
-            setError('Voice transcription failed. Please enter your symptoms manually.');
-        } finally {
-            setTranscribing(false);
         }
     };
+
+    const [emergencyDispatch, setEmergencyDispatch] = useState(null);
+    const [dispatching, setDispatching] = useState(false);
+    const [broadcastLoading, setBroadcastLoading] = useState(false);
 
     const handleCheck = async (e) => {
         if (e) e.preventDefault();
         setError('');
         setResult(null);
+        setEmergencyDispatch(null);
 
         if (!symptoms.trim()) {
             setError('Please describe your symptoms before proceeding with triage.');
@@ -200,23 +309,23 @@ export const AiTriage = () => {
 
         setLoading(true);
         try {
-            const response = await axios.post(
-                `${import.meta.env.VITE_API_URL}/triage`,
-                {
-                    symptoms,
-                    duration,
-                    severity,
-                    targetLang: currentLang,
-                },
-                {
-                    headers: { Authorization: `Bearer ${token}` },
-                }
-            );
+            const response = await api.post('/triage', {
+                symptoms,
+                duration,
+                severity,
+                targetLang: currentLang,
+            });
 
-            if (response.data?.recommendation) {
+            const data = response.data;
+            if (data?.recommendation || data?.route) {
+                const normRec = (data.recommendation || (data.route === 'TELECONSULTATION' ? 'teleconsultation' : data.route === 'EMERGENCY' ? 'emergency' : 'doctor_visit')).toLowerCase();
                 setResult({
-                    recommendation: response.data.recommendation,
-                    reason: response.data.reason,
+                    recommendation: normRec === 'clinic_visit' ? 'doctor_visit' : normRec,
+                    route: data.route || (normRec === 'teleconsultation' ? 'TELECONSULTATION' : normRec === 'emergency' ? 'EMERGENCY' : 'CLINIC_VISIT'),
+                    reason: data.reason || data.recommendation || 'Clinical analysis completed based on your reported symptoms.',
+                    temporary_diagnosis: data.temporary_diagnosis || null,
+                    recommended_speciality: data.recommended_speciality || 'General Medicine',
+                    urgency: data.urgency || 'low',
                 });
             } else {
                 setError('Received unknown response format from clinical analysis.');
@@ -235,15 +344,67 @@ export const AiTriage = () => {
         setSeverity('');
         setResult(null);
         setError('');
+        setEmergencyDispatch(null);
+    };
+
+    const handleDispatchEmergency = async () => {
+        setDispatching(true);
+        try {
+            const res = await api.post('/transports/emergency-dispatch', {
+                symptoms,
+                reason: result?.reason || 'Emergency Care Triage Trigger',
+                lat: 28.6139,
+                lng: 77.2090
+            });
+            if (res.data?.dispatch) {
+                setEmergencyDispatch(res.data.dispatch);
+            }
+        } catch (err) {
+            console.error('Emergency dispatch error', err);
+            alert('Failed to connect to automated ambulance dispatch. Please dial 108 or 112 immediately.');
+        } finally {
+            setDispatching(false);
+        }
+    };
+
+    const handleBroadcastToSpecialists = async () => {
+        setBroadcastLoading(true);
+        try {
+            await api.post('/queues/request', {
+                specialization: result?.recommended_speciality || 'General Medicine',
+                symptoms,
+                temporaryDiagnosis: result?.temporary_diagnosis || null,
+                urgency: result?.urgency || 'low',
+            });
+            navigate('/patient/requests');
+        } catch (err) {
+            console.error('Broadcast request error', err);
+            const msg = err.response?.data?.error || 'Failed to broadcast consultation request.';
+            if (msg.includes('already have an active request')) {
+                navigate('/patient/requests');
+            } else {
+                alert(msg);
+            }
+        } finally {
+            setBroadcastLoading(false);
+        }
     };
 
     const handleCtaAction = (recommendation) => {
         if (recommendation === 'emergency') {
-            navigate('/patient/dashboard');
+            handleDispatchEmergency();
         } else if (recommendation === 'teleconsultation') {
-            navigate('/patient/book-appointment');
+            handleBroadcastToSpecialists();
         } else {
-            navigate('/patient/doctors');
+            navigate('/patient/book-appointment', {
+                state: {
+                    type: 'clinic_visit',
+                    symptoms,
+                    temporaryDiagnosis: result?.temporary_diagnosis,
+                    specialization: result?.recommended_speciality,
+                    urgency: result?.urgency,
+                }
+            });
         }
     };
 
@@ -534,10 +695,32 @@ export const AiTriage = () => {
                             </button>
                         </div>
 
+                        {/* Temporary Diagnosis & Specialty Banner */}
+                        <div className="flex flex-wrap items-center gap-3 p-4 rounded-2xl bg-white border border-[#f5e4ec] shadow-2xs">
+                            <div className="flex flex-col gap-0.5">
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-[#7d6974]">
+                                    Preliminary AI Assessment
+                                </span>
+                                <span className="text-sm font-black text-[#2d2329]">
+                                    {result.temporary_diagnosis || 'Symptom-based Evaluation'}
+                                </span>
+                            </div>
+                            {result.recommended_speciality && (
+                                <div className="ml-auto flex items-center gap-2">
+                                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#7d6974]">
+                                        Specialty:
+                                    </span>
+                                    <span className="text-xs font-bold px-3 py-1 rounded-full bg-[#ffe6ee] text-[#8e1d41] border border-[#f5c6d6]">
+                                        🩺 {result.recommended_speciality}
+                                    </span>
+                                </div>
+                            )}
+                        </div>
+
                         {/* Emergency Result Card */}
                         {result.recommendation === 'emergency' && (
                             <div
-                                className="rounded-3xl p-6 sm:p-8 flex flex-col gap-5"
+                                className="rounded-3xl p-6 sm:p-8 flex flex-col gap-5 shadow-sm"
                                 style={{ background: 'var(--pastel-pink-bg)', border: '2px solid var(--accent)' }}
                             >
                                 <div className="flex items-start gap-4">
@@ -545,12 +728,14 @@ export const AiTriage = () => {
                                         className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0"
                                         style={{ background: '#ffe6ee', border: '1px solid var(--accent)', color: 'var(--accent)' }}
                                     >
-                                        <AlertTriangle className="w-6 h-6" />
+                                        <AlertTriangle className="w-6 h-6 animate-pulse" />
                                     </div>
                                     <div className="flex flex-col gap-1">
-                                        <span className="text-xs font-black uppercase tracking-wider" style={{ color: 'var(--accent)' }}>
-                                            High Urgency
-                                        </span>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-xs font-black uppercase tracking-wider text-rose-600 bg-rose-100 px-2 py-0.5 rounded-md">
+                                                🚨 High Urgency (Level 1)
+                                            </span>
+                                        </div>
                                         <h4 className="text-xl font-black font-heading" style={{ color: 'var(--text-primary)' }}>
                                             Emergency Care Required
                                         </h4>
@@ -560,32 +745,75 @@ export const AiTriage = () => {
                                     </div>
                                 </div>
 
-                                <div
-                                    className="p-4 rounded-2xl text-xs font-semibold flex items-center gap-2"
-                                    style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
-                                >
-                                    <Info className="w-4 h-4 shrink-0" style={{ color: 'var(--accent)' }} />
-                                    <span>
-                                        Please seek immediate emergency medical assistance at the nearest hospital or contact your local emergency response service (108 / 112).
-                                    </span>
-                                </div>
+                                {/* Active Emergency Dispatch Widget if triggered */}
+                                {emergencyDispatch ? (
+                                    <div className="p-5 rounded-2xl bg-white border-2 border-rose-500 shadow-md flex flex-col gap-3 animate-fade-in">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-2">
+                                                <span className="w-3 h-3 rounded-full bg-rose-500 animate-ping" />
+                                                <span className="font-black text-rose-700 text-sm uppercase tracking-wider">
+                                                    Ambulance Dispatched!
+                                                </span>
+                                            </div>
+                                            <span className="font-black text-base text-rose-800 bg-rose-50 px-3 py-1 rounded-xl border border-rose-200">
+                                                ETA: ~{emergencyDispatch.baseEtaMins} mins
+                                            </span>
+                                        </div>
 
-                                <button
-                                    type="button"
-                                    onClick={() => handleCtaAction('emergency')}
-                                    className="w-full py-3.5 rounded-full font-black text-sm transition shadow-md flex items-center justify-center gap-2 cursor-pointer text-white"
-                                    style={{ background: 'var(--accent)' }}
-                                >
-                                    <span>Return to Emergency Dashboard</span>
-                                    <ArrowRight className="w-4 h-4" />
-                                </button>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs pt-2 border-t border-rose-100">
+                                            <div>
+                                                <span className="font-bold text-gray-500">Vehicle: </span>
+                                                <span className="font-black text-gray-800">{emergencyDispatch.ambulance.vehicleNo} ({emergencyDispatch.ambulance.type})</span>
+                                            </div>
+                                            <div>
+                                                <span className="font-bold text-gray-500">Paramedic: </span>
+                                                <span className="font-black text-gray-800">{emergencyDispatch.ambulance.driverName}</span>
+                                            </div>
+                                            <div>
+                                                <span className="font-bold text-gray-500">Nearest Facility: </span>
+                                                <span className="font-black text-gray-800">{emergencyDispatch.facility.name} ({emergencyDispatch.facility.distanceKm} km)</span>
+                                            </div>
+                                            <div>
+                                                <span className="font-bold text-gray-500">Helpline: </span>
+                                                <a href="tel:108" className="font-black text-rose-600 underline">108 / 112</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="flex flex-col sm:flex-row gap-3">
+                                        <button
+                                            type="button"
+                                            onClick={handleDispatchEmergency}
+                                            disabled={dispatching}
+                                            className="flex-1 py-3.5 rounded-full font-black text-sm transition shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer text-white bg-rose-600 hover:bg-rose-700"
+                                        >
+                                            {dispatching ? (
+                                                <>
+                                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                                    <span>Connecting 108 Dispatch...</span>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <span>🚨 Dispatch Emergency Ambulance (108)</span>
+                                                    <ArrowRight className="w-4 h-4" />
+                                                </>
+                                            )}
+                                        </button>
+                                        <a
+                                            href="tel:108"
+                                            className="px-6 py-3.5 rounded-full font-black text-sm text-center border-2 border-rose-600 text-rose-700 bg-white hover:bg-rose-50 transition"
+                                        >
+                                            Call 108 Directly
+                                        </a>
+                                    </div>
+                                )}
                             </div>
                         )}
 
                         {/* Teleconsultation Result Card */}
                         {result.recommendation === 'teleconsultation' && (
                             <div
-                                className="rounded-3xl p-6 sm:p-8 flex flex-col gap-5"
+                                className="rounded-3xl p-6 sm:p-8 flex flex-col gap-5 shadow-sm"
                                 style={{ background: 'var(--accent-light)', border: '2px solid var(--notif-unread-border)' }}
                             >
                                 <div className="flex items-start gap-4">
@@ -597,7 +825,7 @@ export const AiTriage = () => {
                                     </div>
                                     <div className="flex flex-col gap-1">
                                         <span className="text-xs font-black uppercase tracking-wider" style={{ color: 'var(--accent)' }}>
-                                            Appropriate Next Step
+                                            Appropriate Next Step · Virtual Consultation
                                         </span>
                                         <h4 className="text-xl font-black font-heading" style={{ color: 'var(--text-primary)' }}>
                                             Teleconsultation Recommended
@@ -614,26 +842,46 @@ export const AiTriage = () => {
                                 >
                                     <CheckCircle2 className="w-4 h-4 shrink-0" style={{ color: 'var(--pastel-mint-text)' }} />
                                     <span>
-                                        A qualified doctor can review your symptoms remotely and prescribe medication or arrange a follow-up.
+                                        Broadcast your request to all available <strong>{result.recommended_speciality}</strong> doctors. Multiple doctors can offer slots; you compare their ratings and choose who to consult.
                                     </span>
                                 </div>
 
-                                <button
-                                    type="button"
-                                    onClick={() => handleCtaAction('teleconsultation')}
-                                    className="w-full py-3.5 rounded-full font-black text-sm transition shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer text-white"
-                                    style={{ background: 'var(--accent)' }}
-                                >
-                                    <span>Book Teleconsultation</span>
-                                    <ArrowRight className="w-4 h-4" />
-                                </button>
+                                <div className="flex flex-col sm:flex-row gap-3">
+                                    <button
+                                        type="button"
+                                        onClick={handleBroadcastToSpecialists}
+                                        disabled={broadcastLoading}
+                                        className="flex-1 py-3.5 rounded-full font-black text-sm transition shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer text-white"
+                                        style={{ background: 'var(--accent)' }}
+                                    >
+                                        {broadcastLoading ? (
+                                            <>
+                                                <Loader2 className="w-4 h-4 animate-spin" />
+                                                <span>Broadcasting to Specialists...</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <span>🚀 Broadcast to {result.recommended_speciality || 'Specialist'} Doctors</span>
+                                                <ArrowRight className="w-4 h-4" />
+                                            </>
+                                        )}
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        onClick={() => navigate('/patient/book-appointment')}
+                                        className="px-6 py-3.5 rounded-full font-bold text-xs border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 transition"
+                                    >
+                                        Pick Specific Doctor
+                                    </button>
+                                </div>
                             </div>
                         )}
 
-                        {/* Doctor Visit / In-Person Result Card */}
+                        {/* Doctor Visit / Clinic In-Person Result Card */}
                         {result.recommendation === 'doctor_visit' && (
                             <div
-                                className="rounded-3xl p-6 sm:p-8 flex flex-col gap-5"
+                                className="rounded-3xl p-6 sm:p-8 flex flex-col gap-5 shadow-sm"
                                 style={{ background: 'var(--pastel-peach-bg)', border: '2px solid var(--pastel-peach-text)' }}
                             >
                                 <div className="flex items-start gap-4">
@@ -645,10 +893,10 @@ export const AiTriage = () => {
                                     </div>
                                     <div className="flex flex-col gap-1">
                                         <span className="text-xs font-black uppercase tracking-wider" style={{ color: 'var(--pastel-peach-text)' }}>
-                                            In-Person Evaluation
+                                            In-Person Evaluation · Verified Facilities
                                         </span>
                                         <h4 className="text-xl font-black font-heading" style={{ color: 'var(--text-primary)' }}>
-                                            Doctor Visit Recommended
+                                            Clinic / Hospital Visit Recommended
                                         </h4>
                                         <p className="text-sm font-semibold leading-relaxed mt-1" style={{ color: 'var(--text-primary)' }}>
                                             {result.reason}
@@ -662,7 +910,7 @@ export const AiTriage = () => {
                                 >
                                     <Info className="w-4 h-4 shrink-0" style={{ color: 'var(--pastel-peach-text)' }} />
                                     <span>
-                                        An in-person clinical examination at a verified clinic or hospital is suggested for comprehensive diagnostic evaluation.
+                                        An in-person clinical examination at a verified healthcare center is recommended for a physical exam and immediate diagnostic tests.
                                     </span>
                                 </div>
 
@@ -672,7 +920,7 @@ export const AiTriage = () => {
                                     className="w-full py-3.5 rounded-full font-black text-sm transition shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer text-white"
                                     style={{ background: 'var(--accent)' }}
                                 >
-                                    <span>Find Nearby Clinics &amp; Verified Doctors</span>
+                                    <span>🏥 Find Nearby Doctors &amp; Book In-Person Visit</span>
                                     <ArrowRight className="w-4 h-4" />
                                 </button>
                             </div>
@@ -680,7 +928,7 @@ export const AiTriage = () => {
 
                         <div className="p-3 text-center">
                             <p className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
-                                This clinical assessment is for informational guidance and does not constitute a binding diagnosis.
+                                ⚠️ Note: AI Triage results are for clinical navigation only. Final medical diagnosis and prescriptions are provided by licensed physicians during consultation.
                             </p>
                         </div>
                     </div>

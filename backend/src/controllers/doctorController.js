@@ -1,7 +1,26 @@
 const { Op } = require('sequelize');
-const { User, DoctorProfile } = require('../models');
-const { ROLES, VERIFICATION_STATUS } = require('../config/roles');
+const { DoctorProfile } = require('../models');
+const { VERIFICATION_STATUS } = require('../constants/roles');
 const { findNearbyDoctors } = require('../services/locationService');
+
+// ── Helper: Haversine distance calculator in km ──────────────────────────────
+function calculateDistanceKm(lat1, lon1, lat2, lon2) {
+    if (lat1 == null || lon1 == null || lat2 == null || lon2 == null) return null;
+    const p1 = parseFloat(lat1);
+    const q1 = parseFloat(lon1);
+    const p2 = parseFloat(lat2);
+    const q2 = parseFloat(lon2);
+    if (isNaN(p1) || isNaN(q1) || isNaN(p2) || isNaN(q2)) return null;
+
+    const R = 6371; // km
+    const dLat = (p2 - p1) * Math.PI / 180;
+    const dLon = (q2 - q1) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+              Math.cos(p1 * Math.PI / 180) * Math.cos(p2 * Math.PI / 180) *
+              Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return parseFloat((R * c).toFixed(1));
+}
 
 // ── GET /api/doctors/public ───────────────────────────────────────────────────
 
@@ -13,21 +32,32 @@ const { findNearbyDoctors } = require('../services/locationService');
  * Query params:
  *   ?city=Delhi
  *   ?specialization=Cardiologist
- *   ?page=1&limit=20
+ *   ?lat=28.6139&lng=77.2090
+ *   ?page=1&limit=50
  */
 async function listPublicDoctors(req, res) {
     const page = Math.max(1, parseInt(req.query.page, 10) || 1);
-    const limit = Math.min(50, Math.max(1, parseInt(req.query.limit, 10) || 20));
+    const limit = Math.min(50, Math.max(1, parseInt(req.query.limit, 10) || 30));
     const offset = (page - 1) * limit;
+    const patientLat = req.query.lat ? parseFloat(req.query.lat) : null;
+    const patientLng = req.query.lng ? parseFloat(req.query.lng) : null;
 
     const profileWhere = {
         verificationStatus: VERIFICATION_STATUS.VERIFIED,
+        [Op.and]: [
+            sequelize.literal(`("DoctorProfile"."availability"->>'isAccepting' IS NULL OR "DoctorProfile"."availability"->>'isAccepting' != 'false')`)
+        ]
     };
 
     if (req.query.city) {
-        profileWhere.city = { [Op.iLike]: `%${req.query.city}%` };
+        profileWhere[Op.or] = [
+            { city: { [Op.iLike]: `%${req.query.city}%` } },
+            { address: { [Op.iLike]: `%${req.query.city}%` } },
+            { state: { [Op.iLike]: `%${req.query.city}%` } },
+            { clinicOrHospital: { [Op.iLike]: `%${req.query.city}%` } },
+        ];
     }
-    if (req.query.specialization) {
+    if (req.query.specialization && req.query.specialization !== 'All') {
         profileWhere.specialization = { [Op.iLike]: `%${req.query.specialization}%` };
     }
 
@@ -36,15 +66,39 @@ async function listPublicDoctors(req, res) {
         // PUBLIC FIELDS ONLY — sensitive data explicitly excluded
         attributes: [
             'userId', 'fullName', 'specialization', 'subSpecialization',
-            'city', 'consultationFee', 'languages', 'regionsServed',
-            'clinicOrHospital', 'bio', 'availability', 'yearsOfExperience',
+            'city', 'state', 'address', 'pincode', 'consultationFee', 'teleconsultationFee', 'languages', 'regionsServed',
+            'clinicOrHospital', 'bio', 'availability', 'yearsOfExperience', 'practiceStartYear',
+            'latitude', 'longitude', 'avgRating', 'reviewCount',
         ],
         limit,
         offset,
         order: [['fullName', 'ASC']],
     });
 
-    return res.json({ total: count, page, limit, doctors: rows });
+    const doctorsWithDistance = rows.map((r) => {
+        const raw = r.toJSON();
+        // Sync experience if practiceStartYear is set
+        if (raw.practiceStartYear && (!raw.yearsOfExperience || raw.yearsOfExperience === 0)) {
+            raw.yearsOfExperience = Math.max(0, new Date().getFullYear() - raw.practiceStartYear);
+        }
+        if (patientLat != null && patientLng != null && raw.latitude && raw.longitude) {
+            raw.distanceKm = calculateDistanceKm(patientLat, patientLng, raw.latitude, raw.longitude);
+        } else {
+            raw.distanceKm = null;
+        }
+        return raw;
+    });
+
+    // Sort by distance if patient coords provided
+    if (patientLat != null && patientLng != null) {
+        doctorsWithDistance.sort((a, b) => {
+            if (a.distanceKm == null) return 1;
+            if (b.distanceKm == null) return -1;
+            return a.distanceKm - b.distanceKm;
+        });
+    }
+
+    return res.json({ total: count, page, limit, doctors: doctorsWithDistance });
 }
 
 // ── GET /api/doctors/public/:userId ──────────────────────────────────────────
@@ -61,13 +115,18 @@ async function getPublicDoctor(req, res) {
         },
         attributes: [
             'userId', 'fullName', 'specialization', 'subSpecialization',
-            'city', 'consultationFee', 'languages', 'regionsServed',
-            'clinicOrHospital', 'bio', 'availability', 'yearsOfExperience',
+            'city', 'state', 'address', 'pincode', 'consultationFee', 'teleconsultationFee', 'languages', 'regionsServed',
+            'clinicOrHospital', 'bio', 'availability', 'yearsOfExperience', 'practiceStartYear',
+            'latitude', 'longitude', 'avgRating', 'reviewCount',
         ],
     });
 
     if (!profile) return res.status(404).json({ error: 'Doctor not found or not yet verified' });
-    return res.json({ doctor: profile });
+    const raw = profile.toJSON();
+    if (raw.practiceStartYear && (!raw.yearsOfExperience || raw.yearsOfExperience === 0)) {
+        raw.yearsOfExperience = Math.max(0, new Date().getFullYear() - raw.practiceStartYear);
+    }
+    return res.json({ doctor: raw });
 }
 
 const getNearbyDoctors = async (req, res, next) => {
@@ -79,7 +138,7 @@ const getNearbyDoctors = async (req, res, next) => {
         const doctors = await findNearbyDoctors({
             lat: parseFloat(lat),
             lng: parseFloat(lng),
-            radiusKm: radiusKm ? parseFloat(radiusKm) : 15,
+            radiusKm: radiusKm ? parseFloat(radiusKm) : 30,
             specialization: specialization || null
         });
         res.json({ count: doctors.length, doctors });
@@ -97,10 +156,17 @@ const getNearbyDoctors = async (req, res, next) => {
 const SELF_UPDATABLE_FIELDS = [
     'fullName',
     'city',
+    'state',
+    'address',
+    'pincode',
+    'latitude',
+    'longitude',
     'specialization',
     'subSpecialization',
     'yearsOfExperience',
+    'practiceStartYear',
     'consultationFee',
+    'teleconsultationFee',
     'languages',
     'regionsServed',
     'clinicOrHospital',
@@ -138,6 +204,31 @@ async function updateOwnProfile(req, res, next) {
             if (Object.prototype.hasOwnProperty.call(req.body, field)) {
                 updates[field] = req.body[field];
             }
+        }
+
+        // Auto-calculate & sync yearsOfExperience based on practiceStartYear
+        const currentYear = new Date().getFullYear();
+        if (updates.practiceStartYear != null && updates.practiceStartYear !== '') {
+            const startYr = parseInt(updates.practiceStartYear, 10);
+            if (!isNaN(startYr) && startYr > 1950 && startYr <= currentYear) {
+                updates.practiceStartYear = startYr;
+                if (updates.yearsOfExperience == null || updates.yearsOfExperience === '') {
+                    updates.yearsOfExperience = Math.max(0, currentYear - startYr);
+                }
+            }
+        } else if (updates.yearsOfExperience != null && updates.yearsOfExperience !== '') {
+            const exp = parseInt(updates.yearsOfExperience, 10);
+            if (!isNaN(exp) && exp >= 0) {
+                updates.yearsOfExperience = exp;
+                if (!updates.practiceStartYear) {
+                    updates.practiceStartYear = Math.max(1950, currentYear - exp);
+                }
+            }
+        }
+
+        // If coordinates were updated, update location timestamp
+        if (updates.latitude != null && updates.longitude != null) {
+            updates.locationUpdatedAt = new Date();
         }
 
         await profile.update(updates);

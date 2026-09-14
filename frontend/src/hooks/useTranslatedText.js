@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../services/api';
 import { useLanguage } from './LanguageContext'; // We'll create this to track current global language
 
 /**
@@ -29,7 +29,7 @@ function useTranslatedText(defaultEnglishText) {
         // Fetch securely from our custom translation backend
         const fetchTranslation = async () => {
             try {
-                const response = await axios.post(`${import.meta.env.VITE_API_URL}/translate`, {
+                const response = await api.post('/translate', {
                     text: defaultEnglishText,
                     sourceLang: 'en',
                     targetLang: currentLang

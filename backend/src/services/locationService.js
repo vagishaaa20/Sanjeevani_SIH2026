@@ -65,16 +65,13 @@ async function findNearbyClinics({ lat, lng, radiusKm = 15, specialization = nul
 // ── findNearbyDoctors ─────────────────────────────────────────────────────────
 
 /**
- * Returns VERIFIED doctors whose linked clinic is within `radiusKm` km of (lat, lng).
- * Distance is measured from the clinic's location, not the doctor's own GPS.
- *
- * Doctors NOT linked to a clinic (clinic_id IS NULL) are excluded — only clinic-
- * affiliated verified doctors are recommended to patients.
- *
- * Result includes the clinic name and distance so the UI can group by clinic.
+ * Returns VERIFIED doctors whose practice location (or linked clinic) is within `radiusKm` km of (lat, lng).
+ * Distance is measured from the doctor's practice coordinates or clinic coordinates.
  */
-async function findNearbyDoctors({ lat, lng, radiusKm = 15, specialization = null, limit = 30 }) {
-  const dist = haversineExpr('c.latitude', 'c.longitude');
+async function findNearbyDoctors({ lat, lng, radiusKm = 25, specialization = null, limit = 50 }) {
+  const effectiveLat = 'COALESCE(d.latitude, c.latitude)';
+  const effectiveLng = 'COALESCE(d.longitude, c.longitude)';
+  const dist = haversineExpr(effectiveLat, effectiveLng);
   const specializationFilter = specialization
     ? `AND d.specialization ILIKE :specialization`
     : '';
@@ -87,22 +84,31 @@ async function findNearbyDoctors({ lat, lng, radiusKm = 15, specialization = nul
       d."subSpecialization",
       d."consultationFee",
       d."yearsOfExperience",
+      d."practiceStartYear",
       d."clinicOrHospital",
+      d.address AS "doctorAddress",
+      d.city AS "doctorCity",
+      d.state AS "doctorState",
+      d.pincode AS "doctorPincode",
+      d.latitude AS "doctorLatitude",
+      d.longitude AS "doctorLongitude",
       d.bio,
-      d."clinic_id"  AS "clinicId",
-      c."clinicName",
-      c.address      AS "clinicAddress",
-      c.city         AS "clinicCity",
-      c.latitude     AS "clinicLatitude",
-      c.longitude    AS "clinicLongitude",
-      ${dist}        AS "distanceKm"
+      d.availability,
+      d."avgRating",
+      d."reviewCount",
+      d."clinic_id" AS "clinicId",
+      COALESCE(c."clinicName", d."clinicOrHospital", 'Independent Medical Practice') AS "clinicName",
+      COALESCE(c.address, d.address, d.city, 'Local Clinic') AS "clinicAddress",
+      COALESCE(c.city, d.city, 'India') AS "clinicCity",
+      COALESCE(c.latitude, d.latitude) AS "latitude",
+      COALESCE(c.longitude, d.longitude) AS "longitude",
+      ${dist} AS "distanceKm"
     FROM doctor_profiles d
-    INNER JOIN clinic_profiles c ON c."userId" = d."clinic_id"
+    LEFT JOIN clinic_profiles c ON c."userId" = d."clinic_id"
     WHERE d."verificationStatus" = 'VERIFIED'
-      AND c."verificationStatus" = 'VERIFIED'
-      AND c.latitude  IS NOT NULL
-      AND c.longitude IS NOT NULL
+      AND (${effectiveLat} IS NOT NULL AND ${effectiveLng} IS NOT NULL)
       AND (${dist}) <= :radiusKm
+      AND (d.availability->>'isAccepting' IS NULL OR d.availability->>'isAccepting' != 'false')
       ${specializationFilter}
     ORDER BY "distanceKm" ASC, d."fullName" ASC
     LIMIT :limit;

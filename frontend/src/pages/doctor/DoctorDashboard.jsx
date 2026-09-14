@@ -4,6 +4,7 @@ import useAuth from '../../hooks/useAuth';
 import api from '../../services/api';
 import DoctorOutbreakWidget from '../../components/doctor/DoctorOutbreakWidget';
 import DoctorQueueList from '../../components/doctor/DoctorQueueList';
+import DoctorClinicAppointments from '../../components/doctor/DoctorClinicAppointments';
 import DoctorActiveConsultations from '../../components/doctor/DoctorActiveConsultations';
 import Badge from '../../components/common/Badge';
 import MinimalistAvatar from '../../components/common/MinimalistAvatar';
@@ -13,6 +14,7 @@ import {
     CheckCircle2, 
     Star, 
     Building, 
+    Building2,
     ShieldCheck, 
     MapPin, 
     ArrowUpRight, 
@@ -20,12 +22,14 @@ import {
     Share2,
     Activity,
     FileText,
-    Flame
+    Flame,
+    User,
+    Sparkles,
+    Video
 } from 'lucide-react';
 
 const STATUS_MESSAGES = {
     PENDING_VERIFICATION: {
-        emoji: '⏳',
         title: 'Application Under Review',
         subtitle: 'Your account is pending admin verification.',
         detail:
@@ -33,7 +37,6 @@ const STATUS_MESSAGES = {
         variant: 'peach',
     },
     UNDER_REVIEW: {
-        emoji: '🔍',
         title: 'Active Document Review',
         subtitle: 'An admin is currently reviewing your credentials.',
         detail:
@@ -49,7 +52,7 @@ const STATUS_MESSAGES = {
         variant: 'pink',
     },
     SUSPENDED: {
-        emoji: '🚫',
+        emoji: '✕',
         title: 'Account Suspended',
         subtitle: 'Your account has been suspended by an administrator.',
         detail:
@@ -70,15 +73,18 @@ const VerificationGate = ({ status }) => {
 
     return (
         <div className="w-full flex flex-col gap-6 text-left animate-fade-in-up">
-            <div className="rounded-3xl border border-[#f5e4ec] bg-white p-8 shadow-xs flex flex-col gap-4">
+            <div
+                className="rounded-3xl p-8 shadow-xs flex flex-col gap-4"
+                style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}
+            >
                 <div className="flex items-center gap-4">
                     <span className="text-4xl">{cfg.emoji}</span>
                     <div>
-                        <h2 className="text-2xl font-black text-[#2d2329] font-heading">{cfg.title}</h2>
-                        <p className="text-xs font-bold text-[#7d6974] mt-0.5">{cfg.subtitle}</p>
+                        <h2 className="text-2xl font-black font-heading" style={{ color: 'var(--text-primary)' }}>{cfg.title}</h2>
+                        <p className="text-xs font-bold mt-0.5" style={{ color: 'var(--text-secondary)' }}>{cfg.subtitle}</p>
                     </div>
                 </div>
-                <p className="text-xs font-semibold text-[#4a3c45] leading-relaxed max-w-2xl">{cfg.detail}</p>
+                <p className="text-xs font-semibold leading-relaxed max-w-2xl" style={{ color: 'var(--text-primary)' }}>{cfg.detail}</p>
 
                 <div className="flex items-center gap-2 mt-2 flex-wrap">
                     {STEPS.map((step, i) => (
@@ -90,25 +96,38 @@ const VerificationGate = ({ status }) => {
                                 {step.done ? '✓ ' : step.active ? '● ' : ''}{step.label}
                             </Badge>
                             {i < STEPS.length - 1 && (
-                                <div className="w-4 h-0.5 bg-[#f5e4ec] flex-shrink-0" />
+                                <div className="w-4 h-0.5 flex-shrink-0" style={{ background: 'var(--border)' }} />
                             )}
                         </React.Fragment>
                     ))}
                 </div>
             </div>
 
-            <div className="bg-white border border-[#f5e4ec] rounded-3xl p-6 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between shadow-xs">
-                <div>
-                    <h3 className="font-black text-[#2d2329] text-sm">Ensure your documents are complete</h3>
-                    <p className="text-xs text-[#7d6974] font-medium mt-0.5">
-                        Upload all required credential documents to speed up your verification.
-                    </p>
+            <div
+                className="rounded-3xl p-6 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between shadow-xs"
+                style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}
+            >
+                <div className="flex items-center gap-3">
+                    <div
+                        className="w-10 h-10 rounded-2xl flex items-center justify-center"
+                        style={{ background: 'var(--accent-light)', color: 'var(--accent)' }}
+                    >
+                        <FileText className="w-5 h-5" />
+                    </div>
+                    <div>
+                        <h3 className="text-sm font-black" style={{ color: 'var(--text-primary)' }}>Manage Submitted Credentials</h3>
+                        <p className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
+                            View submitted degree certificates or upload additional NMC verification documents.
+                        </p>
+                    </div>
                 </div>
+
                 <Link
                     to="/doctor/profile"
-                    className="px-5 py-2.5 rounded-full bg-[#e13b68] hover:bg-[#c92a55] text-white text-xs font-bold shadow-xs transition flex-shrink-0"
+                    className="px-5 py-2.5 rounded-full text-white text-xs font-bold shadow-xs transition flex-shrink-0"
+                    style={{ background: 'var(--accent)' }}
                 >
-                    📄 View Profile & Documents →
+                    📄 View Profile &amp; Documents →
                 </Link>
             </div>
         </div>
@@ -116,9 +135,14 @@ const VerificationGate = ({ status }) => {
 };
 
 const DoctorDashboard = () => {
-    const { user } = useAuth();
+    const { user, refreshProfile } = useAuth();
     const [stats, setStats] = useState(null);
     const [practiceLocationsCount, setPracticeLocationsCount] = useState(1);
+    const [activeViewTab, setActiveViewTab] = useState('all'); // 'all' | 'teleconsultation' | 'clinic'
+
+    useEffect(() => {
+        if (refreshProfile) refreshProfile();
+    }, []);
 
     useEffect(() => {
         if (!user || user.role !== 'doctor') return;
@@ -149,54 +173,51 @@ const DoctorDashboard = () => {
     }
 
     const profile = user.profile || {};
-    const doctorInitials = profile.fullName ? profile.fullName.charAt(0).toUpperCase() : 'D';
 
     return (
         <div className="w-full flex flex-col gap-6 text-left animate-fade-in-up">
             {/* Executive Clinical Command Header */}
-            <div className="bg-white border border-[#f5e4ec] rounded-3xl p-6 md:p-8 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden">
-                <div className="absolute top-0 right-0 -mr-16 -mt-16 w-56 h-56 bg-radial from-[#ffe6ee] to-transparent rounded-full pointer-events-none opacity-50" />
-
-                <div className="flex items-start gap-4 md:gap-6 z-10">
+            <div
+                className="rounded-3xl p-6 md:p-8 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden"
+                style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}
+            >
+                <div className="flex items-center gap-4 md:gap-6 z-10">
                     <MinimalistAvatar
                         name={profile.fullName || 'Doctor'}
                         role="doctor"
-                        size={72}
+                        size={68}
                         showStatus={true}
                         status="online"
                     />
 
-                    <div className="flex flex-col gap-1.5">
+                    <div className="flex flex-col gap-1">
                         <div className="flex flex-wrap items-center gap-2.5">
-                            <h1 className="text-2xl md:text-3xl font-black text-[#1c1218] font-heading tracking-tight">
+                            <h1 className="text-2xl md:text-3xl font-black font-heading tracking-tight" style={{ color: 'var(--text-primary)' }}>
                                 Dr. {profile.fullName || 'Doctor'}
                             </h1>
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[11px] font-bold">
-                                <ShieldCheck className="w-3 h-3 text-emerald-600" />
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 text-[11px] font-bold">
+                                <ShieldCheck className="w-3 h-3 text-emerald-500" />
                                 NMC Verified
                             </span>
                         </div>
 
-                        <p className="text-xs md:text-sm font-bold text-[#e13b68]">
-                            {profile.specialization || 'General Medicine & Specialist'}
-                        </p>
-
-                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-[#7d6974] font-medium mt-1">
+                        <div className="flex flex-wrap items-center gap-x-3.5 gap-y-1 text-xs font-medium mt-0.5" style={{ color: 'var(--text-secondary)' }}>
                             {profile.medicalRegistrationNumber && (
                                 <span className="flex items-center gap-1">
-                                    <ShieldCheck className="w-3.5 h-3.5 text-[#e13b68]" />
-                                    Reg: <strong className="text-[#2d2329] font-bold">{profile.medicalRegistrationNumber}</strong>
+                                    <ShieldCheck className="w-3.5 h-3.5" style={{ color: 'var(--accent)' }} />
+                                    <span>Reg:</span>
+                                    <strong className="font-bold" style={{ color: 'var(--text-primary)' }}>{profile.medicalRegistrationNumber}</strong>
                                 </span>
                             )}
                             {profile.city && (
                                 <span className="flex items-center gap-1">
-                                    <MapPin className="w-3.5 h-3.5 text-[#e13b68]" />
-                                    {profile.city}, India
+                                    <MapPin className="w-3.5 h-3.5" style={{ color: 'var(--accent)' }} />
+                                    <span>{profile.city}, India</span>
                                 </span>
                             )}
-                            <span className="flex items-center gap-1.5 font-bold text-emerald-700">
+                            <span className="flex items-center gap-1.5 font-bold text-emerald-500">
                                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                                Available for Consultations
+                                Active for Consultations
                             </span>
                         </div>
                     </div>
@@ -205,21 +226,24 @@ const DoctorDashboard = () => {
                 <div className="flex flex-wrap items-center gap-2.5 z-10 self-start md:self-auto">
                     <Link
                         to="/doctor/profile"
-                        className="px-4 py-2 rounded-full bg-white hover:bg-[#fff0f5] border border-[#f0d0dc] hover:border-[#e13b68]/40 text-[#2d2329] hover:text-[#e13b68] text-xs font-bold transition shadow-xs flex items-center gap-1.5"
+                        className="px-4 py-2 rounded-full text-xs font-bold transition shadow-2xs flex items-center gap-1.5 hover:opacity-90"
+                        style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
                     >
-                        <User className="w-3.5 h-3.5 text-[#e13b68]" />
-                        <span>Profile & Documents</span>
+                        <User className="w-3.5 h-3.5" style={{ color: 'var(--accent)' }} />
+                        <span>Profile &amp; Documents</span>
                     </Link>
                     <Link
                         to="/doctor/clinics"
-                        className="px-4 py-2 rounded-full bg-white hover:bg-[#fff0f5] border border-[#f0d0dc] hover:border-[#e13b68]/40 text-[#2d2329] hover:text-[#e13b68] text-xs font-bold transition shadow-xs flex items-center gap-1.5"
+                        className="px-4 py-2 rounded-full text-xs font-bold transition shadow-2xs flex items-center gap-1.5 hover:opacity-90"
+                        style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
                     >
-                        <Building2 className="w-3.5 h-3.5 text-[#e13b68]" />
+                        <Building2 className="w-3.5 h-3.5" style={{ color: 'var(--accent)' }} />
                         <span>Clinics ({practiceLocationsCount})</span>
                     </Link>
                     <Link
                         to="/doctor/referrals"
-                        className="px-4 py-2 rounded-full bg-[#e13b68] hover:bg-[#c92a55] text-white text-xs font-bold transition shadow-xs flex items-center gap-1.5"
+                        className="px-4 py-2 rounded-full text-white text-xs font-bold transition shadow-xs flex items-center gap-1.5"
+                        style={{ background: 'var(--accent)' }}
                     >
                         <Sparkles className="w-3.5 h-3.5" />
                         <span>Referral Desk</span>
@@ -229,44 +253,59 @@ const DoctorDashboard = () => {
 
             {/* Quick Clinical Metrics Bar */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="bg-white border border-[#f5e4ec] rounded-3xl p-5 shadow-xs flex flex-col gap-1">
-                    <div className="w-9 h-9 rounded-2xl bg-[#ffe6ee] text-[#e13b68] flex items-center justify-center mb-1">
+                <div
+                    className="rounded-3xl p-5 shadow-xs flex flex-col gap-1"
+                    style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}
+                >
+                    <div
+                        className="w-9 h-9 rounded-2xl flex items-center justify-center mb-1"
+                        style={{ background: 'var(--accent-light)', color: 'var(--accent)' }}
+                    >
                         <Users className="w-4 h-4" />
                     </div>
-                    <span className="text-2xl md:text-3xl font-black text-[#2d2329] font-heading">
+                    <span className="text-2xl md:text-3xl font-black font-heading" style={{ color: 'var(--text-primary)' }}>
                         {stats?.uniquePatients ?? 0}
                     </span>
-                    <span className="text-xs font-bold text-[#7d6974]">Patients Checked</span>
+                    <span className="text-xs font-bold" style={{ color: 'var(--text-secondary)' }}>Patients Checked</span>
                 </div>
 
-                <div className="bg-white border border-[#f5e4ec] rounded-3xl p-5 shadow-xs flex flex-col gap-1">
-                    <div className="w-9 h-9 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-1">
+                <div
+                    className="rounded-3xl p-5 shadow-xs flex flex-col gap-1"
+                    style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}
+                >
+                    <div className="w-9 h-9 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center mb-1">
                         <CheckCircle2 className="w-4 h-4" />
                     </div>
-                    <span className="text-2xl md:text-3xl font-black text-[#2d2329] font-heading">
+                    <span className="text-2xl md:text-3xl font-black font-heading" style={{ color: 'var(--text-primary)' }}>
                         {stats?.completedConsultations ?? 0}
                     </span>
-                    <span className="text-xs font-bold text-[#7d6974]">Consultations Done</span>
+                    <span className="text-xs font-bold" style={{ color: 'var(--text-secondary)' }}>Consultations Done</span>
                 </div>
 
-                <div className="bg-white border border-[#f5e4ec] rounded-3xl p-5 shadow-xs flex flex-col gap-1">
-                    <div className="w-9 h-9 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center mb-1">
+                <div
+                    className="rounded-3xl p-5 shadow-xs flex flex-col gap-1"
+                    style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}
+                >
+                    <div className="w-9 h-9 rounded-2xl bg-sky-500/10 text-sky-500 flex items-center justify-center mb-1">
                         <Building className="w-4 h-4" />
                     </div>
-                    <span className="text-2xl md:text-3xl font-black text-[#2d2329] font-heading">
+                    <span className="text-2xl md:text-3xl font-black font-heading" style={{ color: 'var(--text-primary)' }}>
                         {practiceLocationsCount}
                     </span>
-                    <span className="text-xs font-bold text-[#7d6974]">Practice Clinics</span>
+                    <span className="text-xs font-bold" style={{ color: 'var(--text-secondary)' }}>Practice Clinics</span>
                 </div>
 
-                <div className="bg-white border border-[#f5e4ec] rounded-3xl p-5 shadow-xs flex flex-col gap-1">
-                    <div className="w-9 h-9 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mb-1">
+                <div
+                    className="rounded-3xl p-5 shadow-xs flex flex-col gap-1"
+                    style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}
+                >
+                    <div className="w-9 h-9 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center mb-1">
                         <Star className="w-4 h-4 fill-amber-500 text-amber-500" />
                     </div>
-                    <span className="text-2xl md:text-3xl font-black text-[#2d2329] font-heading">
+                    <span className="text-2xl md:text-3xl font-black font-heading" style={{ color: 'var(--text-primary)' }}>
                         {stats?.avgRating ? Number(stats.avgRating).toFixed(1) : '5.0'}
                     </span>
-                    <span className="text-xs font-bold text-[#7d6974]">
+                    <span className="text-xs font-bold" style={{ color: 'var(--text-secondary)' }}>
                         Rating ({stats?.reviewCount ?? 0} reviews)
                     </span>
                 </div>
@@ -276,48 +315,101 @@ const DoctorDashboard = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2 flex flex-col gap-6">
                     <DoctorActiveConsultations />
-                    <DoctorQueueList />
+
+                    {/* Desk Filter Tabs */}
+                    <div className="flex items-center gap-2 p-1.5 rounded-2xl border" style={{ background: 'var(--card-bg)', borderColor: 'var(--border)' }}>
+                        <button
+                            type="button"
+                            onClick={() => setActiveViewTab('all')}
+                            className="flex-1 py-2 px-3 rounded-xl text-xs font-bold transition cursor-pointer text-center flex items-center justify-center gap-1.5"
+                            style={activeViewTab === 'all'
+                                ? { background: 'var(--accent)', color: '#ffffff' }
+                                : { color: 'var(--text-secondary)' }
+                            }
+                        >
+                            <Users className="w-3.5 h-3.5" />
+                            <span>All Patient Desks</span>
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setActiveViewTab('teleconsultation')}
+                            className="flex-1 py-2 px-3 rounded-xl text-xs font-bold transition cursor-pointer text-center flex items-center justify-center gap-1.5"
+                            style={activeViewTab === 'teleconsultation'
+                                ? { background: 'var(--accent)', color: '#ffffff' }
+                                : { color: 'var(--text-secondary)' }
+                            }
+                        >
+                            <Video className="w-3.5 h-3.5" />
+                            <span>Teleconsultation Queue</span>
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setActiveViewTab('clinic')}
+                            className="flex-1 py-2 px-3 rounded-xl text-xs font-bold transition cursor-pointer text-center flex items-center justify-center gap-1.5"
+                            style={activeViewTab === 'clinic'
+                                ? { background: 'var(--accent)', color: '#ffffff' }
+                                : { color: 'var(--text-secondary)' }
+                            }
+                        >
+                            <Building2 className="w-3.5 h-3.5" />
+                            <span>In-Person Clinic Visits</span>
+                        </button>
+                    </div>
+
+                    {(activeViewTab === 'all' || activeViewTab === 'teleconsultation') && (
+                        <DoctorQueueList />
+                    )}
+
+                    {(activeViewTab === 'all' || activeViewTab === 'clinic') && (
+                        <DoctorClinicAppointments />
+                    )}
                 </div>
                 <div className="flex flex-col gap-6">
                     <DoctorOutbreakWidget />
 
                     {/* Rapid Clinical Shortcuts */}
-                    <div className="bg-white rounded-3xl border border-[#f5e4ec] p-6 shadow-xs flex flex-col gap-4">
-                        <h3 className="font-black text-[#2d2329] text-sm font-heading">
+                    <div
+                        className="rounded-3xl p-6 shadow-xs flex flex-col gap-4"
+                        style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}
+                    >
+                        <h3 className="font-black text-sm font-heading" style={{ color: 'var(--text-primary)' }}>
                             Clinical Shortcuts
                         </h3>
                         <div className="flex flex-col gap-2.5">
                             <Link
                                 to="/doctor/referrals"
-                                className="p-3 rounded-2xl bg-[#fffcfd] hover:bg-[#ffe6ee]/50 border border-[#f5e4ec] text-xs font-bold text-[#2d2329] flex items-center justify-between transition group"
+                                className="p-3 rounded-2xl text-xs font-bold flex items-center justify-between transition group hover:opacity-90"
+                                style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
                             >
                                 <span className="flex items-center gap-2">
-                                    <Share2 className="w-4 h-4 text-[#e13b68]" />
+                                    <Share2 className="w-4 h-4" style={{ color: 'var(--accent)' }} />
                                     <span>Incoming ASHA Referrals</span>
                                 </span>
-                                <ArrowUpRight className="w-3.5 h-3.5 text-[#7d6974] group-hover:text-[#e13b68] transition-colors" />
+                                <ArrowUpRight className="w-3.5 h-3.5 transition-colors" style={{ color: 'var(--text-secondary)' }} />
                             </Link>
 
                             <Link
                                 to="/doctor/clinics"
-                                className="p-3 rounded-2xl bg-[#fffcfd] hover:bg-[#ffe6ee]/50 border border-[#f5e4ec] text-xs font-bold text-[#2d2329] flex items-center justify-between transition group"
+                                className="p-3 rounded-2xl text-xs font-bold flex items-center justify-between transition group hover:opacity-90"
+                                style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
                             >
                                 <span className="flex items-center gap-2">
-                                    <Building className="w-4 h-4 text-[#e13b68]" />
-                                    <span>Clinic Timings & Fees</span>
+                                    <Building className="w-4 h-4" style={{ color: 'var(--accent)' }} />
+                                    <span>Clinic Timings &amp; Fees</span>
                                 </span>
-                                <ArrowUpRight className="w-3.5 h-3.5 text-[#7d6974] group-hover:text-[#e13b68] transition-colors" />
+                                <ArrowUpRight className="w-3.5 h-3.5 transition-colors" style={{ color: 'var(--text-secondary)' }} />
                             </Link>
 
                             <Link
                                 to="/doctor/heatmap"
-                                className="p-3 rounded-2xl bg-[#fffcfd] hover:bg-[#ffe6ee]/50 border border-[#f5e4ec] text-xs font-bold text-[#2d2329] flex items-center justify-between transition group"
+                                className="p-3 rounded-2xl text-xs font-bold flex items-center justify-between transition group hover:opacity-90"
+                                style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
                             >
                                 <span className="flex items-center gap-2">
-                                    <Flame className="w-4 h-4 text-[#e13b68]" />
+                                    <Flame className="w-4 h-4" style={{ color: 'var(--accent)' }} />
                                     <span>Nationwide Epidemic Map</span>
                                 </span>
-                                <ArrowUpRight className="w-3.5 h-3.5 text-[#7d6974] group-hover:text-[#e13b68] transition-colors" />
+                                <ArrowUpRight className="w-3.5 h-3.5 transition-colors" style={{ color: 'var(--text-secondary)' }} />
                             </Link>
                         </div>
                     </div>

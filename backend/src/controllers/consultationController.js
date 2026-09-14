@@ -169,31 +169,37 @@ async function generateAiSummary(req, res) {
 
 /**
  * POST /api/consultations/:id/end
- * Allows a patient to manually hang up/terminate their active consultation.
- * This explicitly closes the queue entry so it no longer loops on the dashboard.
+ * Allows a patient or doctor to manually hang up/terminate their active consultation.
+ * This explicitly closes the queue entry and marks consultation as completed/over.
  */
 async function endCallByPatient(req, res) {
     try {
         const { id } = req.params;
         const consultation = await Consultation.findByPk(id);
 
-        if (!consultation || consultation.patientId !== req.user.id) {
+        if (!consultation || (consultation.patientId !== req.user.id && consultation.doctorId !== req.user.id && req.user.role !== 'admin')) {
             return res.status(404).json({ error: 'Consultation not found or unauthorized' });
         }
 
         // Only mark it completed if it's currently active in some form
-        if (['assigned', 'in_progress', 'disconnected'].includes(consultation.status)) {
+        if (['assigned', 'in_progress', 'disconnected', 'pending'].includes(consultation.status)) {
             consultation.status = 'completed';
             consultation.webrtcStatus = 'completed';
             await consultation.save();
 
             // Clear the queue tracking row
-            const { Queue } = require('../models');
+            const { Queue, Appointment } = require('../models');
             const queue = await Queue.findOne({ where: { patientId: consultation.patientId, doctorId: consultation.doctorId, status: 'SERVING' } });
             if (queue) {
                 queue.status = 'COMPLETED';
                 await queue.save();
             }
+
+            // Also update any scheduled teleconsultation appointment to completed
+            await Appointment.update(
+                { status: 'completed' },
+                { where: { patientId: consultation.patientId, doctorId: consultation.doctorId, type: 'teleconsultation', status: 'scheduled' } }
+            ).catch(() => {});
 
             // Prune dangling socket disconnect timers
             const timers = req.app.get('disconnectTimers');
@@ -202,14 +208,15 @@ async function endCallByPatient(req, res) {
                 timers.delete(consultation.roomId);
             }
 
-            // Immediately notify the remote doctor directly so they are cleanly kicked out
+            // Immediately notify both doctor and patient
             const io = req.app.get('io');
             if (io) {
                 io.to(`user:${consultation.doctorId}`).emit('consultation:completed', { consultationId: id });
+                io.to(`user:${consultation.patientId}`).emit('consultation:completed', { consultationId: id });
             }
         }
 
-        return res.json({ success: true, message: 'Consultation ended successfully' });
+        return res.json({ success: true, message: 'Consultation ended and marked as over.' });
     } catch (err) {
         console.error('[endCallByPatient] error:', err);
         return res.status(500).json({ error: 'Failed to end call' });
@@ -406,6 +413,39 @@ async function completeConsultation(req, res) {
                     });
                     console.log('[DEBUG] Disease report effectively recorded');
                     runDetectionCycle().catch(err => console.error('[outbreakDetection] Background err:', err));
+                }
+
+                // 7. Automated Medication Extraction & Reminders
+                if (prescriptionText?.trim()) {
+                    try {
+                        const { extractMedications } = require('../services/medicationExtractionService');
+                        const { MedicationReminder } = require('../models');
+                        const meds = await extractMedications(prescriptionText);
+                        if (meds.length > 0) {
+                            const today = new Date().toISOString().slice(0, 10);
+                            for (const m of meds) {
+                                const existing = await MedicationReminder.findOne({
+                                    where: { consultationId: consultation.id, patientId: consultation.patientId, medicineName: m.name }
+                                });
+                                if (!existing) {
+                                    await MedicationReminder.create({
+                                        patientId: consultation.patientId,
+                                        consultationId: consultation.id,
+                                        medicineName: m.name,
+                                        dosage: m.dosage,
+                                        frequency: m.frequency,
+                                        startDate: today,
+                                        reminderTimes: ['09:00'],
+                                        isActive: false,
+                                        bullJobIds: []
+                                    });
+                                }
+                            }
+                            console.log('[MedicationReminders] Auto-extracted', meds.length, 'medications for consultation', consultation.id);
+                        }
+                    } catch (medErr) {
+                        console.error('[completeConsultation] Medication extraction error:', medErr.message);
+                    }
                 }
 
             } catch (bgErr) {
@@ -613,10 +653,6 @@ async function extractPdfUUID(req, res) {
         const data = await pdfParse(req.file.buffer);
         const text = data.text;
 
-        // Match standard UUID v4 format
-        const uuidRegex = /[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/i;
-        const match = text.match(uuidRegex);
-
         if (match && match[0]) {
             return res.json({ consultationId: match[0].toLowerCase() });
         } else {
@@ -628,4 +664,99 @@ async function extractPdfUUID(req, res) {
     }
 }
 
-module.exports = { getMyConsultations, rejoinCall, generateAiSummary, getTimeline, endCallByPatient, completeConsultation, getActiveConsultations, getPrescriptionPdf, verifyPrescription, extractPdfUUID };
+/**
+ * POST /api/consultations/:id/reschedule
+ * Allows doctor or patient to reschedule a teleconsultation if there are network issues or unreachability.
+ */
+async function rescheduleConsultation(req, res) {
+    try {
+        const { id } = req.params;
+        const { newTimeSlot, newDate, reason } = req.body;
+        const userId = req.user.id;
+
+        if (!newTimeSlot && !newDate) {
+            return res.status(400).json({ error: 'A new time slot or date is required for rescheduling.' });
+        }
+
+        if (req.user.role !== 'doctor' && req.user.role !== 'admin') {
+            return res.status(403).json({ error: 'Only the consulting doctor can reschedule the teleconsultation.' });
+        }
+
+        const consultation = await Consultation.findByPk(id, {
+            include: [
+                { model: PatientProfile, as: 'patient' },
+                { model: DoctorProfile, as: 'doctor' }
+            ]
+        });
+
+        if (!consultation || (consultation.doctorId !== userId && req.user.role !== 'admin')) {
+            return res.status(404).json({ error: 'Consultation not found or unauthorized' });
+        }
+
+        consultation.scheduledAt = newDate ? new Date(newDate) : new Date();
+        consultation.status = 'assigned';
+        consultation.webrtcStatus = 'disconnected';
+        consultation.notes = (consultation.notes ? consultation.notes + '\n' : '') + `[Rescheduled by ${req.user.role} to ${newTimeSlot || newDate}. Reason: ${reason || 'Network connectivity / unreachability'}]`;
+        await consultation.save();
+
+        // Update corresponding appointment
+        const { Appointment, Queue, User } = require('../models');
+        await Appointment.update(
+            { 
+                timeSlot: newTimeSlot || 'Rescheduled Slot',
+                appointmentDate: newDate ? new Date(newDate) : consultation.scheduledAt,
+                status: 'scheduled',
+                notes: `Rescheduled: ${reason || 'Connection difficulty'}`
+            },
+            { 
+                where: { 
+                    patientId: consultation.patientId, 
+                    doctorId: consultation.doctorId,
+                    type: 'teleconsultation'
+                } 
+            }
+        ).catch(() => {});
+
+        // Release socket disconnect timers if any
+        const timers = req.app.get('disconnectTimers');
+        if (timers && timers.has(consultation.roomId)) {
+            clearTimeout(timers.get(consultation.roomId));
+            timers.delete(consultation.roomId);
+        }
+
+        // Notify both parties via Socket.io
+        const io = req.app.get('io');
+        if (io) {
+            const payload = {
+                consultationId: consultation.id,
+                newTimeSlot: newTimeSlot || newDate,
+                reason: reason || 'Connection issue',
+                rescheduledBy: req.user.role
+            };
+            io.to(`user:${consultation.patientId}`).emit('consultation:rescheduled', payload);
+            io.to(`user:${consultation.doctorId}`).emit('consultation:rescheduled', payload);
+        }
+
+        // WhatsApp notification (fire-and-forget)
+        User.findByPk(consultation.patientId).then((patientUser) => {
+            if (patientUser?.phone) {
+                const phone = patientUser.phone.replace('+', '');
+                enqueueFreeText(
+                    phone,
+                    `[Consultation Rescheduled]\n\nYour teleconsultation has been rescheduled to:\nTime: ${newTimeSlot || 'Upcoming Slot'}\nReason: ${reason || 'Network connectivity issue'}\n\nPlease join the room at the scheduled time.`
+                ).catch(() => {});
+            }
+        }).catch(() => {});
+
+        return res.json({
+            success: true,
+            message: `Consultation successfully rescheduled to ${newTimeSlot || newDate}`,
+            consultation
+        });
+    } catch (err) {
+        console.error('[rescheduleConsultation] error:', err);
+        return res.status(500).json({ error: 'Failed to reschedule consultation' });
+    }
+}
+
+module.exports = { getMyConsultations, rejoinCall, generateAiSummary, getTimeline, endCallByPatient, completeConsultation, getActiveConsultations, getPrescriptionPdf, verifyPrescription, extractPdfUUID, rescheduleConsultation };

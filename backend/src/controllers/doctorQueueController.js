@@ -1,11 +1,7 @@
-const { Queue, Consultation, PatientProfile, QueueSkipped, DoctorProfile } = require('../models');
+const { Queue, Consultation, PatientProfile, QueueSkipped, DoctorProfile, Appointment } = require('../models');
 const { Op } = require('sequelize');
 const { QUEUE_STATUS } = require('../constants/queueStatus');
 const crypto = require('crypto');
-
-// Socket instance will be needed to emit consultation:accepted
-// We assume it's attached to req.io or we can import it if necessary.
-// For now, we will assume req.app.get('io') is available.
 
 /**
  * GET /api/doctors/queue
@@ -14,7 +10,6 @@ const crypto = require('crypto');
  * Includes unassigned requests filtered to their specialization, minus skipped.
  */
 exports.getQueue = async (req, res) => {
-    console.log('[getQueue] EXECUTING route!');
     try {
         const doctorId = req.user.id;
         const doctor = await DoctorProfile.findOne({ where: { userId: doctorId } });
@@ -24,13 +19,45 @@ exports.getQueue = async (req, res) => {
         const skipped = await QueueSkipped.findAll({ where: { doctorId }, attributes: ['queueId'] });
         const skippedIds = skipped.map(s => s.queueId);
 
-        // Fetch queues: either assigned specifically to this doctor OR unassigned (if any)
+        // Split doctor specialization into tokens
+        const rawDoctorSpec = doctor.specialization || '';
+        const doctorTokens = rawDoctorSpec
+            .toLowerCase()
+            .split(/[,/&]+/)
+            .map(t => t.trim())
+            .filter(t => t.length > 2);
+
+        // Build specialization matching OR clauses:
+        // 1. If queue has specialization: null or empty
+        // 2. If queue specialization is 'General Physician' / 'General Medicine' / 'Any'
+        // 3. If queue specialization matches any doctor token (e.g. %pediatrics%, %gastroenterology%, %surgery%)
+        // 4. If doctor's specialization matches queue's specialization
+        const specConditions = [
+            { specialization: null },
+            { specialization: '' },
+            { specialization: { [Op.iLike]: '%general%' } },
+            { specialization: { [Op.iLike]: '%physician%' } },
+            { specialization: { [Op.iLike]: '%medicine%' } },
+        ];
+
+        for (const token of doctorTokens) {
+            specConditions.push({ specialization: { [Op.iLike]: `%${token}%` } });
+            // Also split words within token (e.g. 'pediatrics')
+            const words = token.split(/\s+/).filter(w => w.length > 3);
+            for (const word of words) {
+                specConditions.push({ specialization: { [Op.iLike]: `%${word}%` } });
+            }
+        }
+
         const whereClause = {
             status: QUEUE_STATUS.WAITING,
             id: { [Op.notIn]: skippedIds },
             [Op.or]: [
                 { doctorId },
-                { doctorId: null } // pool
+                { 
+                    doctorId: null,
+                    [Op.or]: specConditions
+                }
             ]
         };
 
@@ -45,10 +72,19 @@ exports.getQueue = async (req, res) => {
             ]
         });
 
-        // The prompt asks for urgency flag. Assuming disease_reports or some AI triage data exists, 
-        // we map that if available (omitted for brevity, can attach later if triage ties to queue).
+        // Enrich with isOfferedByMe indicator
+        const enrichedQueues = queues.map(q => {
+            const raw = q.toJSON();
+            const acceptedList = Array.isArray(raw.acceptedDoctorIds) ? raw.acceptedDoctorIds : [];
+            const isOfferedByMe = acceptedList.some(item => (typeof item === 'object' ? item?.doctorId : item) === doctorId);
+            return {
+                ...raw,
+                isOfferedByMe,
+                acceptedDoctorCount: acceptedList.length,
+            };
+        });
 
-        return res.json({ queue: queues });
+        return res.json({ queue: enrichedQueues });
     } catch (err) {
         console.error('[getQueue] error:', err);
         return res.status(500).json({ error: 'Failed to fetch queue' });
@@ -57,6 +93,8 @@ exports.getQueue = async (req, res) => {
 
 /**
  * POST /api/doctors/queue/:queueId/accept
+ * If direct booking: claims queue immediately and creates Consultation.
+ * If broadcast booking: adds doctor to acceptedDoctorIds and notifies patient.
  */
 exports.acceptRequest = async (req, res) => {
     try {
@@ -69,35 +107,94 @@ exports.acceptRequest = async (req, res) => {
             return res.status(400).json({ error: 'Request is no longer waiting' });
         }
 
-        // Generate WebRTC room ID
-        const roomId = crypto.randomUUID();
+        const doctor = await DoctorProfile.findOne({ where: { userId: doctorId } });
+        if (!doctor) return res.status(404).json({ error: 'Doctor profile not found' });
 
-        // Create the Consultation record 
-        const consultation = await Consultation.create({
-            patientId: queue.patientId,
-            doctorId: doctorId,
-            clinicId: queue.clinicId,
-            status: 'assigned',
-            roomId,
-            webrtcStatus: 'waiting'
-        });
-
-        // Mark queue as serving
-        queue.status = QUEUE_STATUS.SERVING;
-        queue.doctorId = doctorId; // Claim it
-        await queue.save();
-
-        // Emit to patient
         const io = req.app.get('io');
-        if (io) {
-            io.to(`user:${queue.patientId}`).emit('consultation:accepted', {
-                consultationId: consultation.id,
+
+        // Case 1: Direct 1-to-1 doctor request
+        if (queue.doctorId === doctorId) {
+            const roomId = crypto.randomUUID();
+            const consultation = await Consultation.create({
+                patientId: queue.patientId,
+                doctorId: doctorId,
+                clinicId: queue.clinicId || doctor.clinicId,
+                status: 'assigned',
                 roomId,
-                doctorId
+                webrtcStatus: 'waiting',
+                reportedSymptoms: queue.symptoms,
+                scheduledAt: queue.appointmentDate || new Date()
+            });
+
+            queue.status = QUEUE_STATUS.SERVING;
+            queue.selectedDoctorId = doctorId;
+            await queue.save();
+
+            if (io) {
+                io.to(`user:${queue.patientId}`).emit('consultation:accepted', {
+                    consultationId: consultation.id,
+                    roomId,
+                    doctorId,
+                    doctorName: doctor.fullName
+                });
+            }
+
+            return res.json({ 
+                success: true, 
+                direct: true, 
+                consultation,
+                message: 'Consultation started successfully' 
             });
         }
 
-        return res.json({ success: true, consultation });
+        // Case 2: Specialty pool broadcast request
+        const { offeredTimeSlot, customNote } = req.body || {};
+        const slotLabel = typeof offeredTimeSlot === 'object' 
+            ? (offeredTimeSlot?.label || 'Right Now · Immediate (Next 5–10 mins)')
+            : (offeredTimeSlot || 'Right Now · Immediate (Next 5–10 mins)');
+
+        const currentAccepted = Array.isArray(queue.acceptedDoctorIds) ? [...queue.acceptedDoctorIds] : [];
+        const existingIndex = currentAccepted.findIndex(item => (typeof item === 'object' ? item?.doctorId : item) === doctorId);
+
+        const doctorOffer = {
+            doctorId: doctor.userId,
+            fullName: doctor.fullName,
+            specialization: doctor.specialization,
+            consultationFee: doctor.teleconsultationFee || doctor.consultationFee || 500,
+            avgRating: doctor.avgRating || '5.0',
+            yearsOfExperience: doctor.yearsOfExperience || 0,
+            clinicName: doctor.clinicOrHospital,
+            offeredTimeSlot: slotLabel,
+            slotMetadata: typeof offeredTimeSlot === 'object' ? offeredTimeSlot : null,
+            customNote: customNote || null,
+            acceptedAt: new Date(),
+        };
+
+        if (existingIndex >= 0) {
+            currentAccepted[existingIndex] = doctorOffer;
+        } else {
+            currentAccepted.push(doctorOffer);
+        }
+
+        queue.acceptedDoctorIds = currentAccepted;
+        await queue.save();
+
+        // Emit to patient so their comparison card updates instantly with offered time slot
+        if (io) {
+            io.to(`user:${queue.patientId}`).emit('consultation:doctor_accepted', {
+                queueId: queue.id,
+                doctor: doctorOffer,
+                acceptedDoctors: currentAccepted
+            });
+        }
+
+        return res.json({ 
+            success: true, 
+            direct: false, 
+            message: `Your teleconsultation slot (${formattedSlot}) has been sent to the patient.`,
+            offeredTimeSlot: formattedSlot,
+            queue 
+        });
     } catch (err) {
         console.error('[acceptRequest] error:', err);
         return res.status(500).json({ error: 'Failed to accept request' });
@@ -119,4 +216,5 @@ exports.skipRequest = async (req, res) => {
         return res.status(500).json({ error: 'Failed to skip' });
     }
 };
+
 

@@ -5,6 +5,7 @@ export const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
+    const [token, setToken] = useState(() => localStorage.getItem('accessToken'));
     const [loading, setLoading] = useState(true);
 
     // Load user from localStorage and verify profile
@@ -30,6 +31,7 @@ export const AuthProvider = ({ children }) => {
         const storedUser = localStorage.getItem('user');
 
         if (accessToken) {
+            setToken(accessToken);
             if (storedUser) {
                 setUser(JSON.parse(storedUser));
                 setLoading(false);
@@ -44,6 +46,7 @@ export const AuthProvider = ({ children }) => {
 
         const handleLogoutEvent = () => {
             setUser(null);
+            setToken(null);
         };
 
         window.addEventListener('auth-logout', handleLogoutEvent);
@@ -58,6 +61,7 @@ export const AuthProvider = ({ children }) => {
 
             localStorage.setItem('accessToken', accessToken);
             localStorage.setItem('refreshToken', refreshToken);
+            setToken(accessToken);
 
             // Now fetch full profile
             const profileResponse = await api.get('/profile/me');
@@ -93,6 +97,7 @@ export const AuthProvider = ({ children }) => {
 
             localStorage.setItem('accessToken', accessToken);
             localStorage.setItem('refreshToken', refreshToken);
+            setToken(accessToken);
 
             // Fetch profile
             const profileResponse = await api.get('/profile/me');
@@ -159,6 +164,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem('refreshToken');
         localStorage.removeItem('user');
         setUser(null);
+        setToken(null);
         setLoading(false);
     };
 
@@ -166,6 +172,7 @@ export const AuthProvider = ({ children }) => {
         <AuthContext.Provider
             value={{
                 user,
+                token,
                 loading,
                 login,
                 registerPatient,
