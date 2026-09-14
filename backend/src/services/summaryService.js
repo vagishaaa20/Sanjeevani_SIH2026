@@ -1,7 +1,4 @@
-const axios = require('axios');
-
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
+const { generateText } = require('../utils/aiClient');
 
 const SUMMARY_PROMPT = (notes) =>
     `You are a medical communication assistant for Sanjeevani, a rural India health platform.
@@ -26,23 +23,18 @@ Respond with ONLY the summary text — no markdown, no quotes, no preamble.`;
 async function generateSummary(notesText) {
     if (!notesText?.trim()) return null;
 
-    if (!GEMINI_API_KEY) {
-        throw new Error('GEMINI_API_KEY is not set in environment');
+    try {
+        const text = await generateText({
+            prompt: SUMMARY_PROMPT(notesText),
+            temperature: 0.2,
+            maxTokens: 256,
+        });
+
+        return text || null;
+    } catch (err) {
+        console.error('[generateSummary] Summary generation error:', err.message);
+        return null;
     }
-
-    const response = await axios.post(
-        GEMINI_URL,
-        {
-            contents: [{ parts: [{ text: SUMMARY_PROMPT(notesText) }] }],
-            generationConfig: { temperature: 0.2, maxOutputTokens: 256 },
-        },
-        { timeout: 15000 }
-    );
-
-    const text = response.data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-    if (!text) throw new Error('Empty response from Gemini');
-
-    return text;
 }
 
 module.exports = { generateSummary };

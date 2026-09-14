@@ -254,20 +254,26 @@ export const DoctorPracticeLocations = () => {
     return (
         <div className="w-full flex flex-col gap-6 text-left animate-fade-in-up">
             {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white border border-[#f5e4ec] rounded-3xl p-6 md:p-8 shadow-xs">
+            <div 
+                className="flex flex-col md:flex-row md:items-center justify-between gap-4 rounded-3xl p-6 md:p-8 shadow-xs"
+                style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}
+            >
                 <div>
                     <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs font-bold uppercase tracking-wider text-[#e13b68] bg-[#ffe6ee] px-2.5 py-0.5 rounded-full">
+                        <span 
+                            className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full"
+                            style={{ background: 'var(--accent-light)', color: 'var(--accent)' }}
+                        >
                             Clinic Management
                         </span>
                         <Badge variant="mint" dot>
-                            Active & Verified
+                            Active &amp; Verified
                         </Badge>
                     </div>
-                    <h1 className="text-2xl md:text-3xl font-black text-[#2d2329] font-heading">
+                    <h1 className="text-2xl md:text-3xl font-black font-heading tracking-tight" style={{ color: 'var(--text-primary)' }}>
                         Manage Practice Locations
                     </h1>
-                    <p className="text-xs font-semibold text-[#7d6974] mt-1">
+                    <p className="text-xs font-medium mt-1" style={{ color: 'var(--text-secondary)' }}>
                         Add every clinic you consult at — each one can have its own fee and timing.
                     </p>
                 </div>
@@ -275,41 +281,48 @@ export const DoctorPracticeLocations = () => {
                 {!isFormOpen && (
                     <button
                         onClick={handleOpenAdd}
-                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#e13b68] hover:bg-[#c92a55] text-white text-xs font-bold shadow-xs transition duration-150 self-start md:self-auto"
+                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-white text-xs font-bold shadow-xs transition duration-150 self-start md:self-auto cursor-pointer"
+                        style={{ background: 'var(--accent)' }}
                     >
                         <Plus className="w-4 h-4" />
-                        Add Practice Location
+                        <span>Add Practice Location</span>
                     </button>
                 )}
             </div>
 
             {/* Notifications */}
             {successMsg && (
-                <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2 animate-fade-in">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 text-xs font-bold flex items-center gap-2 animate-fade-in">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
                     <span>{successMsg}</span>
                 </div>
             )}
             {errorMsg && (
-                <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold flex items-center gap-2 animate-fade-in">
-                    <AlertCircle className="w-4 h-4 text-rose-600 flex-shrink-0" />
+                <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-500 text-xs font-bold flex items-center gap-2 animate-fade-in">
+                    <AlertCircle className="w-4 h-4 text-rose-500 flex-shrink-0" />
                     <span>{errorMsg}</span>
                 </div>
             )}
 
             {/* Add / Edit Clinic Form Drawer */}
             {isFormOpen && (
-                <div className="bg-white border-2 border-[#e13b68]/30 rounded-3xl p-6 md:p-8 shadow-md flex flex-col gap-6 animate-fade-in">
-                    <div className="flex items-center justify-between border-b border-[#f5e4ec] pb-4">
+                <div 
+                    className="rounded-3xl p-6 md:p-8 shadow-md flex flex-col gap-6 animate-fade-in"
+                    style={{ background: 'var(--card-bg)', border: '2px solid var(--accent)' }}
+                >
+                    <div className="flex items-center justify-between pb-4" style={{ borderBottom: '1px solid var(--border)' }}>
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-2xl bg-[#ffe6ee] text-[#e13b68] flex items-center justify-center">
+                            <div 
+                                className="w-10 h-10 rounded-2xl flex items-center justify-center"
+                                style={{ background: 'var(--accent-light)', color: 'var(--accent)' }}
+                            >
                                 <Building className="w-5 h-5" />
                             </div>
                             <div>
-                                <h3 className="text-lg font-black text-[#2d2329]">
+                                <h3 className="text-lg font-black font-heading" style={{ color: 'var(--text-primary)' }}>
                                     {editingIndex !== null ? 'Edit Practice Location' : 'Add a Clinic / Hospital Location'}
                                 </h3>
-                                <p className="text-xs text-[#7d6974] font-medium">
+                                <p className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
                                     Set location address, consultation fee, and consulting hours.
                                 </p>
                             </div>
@@ -317,7 +330,8 @@ export const DoctorPracticeLocations = () => {
                         <button
                             type="button"
                             onClick={() => setIsFormOpen(false)}
-                            className="px-3 py-1.5 rounded-xl border border-[#f5e4ec] text-[#7d6974] hover:bg-[#fffcfd] text-xs font-bold transition"
+                            className="px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer hover:opacity-80"
+                            style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', color: 'var(--text-secondary)' }}
                         >
                             Close Form
                         </button>
@@ -325,26 +339,31 @@ export const DoctorPracticeLocations = () => {
 
                     {/* Quick Link from Registered Sanjeevani Clinics */}
                     {registeredClinics.length > 0 && (
-                        <div className="p-4 rounded-2xl bg-[#fffcfd] border border-[#f5e4ec] flex flex-col gap-2">
-                            <label className="text-xs font-bold text-[#4a3c45] uppercase tracking-wider flex items-center gap-2">
-                                <Sparkles className="w-3.5 h-3.5 text-[#e13b68]" />
-                                Quick Select from Registered Sanjeevani Clinics (Optional)
+                        <div 
+                            className="p-4 rounded-2xl flex flex-col gap-2"
+                            style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)' }}
+                        >
+                            <label className="text-xs font-bold uppercase tracking-wider flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
+                                <Sparkles className="w-3.5 h-3.5" style={{ color: 'var(--accent)' }} />
+                                <span>Quick Select from Registered Sanjeevani Clinics (Optional)</span>
                             </label>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                                 <div className="relative">
-                                    <Search className="w-3.5 h-3.5 text-[#7d6974] absolute left-3 top-3 pointer-events-none" />
+                                    <Search className="w-3.5 h-3.5 absolute left-3 top-3 pointer-events-none" style={{ color: 'var(--text-secondary)' }} />
                                     <input
                                         type="text"
                                         placeholder="Filter clinics by name or city..."
                                         value={clinicSearch}
                                         onChange={(e) => setClinicSearch(e.target.value)}
-                                        className="w-full pl-8 pr-3 py-2 rounded-xl border border-[#f5e4ec] bg-white text-xs focus:ring-2 focus:ring-[#e13b68]/30 focus:outline-none"
+                                        className="w-full pl-8 pr-3 py-2 rounded-xl text-xs focus:ring-2 focus:ring-[#e13b68]/30 focus:outline-none"
+                                        style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
                                     />
                                 </div>
                                 <select
                                     value={form.clinicId || ''}
                                     onChange={handleSelectRegisteredClinic}
-                                    className="w-full px-3 py-2 rounded-xl border border-[#f5e4ec] bg-white text-xs focus:ring-2 focus:ring-[#e13b68]/30 focus:outline-none font-medium"
+                                    className="w-full px-3 py-2 rounded-xl text-xs focus:ring-2 focus:ring-[#e13b68]/30 focus:outline-none font-medium cursor-pointer"
+                                    style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
                                 >
                                     <option value="">— Choose a registered center —</option>
                                     {filteredClinics.map((c) => (
@@ -360,7 +379,7 @@ export const DoctorPracticeLocations = () => {
                     <form onSubmit={handleSaveLocation} className="flex flex-col gap-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="flex flex-col gap-1.5">
-                                <label className="text-xs font-bold text-[#4a3c45] uppercase tracking-wider">
+                                <label className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-primary)' }}>
                                     Clinic / Hospital Name <span className="text-rose-500">*</span>
                                 </label>
                                 <input
@@ -369,12 +388,13 @@ export const DoctorPracticeLocations = () => {
                                     placeholder="e.g. Sanjeevani Health Center / City Heart Care"
                                     value={form.clinicName}
                                     onChange={(e) => setForm({ ...form, clinicName: e.target.value })}
-                                    className="w-full px-4 py-2.5 rounded-2xl border border-[#f5e4ec] bg-white text-[#2d2329] focus:ring-2 focus:ring-[#e13b68]/30 focus:border-[#e13b68] text-sm focus:outline-none shadow-2xs"
+                                    className="w-full px-4 py-2.5 rounded-2xl text-sm focus:ring-2 focus:ring-[#e13b68]/30 focus:outline-none shadow-2xs"
+                                    style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
                                 />
                             </div>
 
                             <div className="flex flex-col gap-1.5">
-                                <label className="text-xs font-bold text-[#4a3c45] uppercase tracking-wider">
+                                <label className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-primary)' }}>
                                     Address / Locality <span className="text-rose-500">*</span>
                                 </label>
                                 <input
@@ -383,18 +403,19 @@ export const DoctorPracticeLocations = () => {
                                     placeholder="e.g. 12 MG Road, near Metro Station, Delhi"
                                     value={form.address}
                                     onChange={(e) => setForm({ ...form, address: e.target.value })}
-                                    className="w-full px-4 py-2.5 rounded-2xl border border-[#f5e4ec] bg-white text-[#2d2329] focus:ring-2 focus:ring-[#e13b68]/30 focus:border-[#e13b68] text-sm focus:outline-none shadow-2xs"
+                                    className="w-full px-4 py-2.5 rounded-2xl text-sm focus:ring-2 focus:ring-[#e13b68]/30 focus:outline-none shadow-2xs"
+                                    style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
                                 />
                             </div>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div className="flex flex-col gap-1.5">
-                                <label className="text-xs font-bold text-[#4a3c45] uppercase tracking-wider">
+                                <label className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-primary)' }}>
                                     Consultation Fee (₹) <span className="text-rose-500">*</span>
                                 </label>
                                 <div className="relative">
-                                    <IndianRupee className="w-4 h-4 text-[#7d6974] absolute left-3.5 top-3 pointer-events-none" />
+                                    <IndianRupee className="w-4 h-4 absolute left-3.5 top-3 pointer-events-none" style={{ color: 'var(--text-secondary)' }} />
                                     <input
                                         type="number"
                                         required
@@ -402,13 +423,14 @@ export const DoctorPracticeLocations = () => {
                                         placeholder="e.g. 600"
                                         value={form.consultationFee}
                                         onChange={(e) => setForm({ ...form, consultationFee: e.target.value })}
-                                        className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-[#f5e4ec] bg-white text-[#2d2329] focus:ring-2 focus:ring-[#e13b68]/30 focus:border-[#e13b68] text-sm focus:outline-none shadow-2xs"
+                                        className="w-full pl-10 pr-4 py-2.5 rounded-2xl text-sm focus:ring-2 focus:ring-[#e13b68]/30 focus:outline-none shadow-2xs"
+                                        style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
                                     />
                                 </div>
                             </div>
 
                             <div className="flex flex-col gap-1.5">
-                                <label className="text-xs font-bold text-[#4a3c45] uppercase tracking-wider">
+                                <label className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-primary)' }}>
                                     Start Time <span className="text-rose-500">*</span>
                                 </label>
                                 <input
@@ -416,12 +438,13 @@ export const DoctorPracticeLocations = () => {
                                     required
                                     value={form.startTime}
                                     onChange={(e) => setForm({ ...form, startTime: e.target.value })}
-                                    className="w-full px-4 py-2.5 rounded-2xl border border-[#f5e4ec] bg-white text-[#2d2329] focus:ring-2 focus:ring-[#e13b68]/30 focus:border-[#e13b68] text-sm focus:outline-none shadow-2xs"
+                                    className="w-full px-4 py-2.5 rounded-2xl text-sm focus:ring-2 focus:ring-[#e13b68]/30 focus:outline-none shadow-2xs"
+                                    style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
                                 />
                             </div>
 
                             <div className="flex flex-col gap-1.5">
-                                <label className="text-xs font-bold text-[#4a3c45] uppercase tracking-wider">
+                                <label className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-primary)' }}>
                                     End Time <span className="text-rose-500">*</span>
                                 </label>
                                 <input
@@ -429,14 +452,15 @@ export const DoctorPracticeLocations = () => {
                                     required
                                     value={form.endTime}
                                     onChange={(e) => setForm({ ...form, endTime: e.target.value })}
-                                    className="w-full px-4 py-2.5 rounded-2xl border border-[#f5e4ec] bg-white text-[#2d2329] focus:ring-2 focus:ring-[#e13b68]/30 focus:border-[#e13b68] text-sm focus:outline-none shadow-2xs"
+                                    className="w-full px-4 py-2.5 rounded-2xl text-sm focus:ring-2 focus:ring-[#e13b68]/30 focus:outline-none shadow-2xs"
+                                    style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
                                 />
                             </div>
                         </div>
 
                         {/* Consultation Days Selector */}
                         <div className="flex flex-col gap-2 pt-1">
-                            <label className="text-xs font-bold text-[#4a3c45] uppercase tracking-wider">
+                            <label className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-primary)' }}>
                                 Days of Consultation <span className="text-rose-500">*</span>
                             </label>
                             <div className="flex flex-wrap gap-2">
@@ -447,11 +471,16 @@ export const DoctorPracticeLocations = () => {
                                             key={day}
                                             type="button"
                                             onClick={() => handleToggleDay(day)}
-                                            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                                                selected
-                                                    ? 'bg-[#e13b68] text-white shadow-xs scale-102'
-                                                    : 'bg-white border border-[#f5e4ec] text-[#7d6974] hover:bg-[#ffe6ee] hover:text-[#e13b68]'
-                                            }`}
+                                            className="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer"
+                                            style={selected ? {
+                                                background: 'var(--accent)',
+                                                color: '#ffffff',
+                                                boxShadow: '0 2px 8px rgba(225,59,104,0.3)',
+                                            } : {
+                                                background: 'var(--bg-surface)',
+                                                border: '1px solid var(--border)',
+                                                color: 'var(--text-secondary)'
+                                            }}
                                         >
                                             {day}
                                         </button>
@@ -461,19 +490,21 @@ export const DoctorPracticeLocations = () => {
                         </div>
 
                         {/* Action buttons */}
-                        <div className="flex items-center gap-3 pt-3 border-t border-[#f5e4ec]">
+                        <div className="flex items-center gap-3 pt-3" style={{ borderTop: '1px solid var(--border)' }}>
                             <button
                                 type="submit"
                                 disabled={saving}
-                                className="px-6 py-2.5 rounded-full bg-[#e13b68] hover:bg-[#c92a55] text-white text-xs font-bold shadow-xs transition duration-150 flex items-center gap-2 disabled:opacity-50"
+                                className="px-6 py-2.5 rounded-full text-white text-xs font-bold shadow-xs transition duration-150 flex items-center gap-2 disabled:opacity-50 cursor-pointer"
+                                style={{ background: 'var(--accent)' }}
                             >
                                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
-                                {editingIndex !== null ? 'Update Practice Location' : 'Save Clinic Location'}
+                                <span>{editingIndex !== null ? 'Update Practice Location' : 'Save Clinic Location'}</span>
                             </button>
                             <button
                                 type="button"
                                 onClick={() => setIsFormOpen(false)}
-                                className="px-5 py-2.5 rounded-full border border-[#f5e4ec] bg-white hover:bg-zinc-50 text-[#7d6974] text-xs font-bold transition"
+                                className="px-5 py-2.5 rounded-full text-xs font-bold transition cursor-pointer hover:opacity-80"
+                                style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', color: 'var(--text-secondary)' }}
                             >
                                 Cancel
                             </button>
@@ -485,33 +516,46 @@ export const DoctorPracticeLocations = () => {
             {/* Practice Locations Cards List */}
             <div className="flex flex-col gap-4">
                 <div className="flex items-center justify-between">
-                    <h2 className="text-lg font-black text-[#2d2329] font-heading flex items-center gap-2">
+                    <h2 className="text-lg font-black font-heading flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
                         <span>Your Practice Locations</span>
-                        <span className="text-xs font-bold text-[#7d6974] bg-[#ffe6ee] px-2.5 py-0.5 rounded-full">
+                        <span 
+                            className="text-xs font-bold px-2.5 py-0.5 rounded-full"
+                            style={{ background: 'var(--accent-light)', color: 'var(--accent)' }}
+                        >
                             {locations.length} {locations.length === 1 ? 'Location' : 'Locations'}
                         </span>
                     </h2>
                 </div>
 
                 {loading ? (
-                    <div className="p-12 text-center flex flex-col items-center justify-center gap-3 bg-white rounded-3xl border border-[#f5e4ec]">
-                        <Loader2 className="w-6 h-6 text-[#e13b68] animate-spin" />
-                        <span className="text-xs font-bold text-[#7d6974]">Loading practice locations…</span>
+                    <div 
+                        className="p-12 text-center flex flex-col items-center justify-center gap-3 rounded-3xl"
+                        style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}
+                    >
+                        <Loader2 className="w-6 h-6 animate-spin" style={{ color: 'var(--accent)' }} />
+                        <span className="text-xs font-bold" style={{ color: 'var(--text-secondary)' }}>Loading practice locations…</span>
                     </div>
                 ) : locations.length === 0 ? (
-                    <div className="p-10 text-center flex flex-col items-center justify-center gap-4 bg-white rounded-3xl border border-[#f5e4ec]">
-                        <div className="w-14 h-14 rounded-3xl bg-[#ffe6ee] text-[#e13b68] flex items-center justify-center">
+                    <div 
+                        className="p-10 text-center flex flex-col items-center justify-center gap-4 rounded-3xl"
+                        style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}
+                    >
+                        <div 
+                            className="w-14 h-14 rounded-3xl flex items-center justify-center"
+                            style={{ background: 'var(--accent-light)', color: 'var(--accent)' }}
+                        >
                             <Building className="w-7 h-7" />
                         </div>
                         <div>
-                            <h3 className="text-base font-black text-[#2d2329]">No Practice Locations Added Yet</h3>
-                            <p className="text-xs text-[#7d6974] font-medium mt-0.5 max-w-md">
+                            <h3 className="text-base font-black font-heading" style={{ color: 'var(--text-primary)' }}>No Practice Locations Added Yet</h3>
+                            <p className="text-xs font-medium mt-0.5 max-w-md" style={{ color: 'var(--text-secondary)' }}>
                                 Add clinics, hospitals, or consulting rooms where patients can visit you in person.
                             </p>
                         </div>
                         <button
                             onClick={handleOpenAdd}
-                            className="px-5 py-2.5 rounded-full bg-[#e13b68] hover:bg-[#c92a55] text-white text-xs font-bold shadow-xs transition"
+                            className="px-5 py-2.5 rounded-full text-white text-xs font-bold shadow-xs transition cursor-pointer"
+                            style={{ background: 'var(--accent)' }}
                         >
                             + Add Your First Clinic Location
                         </button>
@@ -521,20 +565,24 @@ export const DoctorPracticeLocations = () => {
                         {locations.map((loc, idx) => (
                             <div
                                 key={loc.id || idx}
-                                className="bg-white border border-[#f5e4ec] hover:border-[#f5c6d6] rounded-3xl p-6 shadow-xs hover:shadow-md transition duration-200 flex flex-col justify-between gap-4"
+                                className="rounded-3xl p-6 shadow-xs hover:shadow-md transition duration-200 flex flex-col justify-between gap-4"
+                                style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}
                             >
                                 <div className="flex flex-col gap-3">
                                     <div className="flex items-start justify-between gap-3">
                                         <div className="flex items-start gap-3">
-                                            <div className="w-11 h-11 rounded-2xl bg-[#ffe6ee] text-[#e13b68] flex items-center justify-center flex-shrink-0 mt-0.5">
+                                            <div 
+                                                className="w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0 mt-0.5"
+                                                style={{ background: 'var(--accent-light)', color: 'var(--accent)' }}
+                                            >
                                                 <Building className="w-5 h-5" />
                                             </div>
                                             <div>
-                                                <h3 className="text-base font-black text-[#2d2329] leading-snug">
+                                                <h3 className="text-base font-black font-heading leading-snug" style={{ color: 'var(--text-primary)' }}>
                                                     {loc.clinicName}
                                                 </h3>
-                                                <p className="text-xs text-[#7d6974] font-medium flex items-center gap-1 mt-1">
-                                                    <MapPin className="w-3.5 h-3.5 text-[#e13b68] flex-shrink-0" />
+                                                <p className="text-xs font-medium flex items-center gap-1 mt-1" style={{ color: 'var(--text-secondary)' }}>
+                                                    <MapPin className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'var(--accent)' }} />
                                                     <span>{loc.address}</span>
                                                 </p>
                                             </div>
@@ -543,14 +591,15 @@ export const DoctorPracticeLocations = () => {
                                         <div className="flex items-center gap-1">
                                             <button
                                                 onClick={() => handleOpenEdit(idx)}
-                                                className="p-2 rounded-xl text-[#7d6974] hover:text-[#e13b68] hover:bg-[#ffe6ee] transition"
+                                                className="p-2 rounded-xl transition cursor-pointer hover:opacity-80"
+                                                style={{ color: 'var(--text-secondary)' }}
                                                 title="Edit location"
                                             >
                                                 <Pencil className="w-4 h-4" />
                                             </button>
                                             <button
                                                 onClick={() => handleDeleteLocation(idx)}
-                                                className="p-2 rounded-xl text-[#7d6974] hover:text-rose-600 hover:bg-rose-50 transition"
+                                                className="p-2 rounded-xl transition cursor-pointer hover:opacity-80 text-rose-500"
                                                 title="Delete location"
                                             >
                                                 <Trash2 className="w-4 h-4" />
@@ -559,13 +608,16 @@ export const DoctorPracticeLocations = () => {
                                     </div>
 
                                     {/* Fee and Timing */}
-                                    <div className="flex flex-wrap items-center gap-4 pt-3 border-t border-[#f5e4ec]/80 text-xs">
-                                        <div className="flex items-center gap-1 font-bold text-[#2d2329]">
-                                            <IndianRupee className="w-3.5 h-3.5 text-[#e13b68]" />
-                                            <span>{loc.consultationFee ? `${loc.consultationFee} per visit` : '₹ 500 per visit'}</span>
+                                    <div 
+                                        className="flex flex-wrap items-center gap-4 pt-3 text-xs"
+                                        style={{ borderTop: '1px solid var(--border)' }}
+                                    >
+                                        <div className="flex items-center gap-1 font-bold text-emerald-500">
+                                            <IndianRupee className="w-3.5 h-3.5" />
+                                            <span>{loc.consultationFee ? `₹${loc.consultationFee} per visit` : '₹500 per visit'}</span>
                                         </div>
-                                        <div className="flex items-center gap-1 font-semibold text-[#7d6974]">
-                                            <Clock className="w-3.5 h-3.5 text-[#7d6974]" />
+                                        <div className="flex items-center gap-1 font-semibold" style={{ color: 'var(--text-secondary)' }}>
+                                            <Clock className="w-3.5 h-3.5" />
                                             <span>{loc.startTime || '09:00'} – {loc.endTime || '17:00'}</span>
                                         </div>
                                     </div>
@@ -575,7 +627,8 @@ export const DoctorPracticeLocations = () => {
                                         {(loc.days || ['MON', 'WED', 'FRI']).map((d) => (
                                             <span
                                                 key={d}
-                                                className="px-2.5 py-0.5 rounded-lg text-[11px] font-bold bg-[#fffcfd] border border-[#f5e4ec] text-[#4a3c45]"
+                                                className="px-2.5 py-0.5 rounded-lg text-[11px] font-bold"
+                                                style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
                                             >
                                                 {d}
                                             </span>
@@ -585,18 +638,22 @@ export const DoctorPracticeLocations = () => {
                             </div>
                         ))}
 
-                        {/* Dashed Add Another Clinic Card (matches user ref Screenshot 2) */}
+                        {/* Dashed Add Another Clinic Card */}
                         <button
                             onClick={handleOpenAdd}
-                            className="border-2 border-dashed border-[#f5c6d6] hover:border-[#e13b68] bg-[#fffcfd] hover:bg-[#ffe6ee]/30 rounded-3xl p-8 flex flex-col items-center justify-center gap-2 text-[#e13b68] transition duration-200 min-h-[160px] group"
+                            className="border-2 border-dashed rounded-3xl p-8 flex flex-col items-center justify-center gap-2 transition duration-200 min-h-[160px] group cursor-pointer"
+                            style={{ borderColor: 'var(--border)', background: 'var(--bg-surface)' }}
                         >
-                            <div className="w-10 h-10 rounded-full bg-[#ffe6ee] group-hover:bg-[#e13b68] group-hover:text-white text-[#e13b68] flex items-center justify-center transition-colors">
+                            <div 
+                                className="w-10 h-10 rounded-full flex items-center justify-center transition-colors"
+                                style={{ background: 'var(--accent-light)', color: 'var(--accent)' }}
+                            >
                                 <Plus className="w-5 h-5" />
                             </div>
-                            <span className="text-sm font-bold text-[#2d2329] group-hover:text-[#e13b68] transition-colors">
+                            <span className="text-sm font-bold transition-colors font-heading" style={{ color: 'var(--text-primary)' }}>
                                 + Add another clinic
                             </span>
-                            <span className="text-xs text-[#7d6974]">
+                            <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>
                                 Configure additional practice chambers, hospitals, or OPD timings.
                             </span>
                         </button>

@@ -13,6 +13,9 @@ router.post('/request', authenticate, requireRole('patient'), queueController.re
 // Patient views their own queue entries
 router.get('/my', authenticate, requireRole('patient'), queueController.myQueue);
 
+// Patient selects one doctor from the accepted doctors list for a pool broadcast
+router.post('/:id/select-doctor', authenticate, requireRole('patient'), queueController.selectDoctor);
+
 // Patient explicitly cancels their own WAITING queue request
 router.post('/:id/cancel', authenticate, requireRole('patient'), queueController.cancelQueue);
 

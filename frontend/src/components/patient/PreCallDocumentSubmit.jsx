@@ -99,7 +99,7 @@ export default function PreCallDocumentSubmit({ consultationId }) {
                             className="flex-1 py-3 shadow-[2px_2px_0px_#111] hover:shadow-[4px_4px_0px_#111] active:translate-y-0 active:shadow-none hover:-translate-y-0.5 rounded-xl font-bold text-white text-sm transition-all disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
                             style={{ background: 'var(--accent)', border: '2px solid var(--border)' }}
                         >
-                            {status === 'loading' ? 'Uploading...' : status === 'success' ? 'Joined! 🎥' : 'Upload & Join Call 🎥'}
+                            {status === 'loading' ? 'Uploading...' : status === 'success' ? 'Joined!' : 'Upload & Join Call'}
                         </button>
                     </div>
                 </form>

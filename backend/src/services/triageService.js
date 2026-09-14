@@ -1,12 +1,9 @@
-const axios = require('axios');
+const { generateText } = require('../utils/aiClient');
 const bhashiniService = require('./bhashiniService');
 const { buildTriagePrompt } = require('../prompts/triagePrompt');
 const { PatientProfile, DiseaseReport } = require('../models');
 const { runDetectionCycle } = require('./outbreakDetectionService');
 const ngeohash = require('ngeohash');
-
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
 
 const VALID_RECOMMENDATIONS = ['emergency', 'teleconsultation', 'doctor_visit'];
 
@@ -88,36 +85,87 @@ function mapDiseaseCategory(reasonText = '', symptoms = '') {
  * @throws {Error} if Gemini is unreachable, response is malformed, or key is missing
  */
 async function runTriage({ symptoms, duration, severity, patientId, targetLang = 'en' }) {
-    if (!GEMINI_API_KEY) {
-        throw new Error('GEMINI_API_KEY is not set in environment');
-    }
-
     // 1. Sanitize local symptoms to pure English via Bhashini wrapper (critical for disease tagging logic)
     let englishSymptoms = symptoms;
     if (targetLang !== 'en') {
-        englishSymptoms = await bhashiniService.translateText(symptoms, targetLang, 'en');
+        try {
+            englishSymptoms = await bhashiniService.translateText(symptoms, targetLang, 'en');
+        } catch (e) {
+            console.warn('[runTriage] Translation to English skipped:', e.message);
+        }
     }
 
     const prompt = buildTriagePrompt({ symptoms: englishSymptoms, duration, severity });
 
-    const response = await axios.post(
-        GEMINI_URL,
-        {
-            contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: { temperature: 0.1, maxOutputTokens: 256 },
-        },
-        { timeout: 15000 }
-    );
+    let rawText = '';
+    try {
+        rawText = await generateText({ prompt, temperature: 0.1, maxTokens: 256, json: true });
+    } catch (err) {
+        console.error('[runTriage] AI generation failed, using rule-based fallback:', err.message);
+        // Resilient clinical rule-based fallback
+        const lower = (englishSymptoms + ' ' + (severity || '')).toLowerCase();
+        let fallbackRec = 'teleconsultation';
+        let fallbackReason = 'Your symptoms can be effectively evaluated through a teleconsultation with a doctor.';
 
-    const rawText = response.data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-    if (!rawText) throw new Error('Empty response from Gemini');
+        if (lower.includes('chest pain') || lower.includes('shortness of breath') || lower.includes('unconscious') || lower.includes('fainting') || lower.includes('critical')) {
+            fallbackRec = 'emergency';
+            fallbackReason = 'Severe symptoms detected requiring immediate medical attention.';
+        } else if (lower.includes('severe') || lower.includes('blood') || lower.includes('fracture') || lower.includes('high fever')) {
+            fallbackRec = 'doctor_visit';
+            fallbackReason = 'Please visit an in-person clinic or primary health center for physical examination.';
+        }
+
+        return { recommendation: fallbackRec, reason: fallbackReason };
+    }
+
+    const routeMap = {
+        emergency: 'EMERGENCY',
+        teleconsultation: 'TELECONSULTATION',
+        doctor_visit: 'CLINIC_VISIT'
+    };
 
     const cleaned = rawText.replace(/```json|```/g, '').trim();
-    const parsed = JSON.parse(cleaned);
+    let parsed;
+    try {
+        parsed = JSON.parse(cleaned);
+    } catch (jsonErr) {
+        const recMatch = cleaned.match(/"recommendation"\s*:\s*"([^"]+)"/i);
+        const routeMatch = cleaned.match(/"route"\s*:\s*"([^"]+)"/i);
+        const reasonMatch = cleaned.match(/"reason"\s*:\s*"([^"]+)"/i);
+        const diagMatch = cleaned.match(/"temporary_diagnosis"\s*:\s*"([^"]+)"/i);
+        const specMatch = cleaned.match(/"recommended_speciality"\s*:\s*"([^"]+)"/i);
+        const urgMatch = cleaned.match(/"urgency"\s*:\s*"([^"]+)"/i);
 
-    if (!VALID_RECOMMENDATIONS.includes(parsed.recommendation)) {
-        throw new Error(`Unexpected recommendation: ${parsed.recommendation}`);
+        let rec = recMatch ? recMatch[1].toLowerCase() : 'teleconsultation';
+        if (routeMatch && !recMatch) {
+            const r = routeMatch[1].toUpperCase();
+            rec = r === 'EMERGENCY' ? 'emergency' : (r === 'CLINIC_VISIT' ? 'doctor_visit' : 'teleconsultation');
+        }
+
+        parsed = {
+            recommendation: rec,
+            route: routeMap[rec] || 'TELECONSULTATION',
+            temporary_diagnosis: diagMatch ? diagMatch[1] : 'Clinical evaluation needed',
+            recommended_speciality: specMatch ? specMatch[1] : 'General Medicine',
+            urgency: urgMatch ? urgMatch[1] : 'routine',
+            reason: reasonMatch ? reasonMatch[1] : 'Consultation recommended for clinical review.',
+        };
     }
+
+    let rec = (parsed.recommendation || '').toLowerCase();
+    if (parsed.route && !parsed.recommendation) {
+        const r = parsed.route.toUpperCase();
+        rec = r === 'EMERGENCY' ? 'emergency' : (r === 'CLINIC_VISIT' ? 'doctor_visit' : 'teleconsultation');
+    }
+    if (!VALID_RECOMMENDATIONS.includes(rec)) {
+        rec = 'teleconsultation';
+    }
+
+    parsed.recommendation = rec;
+    parsed.route = routeMap[rec] || 'TELECONSULTATION';
+    parsed.temporary_diagnosis = parsed.temporary_diagnosis || 'Preliminary assessment pending doctor examination';
+    parsed.recommended_speciality = parsed.recommended_speciality || 'General Medicine';
+    parsed.urgency = parsed.urgency || (rec === 'emergency' ? 'emergency' : 'routine');
 
     // Attempt to log disease report for outbreak detection (fire and forget)
     if (patientId) {
@@ -146,14 +194,24 @@ async function runTriage({ symptoms, duration, severity, patientId, targetLang =
         }).catch(err => console.error('[diseaseReport] Error fetching patient:', err.message));
     }
 
-    // Translate the reason block natively back into the user's localized targetLang!
+    // Translate the reason and temporary diagnosis back to user targetLang if requested
     let finalReason = parsed.reason;
+    let finalDiag = parsed.temporary_diagnosis;
     if (targetLang !== 'en') {
-        finalReason = await bhashiniService.translateText(finalReason, 'en', targetLang);
+        try {
+            finalReason = await bhashiniService.translateText(finalReason, 'en', targetLang);
+            finalDiag = await bhashiniService.translateText(finalDiag, 'en', targetLang);
+        } catch (e) {}
     }
 
-    // Keep recommendation in English for downstream ENUM layout routing
-    return { recommendation: parsed.recommendation, reason: finalReason };
+    return {
+        recommendation: parsed.recommendation,
+        route: parsed.route,
+        temporary_diagnosis: finalDiag,
+        recommended_speciality: parsed.recommended_speciality,
+        urgency: parsed.urgency,
+        reason: finalReason,
+    };
 }
 
 module.exports = { runTriage, mapDiseaseCategory };

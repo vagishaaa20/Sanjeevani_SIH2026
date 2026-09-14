@@ -78,27 +78,35 @@ const DoctorReferralForm = () => {
     };
 
     return (
-        <section className="bg-white border border-[#f5e4ec] rounded-3xl p-6 md:p-8 shadow-xs text-left">
-            <div className="mb-6 border-b border-[#f5e4ec] pb-4">
+        <section 
+            className="rounded-3xl p-6 md:p-8 shadow-xs text-left"
+            style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}
+        >
+            <div className="mb-6 pb-4" style={{ borderBottom: '1px solid var(--border)' }}>
                 <div className="flex items-center gap-2 mb-1">
-                    <span className="text-xs font-bold uppercase tracking-wider text-[#e13b68] bg-[#ffe6ee] px-2.5 py-0.5 rounded-full">
+                    <span 
+                        className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full"
+                        style={{ background: 'var(--accent-light)', color: 'var(--accent)' }}
+                    >
                         Referral Poster
                     </span>
                 </div>
-                <h3 className="text-xl font-black text-[#2d2329] font-heading">Create Patient Referral</h3>
-                <p className="text-xs text-[#7d6974] font-medium mt-0.5">
+                <h3 className="text-xl font-black font-heading" style={{ color: 'var(--text-primary)' }}>Create Patient Referral</h3>
+                <p className="text-xs font-medium mt-0.5" style={{ color: 'var(--text-secondary)' }}>
                     Refer patients from your queue or recent consultations to specialized hospitals or doctors.
                 </p>
             </div>
             
             {message.text && (
-                <div className={`mb-6 p-4 rounded-2xl border text-xs font-bold flex items-center gap-2 animate-fade-in ${
-                    message.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-rose-50 border-rose-200 text-rose-800'
+                <div className={`mb-6 p-4 rounded-2xl text-xs font-bold flex items-center gap-2 animate-fade-in ${
+                    message.type === 'success' 
+                        ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-500' 
+                        : 'bg-rose-500/10 border border-rose-500/30 text-rose-500'
                 }`}>
                     {message.type === 'success' ? (
-                        <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                        <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
                     ) : (
-                        <AlertCircle className="w-4 h-4 text-rose-600 flex-shrink-0" />
+                        <AlertCircle className="w-4 h-4 text-rose-500 flex-shrink-0" />
                     )}
                     <span>{message.text}</span>
                 </div>
@@ -106,14 +114,15 @@ const DoctorReferralForm = () => {
             
             <form onSubmit={submit} className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-bold text-[#4a3c45] uppercase tracking-wider">
+                    <label className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-primary)' }}>
                         Select Patient <span className="text-rose-500">*</span>
                     </label>
                     <select
                         required
                         value={form.patientId}
                         onChange={(event) => update('patientId', event.target.value)}
-                        className="w-full px-4 py-2.5 rounded-2xl border border-[#f5e4ec] bg-white text-xs font-medium text-[#2d2329] focus:ring-2 focus:ring-[#e13b68]/30 focus:border-[#e13b68] outline-none shadow-2xs"
+                        className="w-full px-4 py-2.5 rounded-2xl text-xs font-medium focus:ring-2 focus:ring-[#e13b68]/30 focus:border-[#e13b68] outline-none shadow-2xs cursor-pointer"
+                        style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
                     >
                         <option value="">Choose patient from queue / history</option>
                         {patients.map((patient) => (
@@ -125,29 +134,39 @@ const DoctorReferralForm = () => {
                 </div>
                 
                 <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-bold text-[#4a3c45] uppercase tracking-wider">
+                    <label className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-primary)' }}>
                         Destination Type <span className="text-rose-500">*</span>
                     </label>
                     <div className="flex gap-2">
                         <button
                             type="button"
                             onClick={() => { setDestType('clinic'); update('toDoctorId', ''); }}
-                            className={`flex-1 py-2 rounded-2xl text-xs font-bold border transition ${
-                                destType === 'clinic'
-                                    ? 'bg-[#ffe6ee] text-[#8e1d41] border-[#f5c6d6] shadow-2xs'
-                                    : 'bg-white border-[#f5e4ec] text-[#7d6974] hover:bg-zinc-50'
-                            }`}
+                            className="flex-1 py-2 rounded-2xl text-xs font-bold transition cursor-pointer"
+                            style={destType === 'clinic' ? {
+                                background: 'var(--accent)',
+                                color: '#ffffff',
+                                boxShadow: '0 2px 8px rgba(225,59,104,0.3)',
+                            } : {
+                                background: 'var(--bg-surface)',
+                                border: '1px solid var(--border)',
+                                color: 'var(--text-secondary)'
+                            }}
                         >
                             Hospital / Clinic
                         </button>
                         <button
                             type="button"
                             onClick={() => { setDestType('doctor'); update('toClinicId', ''); }}
-                            className={`flex-1 py-2 rounded-2xl text-xs font-bold border transition ${
-                                destType === 'doctor'
-                                    ? 'bg-[#ffe6ee] text-[#8e1d41] border-[#f5c6d6] shadow-2xs'
-                                    : 'bg-white border-[#f5e4ec] text-[#7d6974] hover:bg-zinc-50'
-                            }`}
+                            className="flex-1 py-2 rounded-2xl text-xs font-bold transition cursor-pointer"
+                            style={destType === 'doctor' ? {
+                                background: 'var(--accent)',
+                                color: '#ffffff',
+                                boxShadow: '0 2px 8px rgba(225,59,104,0.3)',
+                            } : {
+                                background: 'var(--bg-surface)',
+                                border: '1px solid var(--border)',
+                                color: 'var(--text-secondary)'
+                            }}
                         >
                             Specialist Doctor
                         </button>
@@ -156,14 +175,15 @@ const DoctorReferralForm = () => {
 
                 {destType === 'clinic' ? (
                     <div className="flex flex-col gap-1.5">
-                        <label className="text-xs font-bold text-[#4a3c45] uppercase tracking-wider">
+                        <label className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-primary)' }}>
                             Destination Clinic / Hospital <span className="text-rose-500">*</span>
                         </label>
                         <select
                             required
                             value={form.toClinicId}
                             onChange={(event) => update('toClinicId', event.target.value)}
-                            className="w-full px-4 py-2.5 rounded-2xl border border-[#f5e4ec] bg-white text-xs font-medium text-[#2d2329] focus:ring-2 focus:ring-[#e13b68]/30 focus:border-[#e13b68] outline-none shadow-2xs"
+                            className="w-full px-4 py-2.5 rounded-2xl text-xs font-medium focus:ring-2 focus:ring-[#e13b68]/30 focus:border-[#e13b68] outline-none shadow-2xs cursor-pointer"
+                            style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
                         >
                             <option value="">Select hospital / medical center</option>
                             {clinics.map((clinic) => (
@@ -175,14 +195,15 @@ const DoctorReferralForm = () => {
                     </div>
                 ) : (
                     <div className="flex flex-col gap-1.5">
-                        <label className="text-xs font-bold text-[#4a3c45] uppercase tracking-wider">
+                        <label className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-primary)' }}>
                             Destination Doctor <span className="text-rose-500">*</span>
                         </label>
                         <select
                             required
                             value={form.toDoctorId}
                             onChange={(event) => update('toDoctorId', event.target.value)}
-                            className="w-full px-4 py-2.5 rounded-2xl border border-[#f5e4ec] bg-white text-xs font-medium text-[#2d2329] focus:ring-2 focus:ring-[#e13b68]/30 focus:border-[#e13b68] outline-none shadow-2xs"
+                            className="w-full px-4 py-2.5 rounded-2xl text-xs font-medium focus:ring-2 focus:ring-[#e13b68]/30 focus:border-[#e13b68] outline-none shadow-2xs cursor-pointer"
+                            style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
                         >
                             <option value="">Select specialist practitioner</option>
                             {doctors.map((doctor) => (
@@ -195,7 +216,7 @@ const DoctorReferralForm = () => {
                 )}
 
                 <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-bold text-[#4a3c45] uppercase tracking-wider">
+                    <label className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-primary)' }}>
                         Specialization Required <span className="text-rose-500">*</span>
                     </label>
                     <input
@@ -203,18 +224,20 @@ const DoctorReferralForm = () => {
                         value={form.specialization}
                         onChange={(event) => update('specialization', event.target.value)}
                         placeholder="e.g. Cardiology / Neurology"
-                        className="w-full px-4 py-2.5 rounded-2xl border border-[#f5e4ec] bg-white text-xs font-medium text-[#2d2329] focus:ring-2 focus:ring-[#e13b68]/30 focus:border-[#e13b68] outline-none shadow-2xs"
+                        className="w-full px-4 py-2.5 rounded-2xl text-xs font-medium focus:ring-2 focus:ring-[#e13b68]/30 focus:border-[#e13b68] outline-none shadow-2xs"
+                        style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
                     />
                 </div>
                 
                 <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-bold text-[#4a3c45] uppercase tracking-wider">
+                    <label className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-primary)' }}>
                         Clinical Priority <span className="text-rose-500">*</span>
                     </label>
                     <select
                         value={form.priority}
                         onChange={(event) => update('priority', event.target.value)}
-                        className="w-full px-4 py-2.5 rounded-2xl border border-[#f5e4ec] bg-white text-xs font-medium text-[#2d2329] focus:ring-2 focus:ring-[#e13b68]/30 focus:border-[#e13b68] outline-none shadow-2xs"
+                        className="w-full px-4 py-2.5 rounded-2xl text-xs font-medium focus:ring-2 focus:ring-[#e13b68]/30 focus:border-[#e13b68] outline-none shadow-2xs cursor-pointer"
+                        style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
                     >
                         <option value="NORMAL">Normal</option>
                         <option value="HIGH">High</option>
@@ -223,20 +246,21 @@ const DoctorReferralForm = () => {
                 </div>
                 
                 <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-bold text-[#4a3c45] uppercase tracking-wider">
+                    <label className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-primary)' }}>
                         Preferred Appointment Date
                     </label>
                     <input
                         type="datetime-local"
                         value={form.appointmentDate}
                         onChange={(event) => update('appointmentDate', event.target.value)}
-                        className="w-full px-4 py-2.5 rounded-2xl border border-[#f5e4ec] bg-white text-xs font-medium text-[#2d2329] focus:ring-2 focus:ring-[#e13b68]/30 focus:border-[#e13b68] outline-none shadow-2xs"
+                        className="w-full px-4 py-2.5 rounded-2xl text-xs font-medium focus:ring-2 focus:ring-[#e13b68]/30 focus:border-[#e13b68] outline-none shadow-2xs"
+                        style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
                     />
                 </div>
                 
                 <div className="flex flex-col gap-1.5 md:col-span-2">
-                    <label className="text-xs font-bold text-[#4a3c45] uppercase tracking-wider">
-                        Clinical Referral Reason & Diagnosis Summary <span className="text-rose-500">*</span>
+                    <label className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-primary)' }}>
+                        Clinical Referral Reason &amp; Diagnosis Summary <span className="text-rose-500">*</span>
                     </label>
                     <textarea
                         required
@@ -244,23 +268,28 @@ const DoctorReferralForm = () => {
                         onChange={(event) => update('reason', event.target.value)}
                         rows="3"
                         placeholder="Detailed clinical history, suspected condition, diagnostic findings, and urgency rationale..."
-                        className="w-full px-4 py-2.5 rounded-2xl border border-[#f5e4ec] bg-white text-xs font-medium text-[#2d2329] focus:ring-2 focus:ring-[#e13b68]/30 focus:border-[#e13b68] outline-none shadow-2xs resize-none"
+                        className="w-full px-4 py-2.5 rounded-2xl text-xs font-medium focus:ring-2 focus:ring-[#e13b68]/30 focus:border-[#e13b68] outline-none shadow-2xs resize-none"
+                        style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
                     />
                 </div>
                 
-                <div className="md:col-span-2 flex justify-end gap-3 pt-3 border-t border-[#f5e4ec]">
+                <div className="md:col-span-2 flex justify-end gap-3 pt-3" style={{ borderTop: '1px solid var(--border)' }}>
                     <button
                         type="submit"
                         disabled={saving || !patients.length}
-                        className="px-6 py-2.5 rounded-full bg-[#e13b68] hover:bg-[#c92a55] text-white text-xs font-bold shadow-xs transition flex items-center gap-2 disabled:opacity-50"
+                        className="px-6 py-2.5 rounded-full text-white text-xs font-bold shadow-xs transition flex items-center gap-2 disabled:opacity-50 cursor-pointer"
+                        style={{ background: 'var(--accent)' }}
                     >
                         {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                        <span>Create & Dispatch Referral</span>
+                        <span>Create &amp; Dispatch Referral</span>
                     </button>
                 </div>
             </form>
             {!patients.length && (
-                <p className="mt-4 p-3 bg-[#ffe6ee]/60 border border-[#f5c6d6] text-xs font-bold text-[#8e1d41] rounded-2xl">
+                <p 
+                    className="mt-4 p-3 text-xs font-bold rounded-2xl"
+                    style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', color: 'var(--accent)' }}
+                >
                     Note: You must have seen a patient or have one in your queue to create a direct referral.
                 </p>
             )}

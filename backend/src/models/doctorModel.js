@@ -51,6 +51,26 @@ const DoctorProfile = sequelize.define(
             type: DataTypes.STRING(150),
             allowNull: true,
         },
+        practiceStartYear: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+            comment: 'Year when doctor started active medical practice',
+        },
+        address: {
+            type: DataTypes.STRING(250),
+            allowNull: true,
+            comment: 'Street address / chamber / area of practice',
+        },
+        pincode: {
+            type: DataTypes.STRING(10),
+            allowNull: true,
+            comment: 'Postal PIN code',
+        },
+        state: {
+            type: DataTypes.STRING(100),
+            allowNull: true,
+            comment: 'State of practice in India',
+        },
         yearsOfExperience: {
             type: DataTypes.INTEGER,
             allowNull: true,
@@ -59,6 +79,12 @@ const DoctorProfile = sequelize.define(
         consultationFee: {
             type: DataTypes.DECIMAL(10, 2),
             allowNull: true,
+        },
+        teleconsultationFee: {
+            type: DataTypes.DECIMAL(10, 2),
+            allowNull: true,
+            defaultValue: 500.00,
+            comment: 'Online digital triage / teleconsultation fee in INR',
         },
         languages: {
             type: DataTypes.ARRAY(DataTypes.STRING),
