@@ -1,5 +1,5 @@
-const sequelize = require('./src/config/db');
-const { generateAccessToken } = require('./src/utils/jwt');
+const sequelize = require('../src/config/db');
+const { generateAccessToken } = require('../src/utils/jwt');
 const http = require('http');
 
 async function run() {

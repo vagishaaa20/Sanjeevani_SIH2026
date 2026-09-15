@@ -11,6 +11,15 @@ import SanjeevaniLogo from '../../components/common/SanjeevaniLogo';
 const DEV_ADMIN_EMAIL = 'admin@sanjeevani.gov.in';
 const DEV_ADMIN_PASSWORD = 'admin1234';
 
+// Dev Test Credentials
+const DEV_DOCTOR_EMAIL = 'drtest@sanjeevani.dev';
+const DEV_DOCTOR_PASSWORD = 'doctor1234';
+
+const DEV_WORKER_EMAIL = 'worker@sanjeevani.gov.in';
+const DEV_WORKER_PASSWORD = 'worker1234';
+
+const DEV_PATIENT_PHONE = '9876543210';
+
 export const Login = () => {
     const { login, sendPatientOtp, verifyPatientOtp } = useAuth();
     const { theme, toggleTheme } = useTheme();
@@ -75,6 +84,19 @@ export const Login = () => {
         }
     };
 
+    const handleQuickLogin = async (testEmail, testPassword) => {
+        setError('');
+        setLoading(true);
+        try {
+            const user = await login({ email: testEmail, password: testPassword });
+            redirectUser(user.role);
+        } catch (err) {
+            setError(err.response?.data?.error || 'Quick Login failed.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const handleSendOtp = async (e) => {
         e.preventDefault();
         setError('');
@@ -119,7 +141,9 @@ export const Login = () => {
     const isClinicTab = activeTab === 'clinic';
     const isAdminTab = activeTab === 'admin';
     const isHealthWorkerTab = activeTab === 'health_worker';
-    const isDev = import.meta.env.DEV;
+
+    // We are no longer restricting sandbox to DEV so isDev is removed
+    const isDev = true;
 
     return (
         <div className="relative min-h-screen w-full overflow-x-hidden flex flex-col justify-between" style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
@@ -252,6 +276,22 @@ export const Login = () => {
                                     <Button type="submit" variant="primary" className="mt-2 w-full" disabled={loading}>
                                         {loading ? 'Sending…' : 'Send OTP'}
                                     </Button>
+
+                                    {/* Sandbox Dev Fill */}
+                                    <div className="p-4 mt-2 border border-dashed rounded-2xl flex flex-col gap-3" style={{ background: 'var(--accent-light)', borderColor: 'var(--notif-unread-border)' }}>
+                                        <div className="flex items-center gap-1.5" style={{ color: 'var(--accent)' }}>
+                                            <Sparkles className="w-4 h-4" />
+                                            <span className="text-xs font-black uppercase tracking-wider">Dev Sandbox</span>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => setPhone(DEV_PATIENT_PHONE)}
+                                            className="w-full py-2.5 text-xs font-black text-white rounded-full cursor-pointer transition shadow-xs disabled:opacity-50"
+                                            style={{ background: 'var(--accent)' }}
+                                        >
+                                            ⚡ Auto-fill Test Patient Phone
+                                        </button>
+                                    </div>
                                 </form>
                             ) : (
                                 <form className="flex flex-col gap-4" onSubmit={handleVerifyOtp}>
@@ -305,6 +345,22 @@ export const Login = () => {
                                 <Button type="submit" variant="primary" className="mt-2 w-full" disabled={loading}>
                                     {loading ? 'Signing In…' : 'Sign In as Doctor'}
                                 </Button>
+
+                                <div className="p-4 mt-2 border border-dashed rounded-2xl flex flex-col gap-3" style={{ background: 'var(--accent-light)', borderColor: 'var(--notif-unread-border)' }}>
+                                    <div className="flex items-center gap-1.5" style={{ color: 'var(--accent)' }}>
+                                        <Sparkles className="w-4 h-4" />
+                                        <span className="text-xs font-black uppercase tracking-wider">Dev Sandbox</span>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => handleQuickLogin(DEV_DOCTOR_EMAIL, DEV_DOCTOR_PASSWORD)}
+                                        disabled={loading}
+                                        className="w-full py-2.5 text-xs font-black text-white rounded-full cursor-pointer transition shadow-xs disabled:opacity-50"
+                                        style={{ background: 'var(--accent)' }}
+                                    >
+                                        ⚡ Quick Login as Doctor
+                                    </button>
+                                </div>
                             </form>
                         )}
 
@@ -361,6 +417,22 @@ export const Login = () => {
                                 <Button type="submit" variant="primary" className="mt-2 w-full" disabled={loading}>
                                     {loading ? 'Signing In…' : 'Sign In as Health Worker'}
                                 </Button>
+
+                                <div className="p-4 mt-2 border border-dashed rounded-2xl flex flex-col gap-3" style={{ background: 'var(--accent-light)', borderColor: 'var(--notif-unread-border)' }}>
+                                    <div className="flex items-center gap-1.5" style={{ color: 'var(--accent)' }}>
+                                        <Sparkles className="w-4 h-4" />
+                                        <span className="text-xs font-black uppercase tracking-wider">Dev Sandbox</span>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => handleQuickLogin(DEV_WORKER_EMAIL, DEV_WORKER_PASSWORD)}
+                                        disabled={loading}
+                                        className="w-full py-2.5 text-xs font-black text-white rounded-full cursor-pointer transition shadow-xs disabled:opacity-50"
+                                        style={{ background: 'var(--accent)' }}
+                                    >
+                                        ⚡ Quick Login as Health Worker
+                                    </button>
+                                </div>
                             </form>
                         )}
 
@@ -393,27 +465,25 @@ export const Login = () => {
                                 </form>
 
                                 {/* Dev Sandbox Quick Login */}
-                                {isDev && (
-                                    <div className="p-4 border border-dashed rounded-2xl flex flex-col gap-3" style={{ background: 'var(--accent-light)', borderColor: 'var(--notif-unread-border)' }}>
-                                        <div className="flex items-center gap-1.5" style={{ color: 'var(--accent)' }}>
-                                            <Sparkles className="w-4 h-4" />
-                                            <span className="text-xs font-black uppercase tracking-wider">Dev Sandbox</span>
-                                        </div>
-                                        <div className="text-xs font-mono p-2.5 rounded-xl space-y-0.5" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', color: 'var(--text-secondary)' }}>
-                                            <p><span className="font-bold">Email:</span> {DEV_ADMIN_EMAIL}</p>
-                                            <p><span className="font-bold">Password:</span> {DEV_ADMIN_PASSWORD}</p>
-                                        </div>
-                                        <button
-                                            type="button"
-                                            onClick={handleQuickAdminLogin}
-                                            disabled={loading}
-                                            className="w-full py-2.5 text-xs font-black text-white rounded-full cursor-pointer transition shadow-xs disabled:opacity-50"
-                                            style={{ background: 'var(--accent)' }}
-                                        >
-                                            {loading ? 'Logging in…' : '⚡ Quick Login as Administrator'}
-                                        </button>
+                                <div className="p-4 border border-dashed rounded-2xl flex flex-col gap-3" style={{ background: 'var(--accent-light)', borderColor: 'var(--notif-unread-border)' }}>
+                                    <div className="flex items-center gap-1.5" style={{ color: 'var(--accent)' }}>
+                                        <Sparkles className="w-4 h-4" />
+                                        <span className="text-xs font-black uppercase tracking-wider">Dev Sandbox</span>
                                     </div>
-                                )}
+                                    <div className="text-xs font-mono p-2.5 rounded-xl space-y-0.5" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', color: 'var(--text-secondary)' }}>
+                                        <p><span className="font-bold">Email:</span> {DEV_ADMIN_EMAIL}</p>
+                                        <p><span className="font-bold">Password:</span> {DEV_ADMIN_PASSWORD}</p>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={handleQuickAdminLogin}
+                                        disabled={loading}
+                                        className="w-full py-2.5 text-xs font-black text-white rounded-full cursor-pointer transition shadow-xs disabled:opacity-50"
+                                        style={{ background: 'var(--accent)' }}
+                                    >
+                                        {loading ? 'Logging in…' : '⚡ Quick Login as Administrator'}
+                                    </button>
+                                </div>
                             </div>
                         )}
 

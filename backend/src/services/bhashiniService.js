@@ -9,11 +9,17 @@ class BhashiniService {
 
         this.pipelineCache = new Map();
 
-        this.initPromise = this.initializePipeline().finally(() => {
+        // In test environments, skip automatic background initialization on module load.
+        // It will lazy-load via getServiceConfig() when actually needed.
+        if (process.env.NODE_ENV !== 'test') {
+            this.initPromise = this.initializePipeline().finally(() => {
+                this.initPromise = null;
+            }).catch(err => {
+                console.warn('[Bhashini] Pipeline initialization skipped/failed:', err.message);
+            });
+        } else {
             this.initPromise = null;
-        }).catch(err => {
-            console.warn('[Bhashini] Pipeline initialization skipped/failed:', err.message);
-        });
+        }
     }
 
     async initializePipeline() {

@@ -1,4 +1,4 @@
-const { generateAccessToken } = require('./src/utils/jwt');
+const { generateAccessToken } = require('../src/utils/jwt');
 const http = require('http');
 
 async function run() {
