@@ -44,6 +44,10 @@ import HealthWorkerFollowups from './pages/health-worker/HealthWorkerFollowups';
 import HealthWorkerProfile from './pages/health-worker/HealthWorkerProfile';
 import VerifyPrescription from './pages/shared/VerifyPrescription';
 import VerifyPrescriptionUpload from './pages/shared/VerifyPrescriptionUpload';
+import DiagnosticRequests from './pages/patient/DiagnosticRequests';
+import DoctorDiagnosticRequests from './pages/doctor/DoctorDiagnosticRequests';
+import HealthWorkerDiagnostics from './pages/health-worker/HealthWorkerDiagnostics';
+import ClinicDiagnostics from './pages/clinic/ClinicDiagnostics';
 
 // Main layout wrapper that includes sidebar and navbar for authenticated users
 const AppLayout = ({ children }) => {
@@ -175,6 +179,16 @@ export const App = () => {
                                                 </ProtectedRoute>
                                             }
                                         />
+                                        <Route
+                                            path="/clinic/diagnostics"
+                                            element={
+                                                <ProtectedRoute allowedRoles={['clinic_admin']}>
+                                                    <AppLayout>
+                                                        <ClinicDiagnostics />
+                                                    </AppLayout>
+                                                </ProtectedRoute>
+                                            }
+                                        />
 
                                         <Route
                                             path="/doctor/profile"
@@ -245,6 +259,17 @@ export const App = () => {
                                             }
                                         />
 
+                                        <Route
+                                            path="/doctor/diagnostics"
+                                            element={
+                                                <ProtectedRoute allowedRoles={['doctor']}>
+                                                    <AppLayout>
+                                                        <DoctorDiagnosticRequests />
+                                                    </AppLayout>
+                                                </ProtectedRoute>
+                                            }
+                                        />
+                                        <Route path="/health-worker/diagnostics" element={<ProtectedRoute allowedRoles={['health_worker']}><AppLayout><HealthWorkerDiagnostics /></AppLayout></ProtectedRoute>} />
                                         <Route
                                             path="/doctor/consultation/:id/room"
                                             element={
@@ -366,6 +391,16 @@ export const App = () => {
                                             }
                                         />
 
+                                        <Route
+                                            path="/patient/diagnostics"
+                                            element={
+                                                <ProtectedRoute allowedRoles={['patient']}>
+                                                    <AppLayout>
+                                                        <DiagnosticRequests />
+                                                    </AppLayout>
+                                                </ProtectedRoute>
+                                            }
+                                        />
                                         <Route
                                             path="/patient/medicine-availability"
                                             element={

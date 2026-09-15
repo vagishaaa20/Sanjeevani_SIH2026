@@ -66,7 +66,7 @@ async function runDetectionCycle(customConfig = null) {
                 [Op.gte]: windowStart
             }
         },
-        group: ['geohash', 'diseaseCategory', 'confidenceLevel'],
+        group: ['geohash', 'disease_category', 'confidence_level'],
         raw: true
     });
 
@@ -79,7 +79,7 @@ async function runDetectionCycle(customConfig = null) {
                 [Op.lt]: windowStart
             }
         },
-        group: ['geohash', 'diseaseCategory', 'confidenceLevel'],
+        group: ['geohash', 'disease_category', 'confidence_level'],
         raw: true
     });
 
