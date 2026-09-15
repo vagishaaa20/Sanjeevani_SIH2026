@@ -2,21 +2,27 @@ import React, { useEffect, useState } from 'react';
 import diagnosticService from '../../services/diagnosticService';
 import DiagnosticStatusBadge from '../../components/diagnostic/DiagnosticStatusBadge';
 import DiagnosticRequestForm from '../../components/diagnostic/DiagnosticRequestForm';
+import healthWorkerService from '../../services/healthWorkerService';
 
 export default function HealthWorkerDiagnostics() {
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [showForm, setShowForm] = useState(false);
+    const [availablePatients, setAvailablePatients] = useState([]);
 
     const fetchRequests = async () => {
         setLoading(true);
         try {
             const data = await diagnosticService.getRequests();
             setRequests(data);
+            
+            const patientsData = await healthWorkerService.getPatients();
+            // Depending on response structure (it might be data.patients or data directly)
+            setAvailablePatients(patientsData.patients || patientsData || []);
         } catch (err) {
             console.error(err);
-            setError('Failed to load diagnostic requests');
+            setError('Failed to load diagnostic requests or patients');
         } finally {
             setLoading(false);
         }
@@ -48,10 +54,13 @@ export default function HealthWorkerDiagnostics() {
                 
                 {showForm && (
                     <div className="mt-4">
-                        <DiagnosticRequestForm onSuccess={() => {
-                            setShowForm(false);
-                            fetchRequests();
-                        }} />
+                        <DiagnosticRequestForm 
+                            onSuccess={() => {
+                                setShowForm(false);
+                                fetchRequests();
+                            }}
+                            availablePatients={availablePatients} 
+                        />
                     </div>
                 )}
             </div>

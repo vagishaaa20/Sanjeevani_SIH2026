@@ -5,6 +5,9 @@ const routes = require('./routes');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
+const path = require('path');
+
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 const CORS_ALLOWED_ORIGINS = [
     process.env.FRONTEND_URL,
     'http://localhost:5173',
