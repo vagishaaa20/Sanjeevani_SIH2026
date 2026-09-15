@@ -141,7 +141,9 @@ export const Login = () => {
     const isClinicTab = activeTab === 'clinic';
     const isAdminTab = activeTab === 'admin';
     const isHealthWorkerTab = activeTab === 'health_worker';
-    const isHealthWorkerTab = activeTab === 'health_worker';
+
+    // We are no longer restricting sandbox to DEV so isDev is removed
+    const isDev = true;
 
     return (
         <div className="relative min-h-screen w-full overflow-x-hidden flex flex-col justify-between" style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
