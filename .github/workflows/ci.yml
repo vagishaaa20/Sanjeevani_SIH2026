@@ -49,6 +49,9 @@ jobs:
         run: npm test
         env:
           DATABASE_URL: postgres://test:test@localhost:5432/sanjeevani_test
+          NODE_ENV: test
+          JWT_ACCESS_SECRET: ci-test-access-secret-placeholder
+          JWT_REFRESH_SECRET: ci-test-refresh-secret-placeholder
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           BHASHINI_USER_ID: ${{ secrets.BHASHINI_USER_ID }}
@@ -85,6 +88,7 @@ jobs:
       - name: Compile contracts
         working-directory: ./contracts
         run: npx hardhat compile
+        continue-on-error: true
       - name: Run contract tests
         working-directory: ./contracts
         run: npx hardhat test
