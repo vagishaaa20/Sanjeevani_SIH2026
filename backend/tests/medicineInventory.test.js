@@ -12,8 +12,9 @@ let clinicTokens;
 let createdIds = {};
 
 beforeAll(async () => {
-  const patient = await PatientProfile.findOne();
-  if (!patient) throw new Error('An existing patient is required for medicine integration tests');
+  const patientId = crypto.randomUUID();
+  await User.create({ id: patientId, email: `medicine-patient-${Date.now()}@example.com`, passwordHash: 'test-hash', role: 'patient', isVerified: true });
+  const patient = await PatientProfile.create({ userId: patientId, fullName: 'Medicine Audit Patient', sex: 'other' });
 
   const doctorId = crypto.randomUUID();
   await User.create({ id: doctorId, email: `medicine-doctor-${Date.now()}@example.com`, passwordHash: 'test-hash', role: 'doctor', isVerified: true });
@@ -37,13 +38,15 @@ beforeAll(async () => {
   doctorToken = generateAccessToken({ id: doctorId, role: 'doctor' });
   clinicTokens = clinicIds.map((id) => generateAccessToken({ id, role: 'clinic_admin' }));
   createdIds.doctorId = doctorId;
+  createdIds.patientId = patientId;
 });
 
 afterAll(async () => {
   await MedicineInventory.destroy({ where: { clinicId: clinicIds } });
   await ClinicProfile.destroy({ where: { userId: clinicIds } });
   await DoctorProfile.destroy({ where: { userId: createdIds.doctorId } });
-  await User.destroy({ where: { id: [...clinicIds, createdIds.doctorId] } });
+  await PatientProfile.destroy({ where: { userId: createdIds.patientId } });
+  await User.destroy({ where: { id: [...clinicIds, createdIds.doctorId, createdIds.patientId] } });
   await require('../src/config/redis').quit();
   await require('../src/config/db').close();
 });
