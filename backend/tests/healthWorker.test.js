@@ -1,7 +1,7 @@
 const request = require('supertest');
 const crypto = require('crypto');
 const app = require('../src/app');
-const { User, PatientProfile, HealthWorkerProfile, HealthWorkerAssignment, HealthWorkerReferral } = require('../src/models');
+const { User, PatientProfile, HealthWorkerProfile, HealthWorkerAssignment, HealthWorkerReferral, HealthWorkerFollowup } = require('../src/models');
 const { generateAccessToken } = require('../src/utils/jwt');
 
 const ids = { worker: crypto.randomUUID(), otherWorker: crypto.randomUUID(), patient: crypto.randomUUID(), otherPatient: crypto.randomUUID(), admin: crypto.randomUUID(), clinicAdmin: crypto.randomUUID(), doctor: crypto.randomUUID() };
@@ -35,6 +35,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
+    await HealthWorkerFollowup.destroy({ where: { patientId: [ids.patient, ids.otherPatient] } });
     await HealthWorkerAssignment.destroy({ where: { [require('sequelize').Op.or]: [{ healthWorkerId: ids.worker }, { healthWorkerId: ids.otherWorker }] } });
     await HealthWorkerReferral.destroy({ where: { patientId: [ids.patient, ids.otherPatient] } });
 

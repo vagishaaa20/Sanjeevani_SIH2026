@@ -1,6 +1,6 @@
 require('dotenv').config();
-const { getQueue } = require('./src/controllers/doctorQueueController');
-const { DoctorProfile } = require('./src/models');
+const { getQueue } = require('../src/controllers/doctorQueueController');
+const { DoctorProfile } = require('../src/models');
 
 async function test() {
     try {

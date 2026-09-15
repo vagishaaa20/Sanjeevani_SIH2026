@@ -14,7 +14,11 @@ const ngeohash = require('ngeohash');
 async function startServer() {
   try {
     await sequelize.authenticateDatabase();
-    await sequelize.sync();
+
+    // Prevent auto-sync in production to protect schema/migrations
+    if (env.nodeEnv !== 'production') {
+      await sequelize.sync();
+    }
 
     // 1. Create HTTP server from Express app
     const server = http.createServer(app);
