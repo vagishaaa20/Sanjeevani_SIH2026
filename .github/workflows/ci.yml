@@ -36,9 +36,13 @@ jobs:
 
       - name: Install backend dependencies
         working-directory: ./backend
-        # --omit=optional skips Linux-only native binaries (@emnapi/core, @emnapi/runtime)
-        # that are absent from the Windows-generated lockfile but cause npm ci to fail on Ubuntu.
-        run: npm ci --omit=optional
+        # Using `npm install` instead of `npm ci`:
+        # The lockfile is generated on Windows, which omits Linux-only optional packages
+        # (@emnapi/core, @emnapi/wasi-threads etc.) from the @unrs/resolver Jest toolchain.
+        # `npm ci` validates the full lockfile before installing and hard-fails on this drift.
+        # The drift is in devDependency/test tooling only — not production runtime code.
+        # TODO: Regenerate lockfile from a Linux environment (WSL/Docker) to restore `npm ci`.
+        run: npm install
 
       - name: Run migrations against test DB
         working-directory: ./backend
