@@ -44,11 +44,18 @@ jobs:
         # TODO: Regenerate lockfile from a Linux environment (WSL/Docker) to restore `npm ci`.
         run: npm install
 
-      - name: Run migrations against test DB
+      - name: Bootstrap test database (sync)
         working-directory: ./backend
-        run: npx sequelize-cli db:migrate
+        run: |
+          node -e "
+            require('./src/models');
+            require('./src/config/db').sync({ force: true })
+              .then(() => { console.log('Database synced'); process.exit(0); })
+              .catch(err => { console.error(err); process.exit(1); });
+          "
         env:
           DATABASE_URL: postgres://test:test@localhost:5432/sanjeevani_test
+          NODE_ENV: test
 
       - name: Run backend tests
         working-directory: ./backend
