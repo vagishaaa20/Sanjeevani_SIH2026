@@ -18,7 +18,7 @@ export const LanguageProvider = ({ children }) => {
         // Optionally, if the user is authenticated as a patient, sync this up to their backend profile
         // so that if they log in elsewhere, their language carries over (assuming a backend patch route exists)
         if (user && user.role === 'patient') {
-            api.patch('/profile/patient/language', { language: currentLang })
+            api.patch('/profile/patient', { preferredLanguage: currentLang })
                 .catch(e => console.warn("Failed to sync language upward", e.message));
         }
 
