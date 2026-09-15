@@ -87,9 +87,9 @@ export const Sidebar = () => {
         >
             <div className="flex flex-col gap-6">
                 {/* Brand Logo in Sidebar (Desktop) */}
-                <div className="hidden md:flex flex-col items-start gap-1 pb-4 border-b border-[#f3dce5]">
+                <div className="hidden md:flex flex-col items-start gap-1 pb-4 border-b" style={{ borderColor: 'var(--border)' }}>
                     <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#ffe6ee] to-white border-2 border-[#f5c6d6] flex items-center justify-center shadow-xs flex-shrink-0 p-1">
+                        <div className="w-12 h-12 rounded-2xl border-2 flex items-center justify-center shadow-xs flex-shrink-0 p-1" style={{ background: 'var(--logo-gradient)', borderColor: 'var(--border)' }}>
                             <SanjeevaniLogo variant="emblem" size={40} />
                         </div>
                         <div className="flex flex-col text-left">

@@ -4,6 +4,18 @@ import useAuth from '../../hooks/useAuth';
 import api from '../../services/api';
 import useWebRTC from '../../hooks/useWebRTC';
 import { NotificationContext } from '../../context/NotificationContext';
+import { generateDynamicFutureSlots } from '../../utils/timeSlots';
+import { 
+    Phone, 
+    Calendar, 
+    Clock, 
+    Video, 
+    AlertCircle, 
+    CheckCircle2, 
+    Loader2, 
+    Send,
+    User
+} from 'lucide-react';
 
 export default function TeleconsultationRoom() {
     const { id: consultationId } = useParams();
@@ -132,35 +144,132 @@ export default function TeleconsultationRoom() {
         }
     };
 
+    // Reschedule modal state
+    const [showRescheduleModal, setShowRescheduleModal] = useState(false);
+    const [rescheduleSlot, setRescheduleSlot] = useState('In 15 minutes');
+    const [customRescheduleSlot, setCustomRescheduleSlot] = useState('');
+    const [rescheduleReason, setRescheduleReason] = useState('Network connectivity issue');
+    const [isRescheduling, setIsRescheduling] = useState(false);
+
+    const handleRescheduleSubmit = async (e) => {
+        e.preventDefault();
+        setIsRescheduling(true);
+        try {
+            const finalSlot = customRescheduleSlot.trim() || rescheduleSlot;
+            await api.post(`/consultations/${consultationId}/reschedule`, {
+                newTimeSlot: finalSlot,
+                reason: rescheduleReason
+            });
+            addNotification(`Consultation rescheduled to: ${finalSlot}`, 'success', 6000);
+            if (isDoctor) navigate('/doctor/dashboard');
+            else navigate('/patient/dashboard');
+        } catch (err) {
+            console.error('Reschedule error', err);
+            addNotification(err.response?.data?.error || 'Failed to reschedule consultation.', 'error');
+        } finally {
+            setIsRescheduling(false);
+        }
+    };
+
     return (
         <div className="w-full h-[calc(100vh-6rem)] flex flex-col md:flex-row gap-4 p-4 text-left">
             {/* Main Video View */}
-            <div className="flex-1 flex flex-col bg-ink-charcoal rounded-2xl overflow-hidden border-2 border-ink-black shadow-lg relative">
+            <div className="flex-1 flex flex-col bg-stone-900 rounded-2xl overflow-hidden border-2 border-stone-800 shadow-lg relative">
 
                 {/* Header Overlay */}
-                <div className="absolute top-0 left-0 w-full p-4 flex justify-between items-start z-10 bg-gradient-to-b from-black/60 to-transparent">
-                    <div className="flex items-center gap-2">
-                        <span className={`px-2 py-1 rounded text-xs font-bold uppercase border-2 ${quality === 'good' ? 'bg-emerald-500 text-white border-emerald-700' : 'bg-amber-500 text-black border-amber-700'
-                            }`}>
+                <div className="absolute top-0 left-0 w-full p-4 flex flex-wrap justify-between items-center z-10 bg-gradient-to-b from-black/80 via-black/40 to-transparent gap-3">
+                    <div className="flex items-center gap-2 flex-wrap">
+                        <span className={`px-2.5 py-1 rounded-full text-xs font-bold uppercase border ${
+                            quality === 'good' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40' : 'bg-amber-500/20 text-amber-400 border-amber-500/40'
+                        }`}>
                             Signal: {quality.toUpperCase()}
                         </span>
                         {remoteUsers === 0 && (
-                            <span className="px-2 py-1 rounded text-xs font-bold bg-white text-ink-black uppercase border-2 border-ink-black">
+                            <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-white/90 text-stone-900 uppercase">
                                 Waiting for {isDoctor ? 'Patient' : 'Doctor'}...
                             </span>
                         )}
                     </div>
-                    <button onClick={handleCompleteCallClick} className="bg-red-600 border-2 border-red-900 text-white font-bold px-4 py-2 rounded shadow-md hover:bg-red-500 transition-colors">
-                        END CALL
-                    </button>
+
+                    {/* Quick Session Control Bar */}
+                    <div className="flex items-center gap-2">
+                        {/* Audio / Video Switcher */}
+                        <button
+                            onClick={mediaMode === 'video' ? switchToAudioMode : switchToVideoMode}
+                            className="px-3 py-1.5 rounded-xl text-xs font-bold text-white transition flex items-center gap-1.5 border border-white/20 bg-black/40 hover:bg-black/60 cursor-pointer"
+                            title="Switch between video and low-bandwidth voice mode"
+                        >
+                            {mediaMode === 'video' ? (
+                                <>
+                                    <Phone className="w-3.5 h-3.5 text-sky-400" />
+                                    <span>Voice Call Only</span>
+                                </>
+                            ) : (
+                                <>
+                                    <Video className="w-3.5 h-3.5 text-emerald-400" />
+                                    <span>Turn on Video</span>
+                                </>
+                            )}
+                        </button>
+
+                        {/* Reschedule Button - Doctor Only */}
+                        {isDoctor && (
+                            <button
+                                onClick={() => setShowRescheduleModal(true)}
+                                className="px-3 py-1.5 rounded-xl text-xs font-bold text-white transition flex items-center gap-1.5 border border-white/20 bg-black/40 hover:bg-black/60 cursor-pointer"
+                                title="Reschedule consultation slot"
+                            >
+                                <Calendar className="w-3.5 h-3.5 text-amber-400" />
+                                <span>Reschedule</span>
+                            </button>
+                        )}
+
+                        {/* End Call */}
+                        <button
+                            onClick={handleCompleteCallClick}
+                            className="bg-red-600 hover:bg-red-500 text-white font-bold px-4 py-1.5 rounded-xl text-xs shadow-md transition-colors cursor-pointer"
+                        >
+                            {isDoctor ? 'FINALIZE & CLOSE' : 'END CALL'}
+                        </button>
+                    </div>
                 </div>
+
+                {/* Participant Unreachable / Delay Helper */}
+                {remoteUsers === 0 && (
+                    <div className="absolute top-16 left-4 right-4 bg-black/60 backdrop-blur-md border border-white/10 rounded-xl p-3 z-30 flex flex-col sm:flex-row items-center justify-between text-white text-xs gap-2">
+                        <div className="flex items-center gap-2">
+                            <Clock className="w-4 h-4 text-amber-400 shrink-0" />
+                            <span>
+                                {isDoctor 
+                                    ? 'Patient not connected yet. If there are network issues, switch to voice call or reschedule.' 
+                                    : 'Waiting for doctor to connect. You can switch to low-bandwidth voice mode if connection is slow.'}
+                            </span>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                            <button
+                                onClick={switchToAudioMode}
+                                className="px-2.5 py-1 rounded bg-sky-500/20 text-sky-300 border border-sky-500/40 font-bold hover:bg-sky-500/30 cursor-pointer"
+                            >
+                                Voice Mode
+                            </button>
+                            {isDoctor && (
+                                <button
+                                    onClick={() => setShowRescheduleModal(true)}
+                                    className="px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold hover:bg-amber-500/30 cursor-pointer"
+                                >
+                                    Reschedule
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                )}
 
                 {/* Quality Warning Banner */}
                 {showQualityBanner && mediaMode === 'video' && (
-                    <div className="absolute top-16 left-4 right-4 bg-red-600 border-2 border-red-900 rounded-lg p-3 z-30 flex items-center justify-between text-white shadow-xl">
+                    <div className="absolute top-28 left-4 right-4 bg-red-600/90 border border-red-400 rounded-xl p-3 z-30 flex items-center justify-between text-white shadow-xl">
                         <div>
-                            <p className="font-bold uppercase text-sm">Poor Connection Detected</p>
-                            <p className="text-xs font-medium opacity-90">Switch to audio-only to stabilize the call.</p>
+                            <p className="font-bold uppercase text-xs">Poor Connection Detected</p>
+                            <p className="text-[11px] opacity-90">Switch to low-bandwidth voice mode to stabilize.</p>
                         </div>
                         <div className="flex gap-2">
                             <button
@@ -168,13 +277,13 @@ export default function TeleconsultationRoom() {
                                     switchToAudioMode();
                                     setShowQualityBanner(false);
                                 }}
-                                className="bg-white text-red-700 hover:bg-red-50 font-bold px-3 py-1.5 rounded text-xs transition-colors border border-transparent"
+                                className="bg-white text-red-700 font-bold px-3 py-1 rounded text-xs transition cursor-pointer"
                             >
                                 Switch to Audio
                             </button>
                             <button
                                 onClick={() => setShowQualityBanner(false)}
-                                className="hover:bg-red-700 px-2 py-1.5 rounded font-bold text-xs"
+                                className="hover:bg-red-700 px-2 py-1 rounded font-bold text-xs cursor-pointer"
                             >
                                 Dismiss
                             </button>
@@ -182,20 +291,33 @@ export default function TeleconsultationRoom() {
                     </div>
                 )}
 
-                {/* Persistent Audio Notice */}
+                {/* Persistent Audio Mode View */}
                 {mediaMode === 'audio-only' && (
-                    <div className="absolute inset-0 bg-ink-charcoal z-20 flex flex-col items-center justify-center gap-4">
-                        <div className="w-24 h-24 rounded-full bg-sky-900/50 flex items-center justify-center animate-pulse border-4 border-sky-500">
-                            <span className="text-4xl text-sky-400 font-bold">🎙</span>
+                    <div className="absolute inset-0 bg-stone-900 z-20 flex flex-col items-center justify-center gap-4">
+                        <div className="w-24 h-24 rounded-full bg-sky-950 flex items-center justify-center animate-pulse border-4 border-sky-500">
+                            <Phone className="w-10 h-10 text-sky-400" />
                         </div>
-                        <h2 className="text-white font-bold text-2xl uppercase tracking-widest">Audio-Only</h2>
-                        <div className="flex gap-4 mt-4">
+                        <h2 className="text-white font-bold text-xl uppercase tracking-widest">Low-Bandwidth Voice Call</h2>
+                        <p className="text-xs text-stone-400 max-w-xs text-center">
+                            Audio stream active. Video is paused to prevent lag on slower network connections.
+                        </p>
+                        <div className="flex gap-3 mt-2">
                             <button
                                 onClick={switchToVideoMode}
-                                className="bg-white text-sky-900 border-2 border-sky-200 hover:bg-sky-50 font-bold px-6 py-3 rounded-xl shadow-lg transition-transform hover:scale-105 active:scale-95"
+                                className="bg-white text-stone-900 font-bold px-5 py-2.5 rounded-xl shadow-lg transition hover:bg-stone-100 text-xs flex items-center gap-1.5 cursor-pointer"
                             >
-                                Switch Back to Video
+                                <Video className="w-4 h-4 text-emerald-600" />
+                                <span>Switch Back to Video</span>
                             </button>
+                            {isDoctor && (
+                                <button
+                                    onClick={() => setShowRescheduleModal(true)}
+                                    className="bg-stone-800 text-stone-200 border border-stone-700 font-bold px-5 py-2.5 rounded-xl transition hover:bg-stone-700 text-xs flex items-center gap-1.5 cursor-pointer"
+                                >
+                                    <Calendar className="w-4 h-4 text-amber-400" />
+                                    <span>Reschedule</span>
+                                </button>
+                            )}
                         </div>
                     </div>
                 )}
@@ -210,7 +332,7 @@ export default function TeleconsultationRoom() {
 
                 {/* Picture in Picture Local Video */}
                 {mediaMode === 'video' && (
-                    <div className="absolute bottom-4 right-4 w-1/4 max-w-[200px] border-2 border-ink-black rounded-lg overflow-hidden shadow-lg bg-black z-20">
+                    <div className="absolute bottom-4 right-4 w-1/4 max-w-[200px] border-2 border-stone-700 rounded-xl overflow-hidden shadow-lg bg-black z-20">
                         <video
                             ref={localVideoRef}
                             autoPlay
@@ -368,6 +490,116 @@ export default function TeleconsultationRoom() {
                                     className="px-6 py-3 rounded-xl bg-ink-black text-white font-black hover:bg-ink-charcoal transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-lg"
                                 >
                                     {isSubmitting ? 'SAVING...' : 'FINALIZE & CLOSE'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Reschedule Consultation Modal - Doctor Only */}
+            {isDoctor && showRescheduleModal && (
+                <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-3xl w-full max-w-lg overflow-hidden flex flex-col shadow-2xl border-2 border-stone-800 animate-slide-up relative text-left">
+                        <div className="p-5 border-b border-stone-200 bg-stone-50 flex justify-between items-center">
+                            <div>
+                                <h2 className="text-lg font-black text-stone-900 tracking-tight flex items-center gap-2">
+                                    <Calendar className="w-5 h-5 text-amber-500" />
+                                    <span>Reschedule Consultation</span>
+                                </h2>
+                                <p className="text-xs font-semibold text-stone-500 mt-0.5">
+                                    Propose a new timing if there are network issues or unreachability
+                                </p>
+                            </div>
+                            <button
+                                onClick={() => setShowRescheduleModal(false)}
+                                className="w-8 h-8 flex items-center justify-center rounded-full border border-stone-300 hover:bg-stone-100 text-stone-600 font-bold"
+                            >
+                                ✕
+                            </button>
+                        </div>
+
+                        <form onSubmit={handleRescheduleSubmit} className="p-5 flex flex-col gap-4">
+                            <div>
+                                <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">
+                                    Select New Time Slot:
+                                </label>
+                                <div className="grid grid-cols-2 gap-2">
+                                    {generateDynamicFutureSlots().map((slotObj) => {
+                                        const slot = slotObj.label;
+                                        const isSelected = rescheduleSlot === slot && !customRescheduleSlot;
+                                        return (
+                                            <button
+                                                key={slot}
+                                                type="button"
+                                                onClick={() => {
+                                                    setRescheduleSlot(slot);
+                                                    setCustomRescheduleSlot('');
+                                                }}
+                                                className={`p-2.5 rounded-xl text-xs font-bold text-left border transition cursor-pointer flex items-center justify-between ${
+                                                    isSelected
+                                                        ? 'bg-amber-50 border-amber-400 text-amber-900'
+                                                        : 'bg-stone-50 border-stone-200 text-stone-700 hover:bg-stone-100'
+                                                }`}
+                                            >
+                                                <span className="truncate">{slot}</span>
+                                                {isSelected && <CheckCircle2 className="w-3.5 h-3.5 text-amber-600 shrink-0" />}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
+                                    Or Custom Time / Specific Note:
+                                </label>
+                                <input
+                                    type="text"
+                                    value={customRescheduleSlot}
+                                    onChange={(e) => setCustomRescheduleSlot(e.target.value)}
+                                    placeholder="e.g., Today at 07:15 PM sharp"
+                                    className="w-full px-3 py-2 rounded-xl text-xs border border-stone-300 focus:outline-none focus:ring-2 focus:ring-amber-300 font-medium"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
+                                    Reason for Rescheduling:
+                                </label>
+                                <select
+                                    value={rescheduleReason}
+                                    onChange={(e) => setRescheduleReason(e.target.value)}
+                                    className="w-full px-3 py-2 rounded-xl text-xs border border-stone-300 focus:outline-none focus:ring-2 focus:ring-amber-300 font-medium bg-white"
+                                >
+                                    <option value="Network connectivity issue">Network connectivity / poor signal</option>
+                                    <option value="Patient unreachable / did not connect">Patient unreachable / did not answer</option>
+                                    <option value="Doctor emergency delay">Doctor clinical emergency delay</option>
+                                    <option value="Patient requested later slot">Patient requested later timing</option>
+                                </select>
+                            </div>
+
+                            <div className="pt-3 border-t border-stone-200 flex justify-end gap-2.5">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowRescheduleModal(false)}
+                                    className="px-4 py-2 rounded-xl text-xs font-bold text-stone-600 hover:bg-stone-100 transition"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={isRescheduling}
+                                    className="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-stone-900 font-black text-xs transition shadow-md disabled:opacity-50 flex items-center gap-1.5"
+                                >
+                                    {isRescheduling ? (
+                                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                    ) : (
+                                        <>
+                                            <Calendar className="w-3.5 h-3.5" />
+                                            <span>Confirm Reschedule</span>
+                                        </>
+                                    )}
                                 </button>
                             </div>
                         </form>

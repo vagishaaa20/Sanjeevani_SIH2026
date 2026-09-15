@@ -16,7 +16,8 @@ import {
     FileText,
     ArrowRight,
     Activity,
-    ExternalLink
+    ExternalLink,
+    MapPin
 } from 'lucide-react';
 import consultationService from '../../services/consultationService';
 import AiSummaryCard from '../../components/patient/AiSummaryCard';
@@ -151,8 +152,7 @@ function ConsultationCard({ consultation, highlighted, cardRef }) {
         setJoining(true);
         setJoinError(null);
         try {
-            const data = await consultationService.rejoinCall(consultation.id);
-            window.location.href = `/patient/call/${data.roomId}`;
+            navigate(`/patient/consultation/${consultation.id}/room`);
         } catch (err) {
             setJoinError(err.response?.data?.error || 'Could not rejoin call');
             setJoining(false);
@@ -358,7 +358,8 @@ function ConsultationCard({ consultation, highlighted, cardRef }) {
 
 // ── Sub-tab toggle ─────────────────────────────────────────────────────────────
 const TABS = [
-    { id: 'list', label: 'My Consultations' },
+    { id: 'list', label: 'Teleconsultations' },
+    { id: 'clinic', label: 'In-Person Clinic Visits' },
     { id: 'timeline', label: 'Symptom Timeline' },
 ];
 
@@ -371,7 +372,34 @@ export default function PatientConsultations() {
     const [error, setError] = useState(null);
     const [highlightedId, setHighlightedId] = useState(null);
 
+    // In-person clinic appointments
+    const [clinicAppointments, setClinicAppointments] = useState([]);
+    const [clinicLoading, setClinicLoading] = useState(false);
+
     const cardRefs = useRef({});
+
+    const fetchClinicAppointments = useCallback(async () => {
+        setClinicLoading(true);
+        try {
+            const API_BASE = import.meta.env.VITE_API_URL || '';
+            const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken') || '';
+            const res = await fetch(`${API_BASE}/appointments/my`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (res.ok) {
+                const json = await res.json();
+                setClinicAppointments(json.appointments || []);
+            }
+        } catch (e) {
+            console.error('[fetchClinicAppointments] error:', e);
+        } finally {
+            setClinicLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchClinicAppointments();
+    }, [fetchClinicAppointments]);
 
     const fetchConsultations = useCallback(async () => {
         setLoading(true);
@@ -461,6 +489,116 @@ export default function PatientConsultations() {
                     style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}
                 >
                     <SymptomTimeline onSelectEntry={handleSelectTimelineEntry} />
+                </div>
+            ) : activeTab === 'clinic' ? (
+                <div className="flex flex-col gap-4">
+                    {clinicLoading ? (
+                        <div
+                            className="p-16 text-center text-xs font-bold rounded-3xl animate-pulse"
+                            style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', color: 'var(--text-secondary)' }}
+                        >
+                            Loading your scheduled clinic visits...
+                        </div>
+                    ) : clinicAppointments.length === 0 ? (
+                        <div
+                            className="rounded-3xl p-12 text-center flex flex-col items-center gap-4 shadow-xs"
+                            style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}
+                        >
+                            <div
+                                className="w-16 h-16 rounded-2xl flex items-center justify-center font-bold"
+                                style={{ background: 'var(--pastel-peach-bg)', color: 'var(--pastel-peach-text)' }}
+                            >
+                                <Building2 className="w-8 h-8" />
+                            </div>
+                            <div className="flex flex-col gap-1 max-w-sm">
+                                <h3 className="font-black text-lg" style={{ color: 'var(--text-primary)' }}>No In-Person Clinic Appointments</h3>
+                                <p className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>
+                                    You have not booked any physical doctor consultations at a clinic chamber.
+                                </p>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => navigate('/patient/ai-triage')}
+                                className="px-6 py-3 rounded-full font-black text-xs transition shadow-md flex items-center gap-2 cursor-pointer text-white"
+                                style={{ background: 'var(--accent)' }}
+                            >
+                                <span>Start AI Clinical Triage</span>
+                                <ArrowRight className="w-4 h-4" />
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {clinicAppointments.map((appt) => {
+                                const doc = appt.doctor || {};
+                                const apptDate = new Date(appt.appointmentDate);
+                                return (
+                                    <div
+                                        key={appt.id}
+                                        className="rounded-3xl p-6 flex flex-col justify-between gap-4 shadow-xs"
+                                        style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}
+                                    >
+                                        <div className="flex flex-col gap-3">
+                                            <div className="flex justify-between items-start gap-2">
+                                                <div className="flex items-start gap-3">
+                                                    <div
+                                                        className="w-11 h-11 rounded-2xl flex items-center justify-center font-black text-base shrink-0"
+                                                        style={{ background: 'var(--pastel-peach-bg)', color: 'var(--pastel-peach-text)' }}
+                                                    >
+                                                        {doc.fullName ? doc.fullName.charAt(0) : 'D'}
+                                                    </div>
+                                                    <div className="flex flex-col">
+                                                        <h4 className="font-bold text-sm" style={{ color: 'var(--text-primary)' }}>
+                                                            Dr. {doc.fullName || 'Verified Physician'}
+                                                        </h4>
+                                                        <p className="text-xs font-bold text-[#e13b68]">
+                                                            {doc.specialization || 'Medical Specialist'}
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                <span
+                                                    className="text-[10px] font-black uppercase px-2.5 py-1 rounded-full border"
+                                                    style={
+                                                        appt.status === 'completed'
+                                                            ? { background: 'var(--pastel-mint-bg)', color: 'var(--pastel-mint-text)', borderColor: 'var(--pastel-mint-text)' }
+                                                            : appt.status === 'checked_in'
+                                                            ? { background: 'var(--accent-light)', color: 'var(--accent)', borderColor: 'var(--notif-unread-border)' }
+                                                            : { background: 'var(--pastel-peach-bg)', color: 'var(--pastel-peach-text)', borderColor: 'var(--pastel-peach-text)' }
+                                                    }
+                                                >
+                                                    {appt.status.replace('_', ' ')}
+                                                </span>
+                                            </div>
+
+                                            <div
+                                                className="p-3.5 rounded-2xl text-xs flex flex-col gap-1.5"
+                                                style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)' }}
+                                            >
+                                                <div className="flex items-center justify-between font-black text-[#8e1d41]">
+                                                    <span>OPD Token #{appt.tokenNumber || 1}</span>
+                                                    <span>Fee: ₹{doc.consultationFee || 500}</span>
+                                                </div>
+                                                <div className="text-[11px] font-bold text-gray-800 flex items-center gap-1.5">
+                                                    <Calendar className="w-3.5 h-3.5 text-[#e13b68]" />
+                                                    <span>{apptDate.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })} · {appt.timeSlot || 'OPD Slot'}</span>
+                                                </div>
+                                                <div className="text-[11px] font-medium text-gray-500 flex items-center gap-1.5">
+                                                    <MapPin className="w-3.5 h-3.5 text-[#e13b68]" />
+                                                    <span>{doc.clinicOrHospital || 'Clinic Chamber'} · {[doc.address, doc.city].filter(Boolean).join(', ')}</span>
+                                                </div>
+                                            </div>
+
+                                            {appt.symptoms && (
+                                                <p className="text-xs text-gray-600 line-clamp-2">
+                                                    <strong className="font-bold">Reason:</strong> {appt.symptoms}
+                                                </p>
+                                            )}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
                 </div>
             ) : (
                 <div className="flex flex-col gap-5">

@@ -66,6 +66,7 @@
   --sidebar-bg: #fdf0f4;
   --sidebar-border: #f3dce5;
   --navbar-bg: rgba(255, 255, 255, 0.8);
+  --logo-gradient: linear-gradient(to top right, #ffe6ee, #ffffff);
 }
 
 /* ─────────────────────────────────────────
@@ -96,6 +97,7 @@
   --sidebar-bg: #12090d;
   --sidebar-border: rgba(244, 63, 94, 0.15);
   --navbar-bg: rgba(9, 4, 6, 0.85);
+  --logo-gradient: linear-gradient(to top right, rgba(244, 63, 94, 0.15), #12090d);
 
   /* Re-map legacy tokens for dark mode */
   --rose-primary: #f43f5e;

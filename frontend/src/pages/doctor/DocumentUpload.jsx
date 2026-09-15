@@ -159,16 +159,22 @@ export const DocumentUpload = () => {
     return (
         <div className="w-full flex flex-col gap-6 text-left max-w-5xl mx-auto pb-16 animate-fade-in-up">
             {/* Header */}
-            <div className="bg-white border border-[#f5e4ec] rounded-3xl p-6 md:p-8 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div 
+                className="rounded-3xl p-6 md:p-8 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6"
+                style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}
+            >
                 <div className="flex items-center gap-3.5">
-                    <div className="w-12 h-12 rounded-2xl bg-[#ffe6ee] border border-[#f8c8d8] flex items-center justify-center text-[#e13b68]">
+                    <div 
+                        className="w-12 h-12 rounded-2xl flex items-center justify-center"
+                        style={{ background: 'var(--accent-light)', color: 'var(--accent)' }}
+                    >
                         <ShieldCheck className="w-6 h-6" />
                     </div>
                     <div>
-                        <h2 className="text-2xl md:text-3xl font-black text-[#1c1218] font-heading">
+                        <h2 className="text-2xl md:text-3xl font-black font-heading tracking-tight" style={{ color: 'var(--text-primary)' }}>
                             Professional Verification Documents
                         </h2>
-                        <p className="text-xs sm:text-sm font-semibold text-[#7d6974] mt-0.5">
+                        <p className="text-xs sm:text-sm font-medium mt-0.5" style={{ color: 'var(--text-secondary)' }}>
                             Upload your medical registration and academic certificates for admin verification.
                         </p>
                     </div>
@@ -176,23 +182,26 @@ export const DocumentUpload = () => {
             </div>
 
             {successMsg && (
-                <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold rounded-2xl animate-fade-in flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 text-xs font-bold rounded-2xl animate-fade-in flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
                     <span>{successMsg}</span>
                 </div>
             )}
             {errorMsg && (
-                <div className="p-4 bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold rounded-2xl animate-fade-in flex items-center gap-2">
-                    <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                <div className="p-4 bg-rose-500/10 border border-rose-500/30 text-rose-500 text-xs font-bold rounded-2xl animate-fade-in flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
                     <span>{errorMsg}</span>
                 </div>
             )}
 
             {/* Upload Form Card */}
-            <div className="bg-white border border-[#f5e4ec] rounded-3xl p-6 sm:p-8 shadow-xs flex flex-col gap-5">
-                <div className="flex items-center gap-2 border-b border-[#f5e4ec] pb-3">
-                    <UploadCloud className="w-5 h-5 text-[#e13b68]" />
-                    <h3 className="text-base font-black text-[#1c1218] font-heading">
+            <div 
+                className="rounded-3xl p-6 sm:p-8 shadow-xs flex flex-col gap-5"
+                style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}
+            >
+                <div className="flex items-center gap-2 pb-3" style={{ borderBottom: '1px solid var(--border)' }}>
+                    <UploadCloud className="w-5 h-5" style={{ color: 'var(--accent)' }} />
+                    <h3 className="text-base font-black font-heading" style={{ color: 'var(--text-primary)' }}>
                         Upload Verification PDF
                     </h3>
                 </div>
@@ -200,13 +209,14 @@ export const DocumentUpload = () => {
                 <form onSubmit={handleUpload} className="flex flex-col gap-5">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div className="flex flex-col gap-1.5">
-                            <label className="text-[11px] font-black text-[#7d6974] uppercase tracking-wider">
-                                Document Type <span className="text-[#e13b68]">*</span>
+                            <label className="text-[11px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-primary)' }}>
+                                Document Type <span style={{ color: 'var(--accent)' }}>*</span>
                             </label>
                             <select
                                 value={docType}
                                 onChange={(e) => setDocType(e.target.value)}
-                                className="border border-[#f5e4ec] focus:border-[#e13b68] focus:ring-2 focus:ring-[#e13b68]/20 outline-none rounded-2xl px-4 py-3 text-xs font-bold text-[#1c1218] transition bg-[#fffafc] cursor-pointer"
+                                className="focus:ring-2 focus:ring-[#e13b68]/20 outline-none rounded-2xl px-4 py-3 text-xs font-bold transition cursor-pointer"
+                                style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
                             >
                                 {DOCUMENT_TYPES.map((t) => (
                                     <option key={t.value} value={t.value}>
@@ -217,32 +227,34 @@ export const DocumentUpload = () => {
                         </div>
 
                         <div className="flex flex-col gap-1.5">
-                            <label className="text-[11px] font-black text-[#7d6974] uppercase tracking-wider">
-                                PDF Document File <span className="text-[#e13b68]">*</span>
+                            <label className="text-[11px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-primary)' }}>
+                                PDF Document File <span style={{ color: 'var(--accent)' }}>*</span>
                             </label>
                             <input
                                 ref={fileInputRef}
                                 type="file"
                                 accept=".pdf,application/pdf"
                                 onChange={handleFileChange}
-                                className="border border-[#f5e4ec] file:mr-4 file:py-2.5 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-black file:bg-[#ffe6ee] file:text-[#e13b68] hover:file:bg-[#ffd6e2] file:cursor-pointer rounded-2xl p-2 text-xs font-semibold text-[#7d6974] bg-[#fffafc] cursor-pointer"
+                                className="file:mr-4 file:py-2.5 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:cursor-pointer rounded-2xl p-2 text-xs font-semibold cursor-pointer"
+                                style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-secondary)' }}
                             />
                         </div>
                     </div>
 
-                    <div className="flex items-center justify-between pt-2">
-                        <p className="text-[11px] font-medium text-[#7d6974]">
+                    <div className="flex items-center justify-between pt-2 flex-wrap gap-3">
+                        <p className="text-[11px] font-medium" style={{ color: 'var(--text-secondary)' }}>
                             Strict PDF format only · Maximum file size 10 MB · Stored in private encrypted bucket.
                         </p>
                         <button
                             type="submit"
                             disabled={uploading || !selectedFile}
-                            className="px-6 py-3 rounded-full bg-[#e13b68] hover:bg-[#c92a55] text-white text-xs font-black transition shadow-md disabled:opacity-40 flex items-center gap-2 cursor-pointer"
+                            className="px-6 py-3 rounded-full text-white text-xs font-bold transition shadow-md disabled:opacity-40 flex items-center gap-2 cursor-pointer"
+                            style={{ background: 'var(--accent)' }}
                         >
                             {uploading ? (
                                 <>
                                     <Loader2 className="w-4 h-4 animate-spin" />
-                                    <span>Encrypting & Uploading...</span>
+                                    <span>Encrypting &amp; Uploading...</span>
                                 </>
                             ) : (
                                 <>
@@ -256,27 +268,30 @@ export const DocumentUpload = () => {
             </div>
 
             {/* Uploaded Documents List */}
-            <div className="bg-white border border-[#f5e4ec] rounded-3xl p-6 sm:p-8 shadow-xs flex flex-col gap-5">
-                <div className="flex items-center justify-between border-b border-[#f5e4ec] pb-3">
+            <div 
+                className="rounded-3xl p-6 sm:p-8 shadow-xs flex flex-col gap-5"
+                style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}
+            >
+                <div className="flex items-center justify-between pb-3" style={{ borderBottom: '1px solid var(--border)' }}>
                     <div className="flex items-center gap-2">
-                        <FileText className="w-5 h-5 text-[#e13b68]" />
-                        <h3 className="text-base font-black text-[#1c1218] font-heading">
+                        <FileText className="w-5 h-5" style={{ color: 'var(--accent)' }} />
+                        <h3 className="text-base font-black font-heading" style={{ color: 'var(--text-primary)' }}>
                             Submitted Documents
                         </h3>
                     </div>
-                    <span className="text-xs font-bold text-[#7d6974]">
+                    <span className="text-xs font-bold" style={{ color: 'var(--text-secondary)' }}>
                         {documents.length} Uploaded
                     </span>
                 </div>
 
                 {loadingDocs ? (
                     <div className="flex justify-center p-12">
-                        <Loader2 className="w-8 h-8 text-[#e13b68] animate-spin" />
+                        <Loader2 className="w-8 h-8 animate-spin" style={{ color: 'var(--accent)' }} />
                     </div>
                 ) : documents.length === 0 ? (
-                    <div className="text-center py-10 flex flex-col items-center gap-2 text-[#7d6974]">
-                        <FileText className="w-8 h-8 text-[#f8c8d8]" />
-                        <p className="text-xs font-bold">No documents submitted yet.</p>
+                    <div className="text-center py-10 flex flex-col items-center gap-2" style={{ color: 'var(--text-secondary)' }}>
+                        <FileText className="w-8 h-8" style={{ color: 'var(--border)' }} />
+                        <p className="text-xs font-bold" style={{ color: 'var(--text-primary)' }}>No documents submitted yet.</p>
                         <p className="text-[11px]">Upload your medical registration and certificates above to complete verification.</p>
                     </div>
                 ) : (
@@ -290,24 +305,28 @@ export const DocumentUpload = () => {
                             return (
                                 <div
                                     key={doc.id}
-                                    className="p-4 sm:p-5 rounded-2xl bg-[#fffafc] border border-[#f5e4ec] flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition shadow-2xs hover:border-[#f8c8d8]"
+                                    className="p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition shadow-2xs"
+                                    style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)' }}
                                 >
                                     <div className="flex items-start gap-3.5">
-                                        <div className="w-10 h-10 rounded-xl bg-[#ffe6ee] border border-[#f8c8d8] flex items-center justify-center text-[#e13b68] shrink-0">
+                                        <div 
+                                            className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                                            style={{ background: 'var(--accent-light)', color: 'var(--accent)' }}
+                                        >
                                             <FileText className="w-5 h-5" />
                                         </div>
                                         <div className="flex flex-col gap-0.5">
                                             <div className="flex items-center gap-2 flex-wrap">
-                                                <h4 className="text-xs sm:text-sm font-black text-[#1c1218]">
+                                                <h4 className="text-xs sm:text-sm font-black" style={{ color: 'var(--text-primary)' }}>
                                                     {typeLabel}
                                                 </h4>
                                                 <Badge variant={statusCfg.variant}>{statusCfg.label}</Badge>
                                             </div>
-                                            <p className="text-[11px] text-[#7d6974] font-medium">
+                                            <p className="text-[11px] font-medium" style={{ color: 'var(--text-secondary)' }}>
                                                 {doc.fileName} · {formatBytes(doc.fileSize)} · Uploaded {new Date(doc.uploadedAt).toLocaleDateString('en-IN')}
                                             </p>
                                             {doc.rejectionReason && (
-                                                <div className="mt-1 p-2 bg-rose-50 border border-rose-200 rounded-xl text-[11px] font-bold text-rose-800">
+                                                <div className="mt-1 p-2 bg-rose-500/10 border border-rose-500/30 rounded-xl text-[11px] font-bold text-rose-500">
                                                     Admin Feedback: {doc.rejectionReason}
                                                 </div>
                                             )}
@@ -318,9 +337,10 @@ export const DocumentUpload = () => {
                                         <button
                                             type="button"
                                             onClick={() => handleViewDocument(doc)}
-                                            className="px-3.5 py-1.5 rounded-full bg-white border border-[#f5e4ec] hover:border-[#f8c8d8] text-xs font-bold text-[#e13b68] transition shadow-2xs flex items-center gap-1.5 cursor-pointer"
+                                            className="px-3.5 py-1.5 rounded-full text-xs font-bold transition shadow-2xs flex items-center gap-1.5 cursor-pointer hover:opacity-90"
+                                            style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
                                         >
-                                            <Eye className="w-3.5 h-3.5" />
+                                            <Eye className="w-3.5 h-3.5" style={{ color: 'var(--accent)' }} />
                                             <span>View PDF</span>
                                         </button>
 
@@ -329,7 +349,7 @@ export const DocumentUpload = () => {
                                                 type="button"
                                                 disabled={deleting === doc.id}
                                                 onClick={() => handleDelete(doc.id)}
-                                                className="p-1.5 rounded-full hover:bg-rose-50 text-[#7d6974] hover:text-rose-600 transition cursor-pointer"
+                                                className="p-1.5 rounded-full text-rose-500 hover:bg-rose-500/10 transition cursor-pointer"
                                                 title="Delete pending document"
                                             >
                                                 <Trash2 className="w-4 h-4" />
@@ -346,11 +366,14 @@ export const DocumentUpload = () => {
             {/* Doctor PDF Preview Modal */}
             {previewDoc && (
                 <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in">
-                    <div className="bg-white border border-[#f5e4ec] rounded-3xl w-full max-w-4xl h-[85vh] flex flex-col shadow-2xl overflow-hidden">
-                        <div className="px-6 py-4 border-b border-[#f5e4ec] flex items-center justify-between">
+                    <div 
+                        className="rounded-3xl w-full max-w-4xl h-[85vh] flex flex-col shadow-2xl overflow-hidden"
+                        style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}
+                    >
+                        <div className="px-6 py-4 flex items-center justify-between" style={{ borderBottom: '1px solid var(--border)' }}>
                             <div className="flex items-center gap-2">
-                                <FileText className="w-5 h-5 text-[#e13b68]" />
-                                <h3 className="font-black text-base text-[#1c1218]">
+                                <FileText className="w-5 h-5" style={{ color: 'var(--accent)' }} />
+                                <h3 className="font-black text-base font-heading" style={{ color: 'var(--text-primary)' }}>
                                     {DOCUMENT_TYPES.find((t) => t.value === previewDoc.documentType)?.label ||
                                         previewDoc.fileName}
                                 </h3>
@@ -361,7 +384,8 @@ export const DocumentUpload = () => {
                                         href={previewSignedUrl}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="px-3 py-1 rounded-full bg-[#fdf5f7] border border-[#f8c8d8] text-xs font-bold text-[#e13b68] flex items-center gap-1"
+                                        className="px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 hover:opacity-90"
+                                        style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', color: 'var(--accent)' }}
                                     >
                                         <ExternalLink className="w-3.5 h-3.5" />
                                         <span>Open Full Window</span>
@@ -370,27 +394,29 @@ export const DocumentUpload = () => {
                                 <button
                                     type="button"
                                     onClick={() => setPreviewDoc(null)}
-                                    className="w-8 h-8 rounded-full bg-[#fdf5f7] text-[#7d6974] hover:text-[#e13b68] flex items-center justify-center cursor-pointer"
+                                    className="w-8 h-8 rounded-full flex items-center justify-center cursor-pointer hover:opacity-80"
+                                    style={{ background: 'var(--bg-surface)', color: 'var(--text-secondary)' }}
                                 >
                                     <X className="w-4 h-4" />
                                 </button>
                             </div>
                         </div>
 
-                        <div className="flex-1 bg-[#f5ecf0] relative flex items-center justify-center overflow-hidden">
+                        <div className="flex-1 relative flex items-center justify-center overflow-hidden" style={{ background: 'var(--bg-primary)' }}>
                             {previewLoading ? (
-                                <div className="flex items-center gap-2 text-xs font-bold text-[#7d6974]">
-                                    <Loader2 className="w-5 h-5 text-[#e13b68] animate-spin" />
+                                <div className="flex items-center gap-2 text-xs font-bold" style={{ color: 'var(--text-secondary)' }}>
+                                    <Loader2 className="w-5 h-5 animate-spin" style={{ color: 'var(--accent)' }} />
                                     <span>Retrieving encrypted document...</span>
                                 </div>
                             ) : previewSignedUrl ? (
                                 <iframe
                                     src={`${previewSignedUrl}#toolbar=1&navpanes=0`}
                                     title="Doctor Verification Document"
-                                    className="w-full h-full border-none bg-white"
+                                    className="w-full h-full border-none"
+                                    style={{ background: 'var(--card-bg)' }}
                                 />
                             ) : (
-                                <p className="text-xs font-bold text-rose-600">Failed to render PDF preview.</p>
+                                <p className="text-xs font-bold text-rose-500">Failed to render PDF preview.</p>
                             )}
                         </div>
                     </div>

@@ -318,7 +318,7 @@ export const Register = () => {
                     to="/"
                     className="flex items-center gap-3 text-lg font-black tracking-tight text-[#1c1218] group"
                 >
-                    <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#ffe6ee] to-white border-2 border-[#f5c6d6] flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform p-1">
+                    <div className="w-10 h-10 rounded-2xl border-2 flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform p-1" style={{ background: 'var(--logo-gradient)', borderColor: 'var(--border)' }}>
                         <SanjeevaniLogo variant="emblem" size={32} />
                     </div>
                     <div className="flex flex-col text-left">
@@ -344,565 +344,565 @@ export const Register = () => {
                 <div className="lg:col-span-6 xl:col-span-6 flex flex-col gap-6 w-full mx-auto lg:mx-0">
                     <div className="w-full p-6 sm:p-8 bg-[var(--bg-surface)] border border-[var(--border)] rounded-3xl shadow-xs flex flex-col gap-6 animate-fade-in-up">
 
-                {/* Step 1: Select Role */}
-                {!role && (
-                    <div className="flex flex-col gap-6 text-center">
-                        <div>
-                            <h2 className="text-3xl font-black text-[var(--text-primary)]">Create Account</h2>
-                            <p className="text-sm font-semibold text-[var(--text-secondary)] mt-1">Select your profile type to register</p>
-                        </div>
+                        {/* Step 1: Select Role */}
+                        {!role && (
+                            <div className="flex flex-col gap-6 text-center">
+                                <div>
+                                    <h2 className="text-3xl font-black text-[var(--text-primary)]">Create Account</h2>
+                                    <p className="text-sm font-semibold text-[var(--text-secondary)] mt-1">Select your profile type to register</p>
+                                </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                            <button
-                                onClick={() => setRole('patient')}
-                                className="p-6 bg-[var(--card-bg)] border-2 border-[var(--border)] rounded-2xl flex flex-col items-center gap-2 hover:-translate-y-1 hover:bg-[rgba(59,130,246,0.1)] hover:shadow cursor-pointer transition duration-200"
-                            >
-                                <span className="w-12 h-12 rounded-full bg-[rgba(59,130,246,0.2)] flex items-center justify-center text-xl font-bold border border-[var(--border)]">👤</span>
-                                <span className="font-bold text-[var(--text-primary)]">Patient Care</span>
-                                <span className="text-xs text-[var(--text-muted)]">Register health card via OTP</span>
-                            </button>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                    <button
+                                        onClick={() => setRole('patient')}
+                                        className="p-6 bg-[var(--card-bg)] border-2 border-[var(--border)] rounded-2xl flex flex-col items-center gap-2 hover:-translate-y-1 hover:bg-[rgba(59,130,246,0.1)] hover:shadow cursor-pointer transition duration-200"
+                                    >
+                                        <span className="w-12 h-12 rounded-full bg-[rgba(59,130,246,0.2)] flex items-center justify-center text-xl font-bold border border-[var(--border)]">👤</span>
+                                        <span className="font-bold text-[var(--text-primary)]">Patient Care</span>
+                                        <span className="text-xs text-[var(--text-muted)]">Register health card via OTP</span>
+                                    </button>
 
-                            <button
-                                onClick={() => setRole('doctor')}
-                                className="p-6 bg-[var(--card-bg)] border-2 border-[var(--border)] rounded-2xl flex flex-col items-center gap-2 hover:-translate-y-1 hover:bg-[rgba(244,63,94,0.1)] hover:shadow cursor-pointer transition duration-200"
-                            >
-                                <span className="w-12 h-12 rounded-full bg-[rgba(244,63,94,0.2)] flex items-center justify-center text-xl font-bold border border-[var(--border)]">🩺</span>
-                                <span className="font-bold text-[var(--text-primary)]">Doctor Profile</span>
-                                <span className="text-xs text-[var(--text-muted)]">Onboard verified practitioner</span>
-                            </button>
+                                    <button
+                                        onClick={() => setRole('doctor')}
+                                        className="p-6 bg-[var(--card-bg)] border-2 border-[var(--border)] rounded-2xl flex flex-col items-center gap-2 hover:-translate-y-1 hover:bg-[rgba(244,63,94,0.1)] hover:shadow cursor-pointer transition duration-200"
+                                    >
+                                        <span className="w-12 h-12 rounded-full bg-[rgba(244,63,94,0.2)] flex items-center justify-center text-xl font-bold border border-[var(--border)]">🩺</span>
+                                        <span className="font-bold text-[var(--text-primary)]">Doctor Profile</span>
+                                        <span className="text-xs text-[var(--text-muted)]">Onboard verified practitioner</span>
+                                    </button>
 
-                            <button
-                                onClick={() => setRole('clinic')}
-                                className="p-6 bg-[var(--card-bg)] border-2 border-[var(--border)] rounded-2xl flex flex-col items-center gap-2 hover:-translate-y-1 hover:bg-[rgba(16,185,129,0.1)] hover:shadow cursor-pointer transition duration-200"
-                            >
-                                <span className="w-12 h-12 rounded-full bg-[rgba(16,185,129,0.2)] flex items-center justify-center text-xl font-bold border border-[var(--border)]">🏥</span>
-                                <span className="font-bold text-[var(--text-primary)]">Clinic / Lab</span>
-                                <span className="text-xs text-[var(--text-muted)]">Onboard hospital & department</span>
-                            </button>
+                                    <button
+                                        onClick={() => setRole('clinic')}
+                                        className="p-6 bg-[var(--card-bg)] border-2 border-[var(--border)] rounded-2xl flex flex-col items-center gap-2 hover:-translate-y-1 hover:bg-[rgba(16,185,129,0.1)] hover:shadow cursor-pointer transition duration-200"
+                                    >
+                                        <span className="w-12 h-12 rounded-full bg-[rgba(16,185,129,0.2)] flex items-center justify-center text-xl font-bold border border-[var(--border)]">🏥</span>
+                                        <span className="font-bold text-[var(--text-primary)]">Clinic / Lab</span>
+                                        <span className="text-xs text-[var(--text-muted)]">Onboard hospital & department</span>
+                                    </button>
 
-                            <button
-                                onClick={() => setRole('health_worker')}
-                                className="p-6 bg-[var(--card-bg)] border-2 border-[var(--border)] rounded-2xl flex flex-col items-center gap-2 hover:-translate-y-1 hover:bg-[rgba(16,185,129,0.1)] hover:shadow cursor-pointer transition duration-200"
-                            >
-                                <span className="w-12 h-12 rounded-full bg-[rgba(16,185,129,0.2)] flex items-center justify-center text-xl font-bold border border-[var(--border)]">🧑‍⚕️</span>
-                                <span className="font-bold text-[var(--text-primary)]">Health Worker</span>
-                                <span className="text-xs text-[var(--text-muted)]">Frontline care access</span>
-                            </button>
-                        </div>
+                                    <button
+                                        onClick={() => setRole('health_worker')}
+                                        className="p-6 bg-[var(--card-bg)] border-2 border-[var(--border)] rounded-2xl flex flex-col items-center gap-2 hover:-translate-y-1 hover:bg-[rgba(16,185,129,0.1)] hover:shadow cursor-pointer transition duration-200"
+                                    >
+                                        <span className="w-12 h-12 rounded-full bg-[rgba(16,185,129,0.2)] flex items-center justify-center text-xl font-bold border border-[var(--border)]">🧑‍⚕️</span>
+                                        <span className="font-bold text-[var(--text-primary)]">Health Worker</span>
+                                        <span className="text-xs text-[var(--text-muted)]">Frontline care access</span>
+                                    </button>
+                                </div>
 
-                        <div className="pt-4 border-t border-cream-surface text-center">
-                            <p className="text-xs font-semibold text-[var(--text-secondary)]">
-                                Already registered?{' '}
-                                <Link to="/login" className="text-[var(--accent)] hover:underline font-bold">Log In</Link>
-                            </p>
-                        </div>
-                    </div>
-                )}
-
-                {/* Selected Role Form container */}
-                {role && (
-                    <div className="flex flex-col gap-4">
-                        <div className="flex items-center justify-between pb-3 border-b border-cream-surface">
-                            <button
-                                onClick={() => {
-                                    setRole(null);
-                                    setError('');
-                                    setOtpVerifyNeeded(false);
-                                }}
-                                className="text-xs font-bold text-[var(--text-muted)] hover:text-[var(--text-primary)] cursor-pointer"
-                            >
-                                ← Change Role
-                            </button>
-                            <span className="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">
-                                {role} registration
-                            </span>
-                        </div>
-
-                        {error && (
-                            <div className="p-3 bg-[var(--pastel-pink-bg)] border border-[var(--accent)] text-[var(--accent)] text-sm font-semibold rounded-xl">
-                                {error}
+                                <div className="pt-4 border-t border-cream-surface text-center">
+                                    <p className="text-xs font-semibold text-[var(--text-secondary)]">
+                                        Already registered?{' '}
+                                        <Link to="/login" className="text-[var(--accent)] hover:underline font-bold">Log In</Link>
+                                    </p>
+                                </div>
                             </div>
                         )}
 
-                        {/* Health Worker Registration */}
-                        {role === 'health_worker' && (
-                            <form className="flex flex-col gap-4" onSubmit={handleHealthWorkerSubmit}>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <Input label="Full Name" id="worker-name" name="name" value={healthWorkerData.name} onChange={handleHealthWorkerChange} required />
-                                    <Input label="Phone Number" id="worker-phone" name="phone" type="tel" value={healthWorkerData.phone} onChange={handleHealthWorkerChange} />
-                                </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <Input label="Email Address" id="worker-email" name="email" type="email" value={healthWorkerData.email} onChange={handleHealthWorkerChange} required />
-                                    <Input label="City / Location" id="worker-city" name="district" value={healthWorkerData.district} onChange={handleHealthWorkerChange} placeholder="e.g. Jamshedpur" />
-                                </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <Input label="Password" id="worker-password" name="password" type="password" value={healthWorkerData.password} onChange={handleHealthWorkerChange} required />
-                                    <Input label="Confirm Password" id="worker-confirm-password" name="confirmPassword" type="password" value={healthWorkerData.confirmPassword} onChange={handleHealthWorkerChange} required />
-                                </div>
-                                <div className="grid grid-cols-1 gap-4">
-                                    <div className="flex flex-col gap-1 w-full text-left">
-                                        <label className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Worker Type</label>
-                                        <select
-                                            name="workerType"
-                                            value={healthWorkerData.workerType}
-                                            onChange={handleHealthWorkerChange}
-                                            className="w-full px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] focus:ring-2 focus:ring-rose-mauve"
-                                        >
-                                            <option value="COMMUNITY_WORKER">Community Worker</option>
-                                            <option value="ASHA">ASHA</option>
-                                            <option value="ANM">ANM</option>
-                                            <option value="OTHER">Other</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <p className="text-xs text-[var(--text-muted)]">Your account will be reviewed by an administrator before Health Worker access is enabled.</p>
-                                <Button type="submit" variant="primary" className="w-full" disabled={loading}>{loading ? 'Registering...' : 'Create Health Worker Account'}</Button>
-                            </form>
-                        )}
-
-                        {/* Patient Registration Flow */}
-                        {role === 'patient' && (
-                            !otpVerifyNeeded ? (
-                                <form className="flex flex-col gap-4" onSubmit={handlePatientSubmit}>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <Input
-                                            label="Full Name"
-                                            id="fullName"
-                                            name="fullName"
-                                            value={patientData.fullName}
-                                            onChange={handlePatientChange}
-                                            required
-                                        />
-                                        <Input
-                                            label="Phone Number"
-                                            id="phone"
-                                            name="phone"
-                                            type="tel"
-                                            value={patientData.phone}
-                                            onChange={handlePatientChange}
-                                            required
-                                            placeholder="e.g. 9876543210"
-                                        />
-                                    </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <Input
-                                            label="Date of Birth"
-                                            id="dateOfBirth"
-                                            name="dateOfBirth"
-                                            type="date"
-                                            value={patientData.dateOfBirth}
-                                            onChange={handlePatientChange}
-                                            required
-                                        />
-                                        <div className="flex flex-col gap-1 w-full text-left">
-                                            <label className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Sex</label>
-                                            <select
-                                                name="sex"
-                                                value={patientData.sex}
-                                                onChange={handlePatientChange}
-                                                className="w-full px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] focus:ring-2 focus:ring-rose-mauve"
-                                            >
-                                                <option value="male">Male</option>
-                                                <option value="female">Female</option>
-                                                <option value="other">Other</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <Input
-                                            label="Preferred Language"
-                                            id="preferredLanguage"
-                                            name="preferredLanguage"
-                                            value={patientData.preferredLanguage}
-                                            onChange={handlePatientChange}
-                                            placeholder="e.g. Hindi, English"
-                                        />
-                                        <Input
-                                            label="City / Location"
-                                            id="region"
-                                            name="region"
-                                            value={patientData.region}
-                                            onChange={handlePatientChange}
-                                            placeholder="e.g. Jamshedpur"
-                                        />
-                                    </div>
-
-                                    <Input
-                                        label="ABHA Health ID Number"
-                                        id="abhaNumber"
-                                        name="abhaNumber"
-                                        value={patientData.abhaNumber}
-                                        onChange={handlePatientChange}
-                                        placeholder="e.g. 14-digit ABHA ID"
-                                    />
-                                    <Button type="submit" variant="primary" className="mt-2 w-full" disabled={loading}>
-                                        {loading ? 'Registering...' : 'Register Profile'}
-                                    </Button>
-                                </form>
-                            ) : (
-                                <div className="flex flex-col gap-4 text-center">
-                                    <h3 className="text-xl font-bold text-[var(--text-primary)]">Confirm Registration</h3>
-                                    <p className="text-sm text-[var(--text-secondary)]">
-                                        Registration request successful! A code has been dispatched. Log in via your phone number from the Sign In page to verify and start operations.
-                                    </p>
-                                    {devOtp && (
-                                        <div className="p-3 bg-[rgba(59,130,246,0.1)] border border-[rgb(59,130,246)] text-[rgb(59,130,246)] text-xs font-mono font-bold rounded-lg mt-2">
-                                            [Development OTP]: {devOtp}
-                                        </div>
-                                    )}
-                                    <Link to="/login" className="w-full">
-                                        <Button variant="primary" className="w-full">Go to Sign In</Button>
-                                    </Link>
-                                </div>
-                            )
-                        )}
-
-                        {/* Doctor Registration Flow */}
-                        {role === 'doctor' && (
-                            <form className="flex flex-col gap-4 text-left" onSubmit={handleDoctorSubmit}>
-                                {/* Progress Indicator */}
-                                <div className="flex items-center justify-between pb-2 border-b border-cream-surface mb-2">
-                                    <span className="text-xs font-bold text-[var(--text-muted)]">
-                                        Step {doctorStep} of 3
-                                    </span>
-                                    <span className="text-xs font-bold text-[var(--accent)]">
-                                        {doctorStep === 1 && 'Credentials & Location'}
-                                        {doctorStep === 2 && 'Professional Information'}
-                                        {doctorStep === 3 && 'Document Upload'}
+                        {/* Selected Role Form container */}
+                        {role && (
+                            <div className="flex flex-col gap-4">
+                                <div className="flex items-center justify-between pb-3 border-b border-cream-surface">
+                                    <button
+                                        onClick={() => {
+                                            setRole(null);
+                                            setError('');
+                                            setOtpVerifyNeeded(false);
+                                        }}
+                                        className="text-xs font-bold text-[var(--text-muted)] hover:text-[var(--text-primary)] cursor-pointer"
+                                    >
+                                        ← Change Role
+                                    </button>
+                                    <span className="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">
+                                        {role} registration
                                     </span>
                                 </div>
 
-                                {/* Step 1: Account details */}
-                                {doctorStep === 1 && (
-                                    <div className="flex flex-col gap-4">
-                                        <Input
-                                            label="Full Name"
-                                            id="fullName"
-                                            name="fullName"
-                                            value={doctorData.fullName}
-                                            onChange={handleDoctorChange}
-                                            required
-                                            placeholder="Dr. John Doe"
-                                        />
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <Input
-                                                label="Email Address"
-                                                id="email"
-                                                name="email"
-                                                type="email"
-                                                value={doctorData.email}
-                                                onChange={handleDoctorChange}
-                                                required
-                                            />
-                                            <Input
-                                                label="Phone Number"
-                                                id="phone"
-                                                name="phone"
-                                                type="tel"
-                                                value={doctorData.phone}
-                                                onChange={handleDoctorChange}
-                                                placeholder="e.g. 9876543210"
-                                            />
-                                        </div>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <Input
-                                                label="Password"
-                                                id="password"
-                                                name="password"
-                                                type="password"
-                                                value={doctorData.password}
-                                                onChange={handleDoctorChange}
-                                                required
-                                                placeholder="Minimum 8 characters"
-                                            />
-                                            <Input
-                                                label="City / Location"
-                                                id="city"
-                                                name="city"
-                                                value={doctorData.city}
-                                                onChange={handleDoctorChange}
-                                                required
-                                                placeholder="e.g. Jamshedpur"
-                                            />
-                                        </div>
+                                {error && (
+                                    <div className="p-3 bg-[var(--pastel-pink-bg)] border border-[var(--accent)] text-[var(--accent)] text-sm font-semibold rounded-xl">
+                                        {error}
                                     </div>
                                 )}
 
-                                {/* Step 2: Professional Profile details */}
-                                {doctorStep === 2 && (
-                                    <div className="flex flex-col gap-4">
-                                        {/* Multi-Select Specialization */}
-                                        <div className="flex flex-col gap-1.5 w-full text-left">
-                                            <div className="flex items-center justify-between">
-                                                <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">
-                                                    Specialization(s) (Registered in India) <span className="text-rose-500">*</span>
-                                                </label>
-                                                {selectedSpecializations.length > 0 && (
-                                                    <span className="text-xs font-semibold text-[var(--accent-hover)] bg-[var(--pastel-pink-bg)] px-2 py-0.5 rounded-full">
-                                                        {selectedSpecializations.length} selected
-                                                    </span>
-                                                )}
-                                            </div>
-
-                                            {/* Selected Specialization Chips */}
-                                            {selectedSpecializations.length > 0 && (
-                                                <div className="flex flex-wrap gap-1.5 p-2.5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border)]">
-                                                    {selectedSpecializations.map((spec) => (
-                                                        <span
-                                                            key={spec}
-                                                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold bg-[var(--pastel-pink-bg)] text-[var(--accent-hover)] border border-[var(--pastel-pink-text)] shadow-2xs"
-                                                        >
-                                                            <span>{spec}</span>
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => handleRemoveSpecialization(spec)}
-                                                                className="w-3.5 h-3.5 rounded-full bg-[rgba(142,29,65,0.1)] hover:bg-[rgba(142,29,65,0.25)] flex items-center justify-center text-[var(--accent-hover)] transition-colors"
-                                                                title="Remove specialization"
-                                                            >
-                                                                &times;
-                                                            </button>
-                                                        </span>
-                                                    ))}
-                                                </div>
-                                            )}
-
-                                            <div className="relative w-full">
+                                {/* Health Worker Registration */}
+                                {role === 'health_worker' && (
+                                    <form className="flex flex-col gap-4" onSubmit={handleHealthWorkerSubmit}>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <Input label="Full Name" id="worker-name" name="name" value={healthWorkerData.name} onChange={handleHealthWorkerChange} required />
+                                            <Input label="Phone Number" id="worker-phone" name="phone" type="tel" value={healthWorkerData.phone} onChange={handleHealthWorkerChange} />
+                                        </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <Input label="Email Address" id="worker-email" name="email" type="email" value={healthWorkerData.email} onChange={handleHealthWorkerChange} required />
+                                            <Input label="City / Location" id="worker-city" name="district" value={healthWorkerData.district} onChange={handleHealthWorkerChange} placeholder="e.g. Jamshedpur" />
+                                        </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <Input label="Password" id="worker-password" name="password" type="password" value={healthWorkerData.password} onChange={handleHealthWorkerChange} required />
+                                            <Input label="Confirm Password" id="worker-confirm-password" name="confirmPassword" type="password" value={healthWorkerData.confirmPassword} onChange={handleHealthWorkerChange} required />
+                                        </div>
+                                        <div className="grid grid-cols-1 gap-4">
+                                            <div className="flex flex-col gap-1 w-full text-left">
+                                                <label className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Worker Type</label>
                                                 <select
-                                                    id="specializationSelect"
-                                                    value=""
-                                                    onChange={(e) => {
-                                                        if (e.target.value) {
-                                                            handleAddSpecialization(e.target.value);
-                                                        }
-                                                    }}
-                                                    className="w-full px-4 py-2.5 rounded-2xl border border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30 focus:border-[var(--accent)] shadow-xs text-sm transition duration-150 appearance-none pr-10 cursor-pointer"
+                                                    name="workerType"
+                                                    value={healthWorkerData.workerType}
+                                                    onChange={handleHealthWorkerChange}
+                                                    className="w-full px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] focus:ring-2 focus:ring-rose-mauve"
                                                 >
-                                                    <option value="">
-                                                        {selectedSpecializations.length === 0
-                                                            ? '— Select Specialization(s) (NMC / AYUSH) —'
-                                                            : '+ Add another Specialization...'}
-                                                    </option>
-                                                    {INDIAN_MEDICAL_SPECIALIZATIONS.filter(
-                                                        (spec) => !selectedSpecializations.includes(spec)
-                                                    ).map((spec) => (
-                                                        <option key={spec} value={spec}>
-                                                            {spec}
-                                                        </option>
-                                                    ))}
+                                                    <option value="COMMUNITY_WORKER">Community Worker</option>
+                                                    <option value="ASHA">ASHA</option>
+                                                    <option value="ANM">ANM</option>
+                                                    <option value="OTHER">Other</option>
                                                 </select>
-                                                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[var(--text-secondary)]">
-                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                                                    </svg>
+                                            </div>
+                                        </div>
+
+                                        <p className="text-xs text-[var(--text-muted)]">Your account will be reviewed by an administrator before Health Worker access is enabled.</p>
+                                        <Button type="submit" variant="primary" className="w-full" disabled={loading}>{loading ? 'Registering...' : 'Create Health Worker Account'}</Button>
+                                    </form>
+                                )}
+
+                                {/* Patient Registration Flow */}
+                                {role === 'patient' && (
+                                    !otpVerifyNeeded ? (
+                                        <form className="flex flex-col gap-4" onSubmit={handlePatientSubmit}>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <Input
+                                                    label="Full Name"
+                                                    id="fullName"
+                                                    name="fullName"
+                                                    value={patientData.fullName}
+                                                    onChange={handlePatientChange}
+                                                    required
+                                                />
+                                                <Input
+                                                    label="Phone Number"
+                                                    id="phone"
+                                                    name="phone"
+                                                    type="tel"
+                                                    value={patientData.phone}
+                                                    onChange={handlePatientChange}
+                                                    required
+                                                    placeholder="e.g. 9876543210"
+                                                />
+                                            </div>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <Input
+                                                    label="Date of Birth"
+                                                    id="dateOfBirth"
+                                                    name="dateOfBirth"
+                                                    type="date"
+                                                    value={patientData.dateOfBirth}
+                                                    onChange={handlePatientChange}
+                                                    required
+                                                />
+                                                <div className="flex flex-col gap-1 w-full text-left">
+                                                    <label className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Sex</label>
+                                                    <select
+                                                        name="sex"
+                                                        value={patientData.sex}
+                                                        onChange={handlePatientChange}
+                                                        className="w-full px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] focus:ring-2 focus:ring-rose-mauve"
+                                                    >
+                                                        <option value="male">Male</option>
+                                                        <option value="female">Female</option>
+                                                        <option value="other">Other</option>
+                                                    </select>
                                                 </div>
                                             </div>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <Input
+                                                    label="Preferred Language"
+                                                    id="preferredLanguage"
+                                                    name="preferredLanguage"
+                                                    value={patientData.preferredLanguage}
+                                                    onChange={handlePatientChange}
+                                                    placeholder="e.g. Hindi, English"
+                                                />
+                                                <Input
+                                                    label="City / Location"
+                                                    id="region"
+                                                    name="region"
+                                                    value={patientData.region}
+                                                    onChange={handlePatientChange}
+                                                    placeholder="e.g. Jamshedpur"
+                                                />
+                                            </div>
 
-                                            {/* Quick-add suggestions */}
-                                            {selectedSpecializations.length === 0 && (
-                                                <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                                                    <span className="text-[11px] text-[var(--text-secondary)] font-medium">Quick add:</span>
-                                                    {[
-                                                        'General Medicine / Internal Medicine',
-                                                        'General Surgery',
-                                                        'Pediatrics & Neonatology',
-                                                        'Cardiology & Interventional Cardiology',
-                                                        'Obstetrics & Gynaecology (OB-GYN)',
-                                                        'Dermatology, Venereology & Leprosy (DVL)',
-                                                        'Orthopaedics & Joint Replacement'
-                                                    ].map((s) => (
-                                                        <button
-                                                            key={s}
-                                                            type="button"
-                                                            onClick={() => handleAddSpecialization(s)}
-                                                            className="text-[11px] px-2 py-0.5 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] hover:bg-[var(--pastel-pink-bg)] hover:border-[var(--pastel-pink-text)] text-[var(--text-secondary)] transition-colors"
-                                                        >
-                                                            + {s.split(' ')[0]}
-                                                        </button>
-                                                    ))}
+                                            <Input
+                                                label="ABHA Health ID Number"
+                                                id="abhaNumber"
+                                                name="abhaNumber"
+                                                value={patientData.abhaNumber}
+                                                onChange={handlePatientChange}
+                                                placeholder="e.g. 14-digit ABHA ID"
+                                            />
+                                            <Button type="submit" variant="primary" className="mt-2 w-full" disabled={loading}>
+                                                {loading ? 'Registering...' : 'Register Profile'}
+                                            </Button>
+                                        </form>
+                                    ) : (
+                                        <div className="flex flex-col gap-4 text-center">
+                                            <h3 className="text-xl font-bold text-[var(--text-primary)]">Confirm Registration</h3>
+                                            <p className="text-sm text-[var(--text-secondary)]">
+                                                Registration request successful! A code has been dispatched. Log in via your phone number from the Sign In page to verify and start operations.
+                                            </p>
+                                            {devOtp && (
+                                                <div className="p-3 bg-[rgba(59,130,246,0.1)] border border-[rgb(59,130,246)] text-[rgb(59,130,246)] text-xs font-mono font-bold rounded-lg mt-2">
+                                                    [Development OTP]: {devOtp}
                                                 </div>
                                             )}
+                                            <Link to="/login" className="w-full">
+                                                <Button variant="primary" className="w-full">Go to Sign In</Button>
+                                            </Link>
+                                        </div>
+                                    )
+                                )}
+
+                                {/* Doctor Registration Flow */}
+                                {role === 'doctor' && (
+                                    <form className="flex flex-col gap-4 text-left" onSubmit={handleDoctorSubmit}>
+                                        {/* Progress Indicator */}
+                                        <div className="flex items-center justify-between pb-2 border-b border-cream-surface mb-2">
+                                            <span className="text-xs font-bold text-[var(--text-muted)]">
+                                                Step {doctorStep} of 3
+                                            </span>
+                                            <span className="text-xs font-bold text-[var(--accent)]">
+                                                {doctorStep === 1 && 'Credentials & Location'}
+                                                {doctorStep === 2 && 'Professional Information'}
+                                                {doctorStep === 3 && 'Document Upload'}
+                                            </span>
                                         </div>
 
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <Input
-                                                label="Medical Registration Number"
-                                                id="medicalRegistrationNumber"
-                                                name="medicalRegistrationNumber"
-                                                value={doctorData.medicalRegistrationNumber}
-                                                onChange={handleDoctorChange}
-                                                required
-                                                placeholder="e.g. 12345/MCI/2018"
-                                            />
-                                            <Input
-                                                label="State Medical Council"
-                                                id="stateMedicalCouncil"
-                                                name="stateMedicalCouncil"
-                                                value={doctorData.stateMedicalCouncil}
-                                                onChange={handleDoctorChange}
-                                                placeholder="e.g. Jharkhand Medical Council"
-                                            />
-                                        </div>
-
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <Input
-                                                label="Primary Medical Qualification"
-                                                id="primaryMedicalQualification"
-                                                name="primaryMedicalQualification"
-                                                value={doctorData.primaryMedicalQualification}
-                                                onChange={handleDoctorChange}
-                                                placeholder="e.g. MBBS, MD, MS, DNB"
-                                            />
-                                            <Input
-                                                label="Medical College / University"
-                                                id="medicalCollege"
-                                                name="medicalCollege"
-                                                value={doctorData.medicalCollege}
-                                                onChange={handleDoctorChange}
-                                                placeholder="e.g. AIIMS New Delhi / RIMS"
-                                            />
-                                        </div>
-
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <Input
-                                                label="Graduation Year"
-                                                id="graduationYear"
-                                                name="graduationYear"
-                                                value={doctorData.graduationYear}
-                                                onChange={handleDoctorChange}
-                                                placeholder="e.g. 2018"
-                                            />
-                                        </div>
-
-                                        {/* Optional Link to Registered Hospital or Clinic */}
-                                        <div className="flex flex-col gap-1.5 w-full text-left pt-2 border-t border-[var(--border)]">
-                                            <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider flex items-center justify-between">
-                                                <span>Link to Registered Hospital / Clinic</span>
-                                                <span className="normal-case font-normal text-xs text-[var(--text-secondary)] bg-[var(--pastel-pink-bg)] px-2 py-0.5 rounded-full">Optional</span>
-                                            </label>
-                                            <div className="flex flex-col gap-2">
-                                                <input
-                                                    type="text"
-                                                    placeholder="Search registered hospitals or clinics..."
-                                                    value={clinicSearch}
-                                                    onChange={(e) => setClinicSearch(e.target.value)}
-                                                    className="w-full px-4 py-2 rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-primary)] placeholder:text-[var(--text-secondary)]/50 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30 focus:border-[var(--accent)] text-xs transition duration-150"
+                                        {/* Step 1: Account details */}
+                                        {doctorStep === 1 && (
+                                            <div className="flex flex-col gap-4">
+                                                <Input
+                                                    label="Full Name"
+                                                    id="fullName"
+                                                    name="fullName"
+                                                    value={doctorData.fullName}
+                                                    onChange={handleDoctorChange}
+                                                    required
+                                                    placeholder="Dr. John Doe"
                                                 />
-                                                <div className="relative w-full">
-                                                    <select
-                                                        name="clinicId"
-                                                        value={doctorData.clinicId || ''}
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <Input
+                                                        label="Email Address"
+                                                        id="email"
+                                                        name="email"
+                                                        type="email"
+                                                        value={doctorData.email}
                                                         onChange={handleDoctorChange}
-                                                        disabled={clinicsLoading}
-                                                        className="w-full px-4 py-2.5 rounded-2xl border border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30 focus:border-[var(--accent)] shadow-xs text-sm transition duration-150 appearance-none pr-10 cursor-pointer"
-                                                    >
-                                                        <option value="">— Not linked to a registered hospital or clinic (link later) —</option>
-                                                        {clinicOptions.map((clinic) => (
-                                                            <option key={clinic.userId || clinic.id} value={clinic.userId || clinic.id}>
-                                                                {clinic.clinicName || clinic.name} {clinic.city ? `(${clinic.city})` : ''}
+                                                        required
+                                                    />
+                                                    <Input
+                                                        label="Phone Number"
+                                                        id="phone"
+                                                        name="phone"
+                                                        type="tel"
+                                                        value={doctorData.phone}
+                                                        onChange={handleDoctorChange}
+                                                        placeholder="e.g. 9876543210"
+                                                    />
+                                                </div>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <Input
+                                                        label="Password"
+                                                        id="password"
+                                                        name="password"
+                                                        type="password"
+                                                        value={doctorData.password}
+                                                        onChange={handleDoctorChange}
+                                                        required
+                                                        placeholder="Minimum 8 characters"
+                                                    />
+                                                    <Input
+                                                        label="City / Location"
+                                                        id="city"
+                                                        name="city"
+                                                        value={doctorData.city}
+                                                        onChange={handleDoctorChange}
+                                                        required
+                                                        placeholder="e.g. Jamshedpur"
+                                                    />
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Step 2: Professional Profile details */}
+                                        {doctorStep === 2 && (
+                                            <div className="flex flex-col gap-4">
+                                                {/* Multi-Select Specialization */}
+                                                <div className="flex flex-col gap-1.5 w-full text-left">
+                                                    <div className="flex items-center justify-between">
+                                                        <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">
+                                                            Specialization(s) (Registered in India) <span className="text-rose-500">*</span>
+                                                        </label>
+                                                        {selectedSpecializations.length > 0 && (
+                                                            <span className="text-xs font-semibold text-[var(--accent-hover)] bg-[var(--pastel-pink-bg)] px-2 py-0.5 rounded-full">
+                                                                {selectedSpecializations.length} selected
+                                                            </span>
+                                                        )}
+                                                    </div>
+
+                                                    {/* Selected Specialization Chips */}
+                                                    {selectedSpecializations.length > 0 && (
+                                                        <div className="flex flex-wrap gap-1.5 p-2.5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border)]">
+                                                            {selectedSpecializations.map((spec) => (
+                                                                <span
+                                                                    key={spec}
+                                                                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold bg-[var(--pastel-pink-bg)] text-[var(--accent-hover)] border border-[var(--pastel-pink-text)] shadow-2xs"
+                                                                >
+                                                                    <span>{spec}</span>
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => handleRemoveSpecialization(spec)}
+                                                                        className="w-3.5 h-3.5 rounded-full bg-[rgba(142,29,65,0.1)] hover:bg-[rgba(142,29,65,0.25)] flex items-center justify-center text-[var(--accent-hover)] transition-colors"
+                                                                        title="Remove specialization"
+                                                                    >
+                                                                        &times;
+                                                                    </button>
+                                                                </span>
+                                                            ))}
+                                                        </div>
+                                                    )}
+
+                                                    <div className="relative w-full">
+                                                        <select
+                                                            id="specializationSelect"
+                                                            value=""
+                                                            onChange={(e) => {
+                                                                if (e.target.value) {
+                                                                    handleAddSpecialization(e.target.value);
+                                                                }
+                                                            }}
+                                                            className="w-full px-4 py-2.5 rounded-2xl border border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30 focus:border-[var(--accent)] shadow-xs text-sm transition duration-150 appearance-none pr-10 cursor-pointer"
+                                                        >
+                                                            <option value="">
+                                                                {selectedSpecializations.length === 0
+                                                                    ? '— Select Specialization(s) (NMC / AYUSH) —'
+                                                                    : '+ Add another Specialization...'}
                                                             </option>
-                                                        ))}
-                                                    </select>
-                                                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[var(--text-secondary)]">
-                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                                                        </svg>
+                                                            {INDIAN_MEDICAL_SPECIALIZATIONS.filter(
+                                                                (spec) => !selectedSpecializations.includes(spec)
+                                                            ).map((spec) => (
+                                                                <option key={spec} value={spec}>
+                                                                    {spec}
+                                                                </option>
+                                                            ))}
+                                                        </select>
+                                                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[var(--text-secondary)]">
+                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                                                            </svg>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Quick-add suggestions */}
+                                                    {selectedSpecializations.length === 0 && (
+                                                        <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                                                            <span className="text-[11px] text-[var(--text-secondary)] font-medium">Quick add:</span>
+                                                            {[
+                                                                'General Medicine / Internal Medicine',
+                                                                'General Surgery',
+                                                                'Pediatrics & Neonatology',
+                                                                'Cardiology & Interventional Cardiology',
+                                                                'Obstetrics & Gynaecology (OB-GYN)',
+                                                                'Dermatology, Venereology & Leprosy (DVL)',
+                                                                'Orthopaedics & Joint Replacement'
+                                                            ].map((s) => (
+                                                                <button
+                                                                    key={s}
+                                                                    type="button"
+                                                                    onClick={() => handleAddSpecialization(s)}
+                                                                    className="text-[11px] px-2 py-0.5 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] hover:bg-[var(--pastel-pink-bg)] hover:border-[var(--pastel-pink-text)] text-[var(--text-secondary)] transition-colors"
+                                                                >
+                                                                    + {s.split(' ')[0]}
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <Input
+                                                        label="Medical Registration Number"
+                                                        id="medicalRegistrationNumber"
+                                                        name="medicalRegistrationNumber"
+                                                        value={doctorData.medicalRegistrationNumber}
+                                                        onChange={handleDoctorChange}
+                                                        required
+                                                        placeholder="e.g. 12345/MCI/2018"
+                                                    />
+                                                    <Input
+                                                        label="State Medical Council"
+                                                        id="stateMedicalCouncil"
+                                                        name="stateMedicalCouncil"
+                                                        value={doctorData.stateMedicalCouncil}
+                                                        onChange={handleDoctorChange}
+                                                        placeholder="e.g. Jharkhand Medical Council"
+                                                    />
+                                                </div>
+
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <Input
+                                                        label="Primary Medical Qualification"
+                                                        id="primaryMedicalQualification"
+                                                        name="primaryMedicalQualification"
+                                                        value={doctorData.primaryMedicalQualification}
+                                                        onChange={handleDoctorChange}
+                                                        placeholder="e.g. MBBS, MD, MS, DNB"
+                                                    />
+                                                    <Input
+                                                        label="Medical College / University"
+                                                        id="medicalCollege"
+                                                        name="medicalCollege"
+                                                        value={doctorData.medicalCollege}
+                                                        onChange={handleDoctorChange}
+                                                        placeholder="e.g. AIIMS New Delhi / RIMS"
+                                                    />
+                                                </div>
+
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <Input
+                                                        label="Graduation Year"
+                                                        id="graduationYear"
+                                                        name="graduationYear"
+                                                        value={doctorData.graduationYear}
+                                                        onChange={handleDoctorChange}
+                                                        placeholder="e.g. 2018"
+                                                    />
+                                                </div>
+
+                                                {/* Optional Link to Registered Hospital or Clinic */}
+                                                <div className="flex flex-col gap-1.5 w-full text-left pt-2 border-t border-[var(--border)]">
+                                                    <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider flex items-center justify-between">
+                                                        <span>Link to Registered Hospital / Clinic</span>
+                                                        <span className="normal-case font-normal text-xs text-[var(--text-secondary)] bg-[var(--pastel-pink-bg)] px-2 py-0.5 rounded-full">Optional</span>
+                                                    </label>
+                                                    <div className="flex flex-col gap-2">
+                                                        <input
+                                                            type="text"
+                                                            placeholder="Search registered hospitals or clinics..."
+                                                            value={clinicSearch}
+                                                            onChange={(e) => setClinicSearch(e.target.value)}
+                                                            className="w-full px-4 py-2 rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-primary)] placeholder:text-[var(--text-secondary)]/50 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30 focus:border-[var(--accent)] text-xs transition duration-150"
+                                                        />
+                                                        <div className="relative w-full">
+                                                            <select
+                                                                name="clinicId"
+                                                                value={doctorData.clinicId || ''}
+                                                                onChange={handleDoctorChange}
+                                                                disabled={clinicsLoading}
+                                                                className="w-full px-4 py-2.5 rounded-2xl border border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30 focus:border-[var(--accent)] shadow-xs text-sm transition duration-150 appearance-none pr-10 cursor-pointer"
+                                                            >
+                                                                <option value="">— Not linked to a registered hospital or clinic (link later) —</option>
+                                                                {clinicOptions.map((clinic) => (
+                                                                    <option key={clinic.userId || clinic.id} value={clinic.userId || clinic.id}>
+                                                                        {clinic.clinicName || clinic.name} {clinic.city ? `(${clinic.city})` : ''}
+                                                                    </option>
+                                                                ))}
+                                                            </select>
+                                                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[var(--text-secondary)]">
+                                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                                                                </svg>
+                                                            </div>
+                                                        </div>
+                                                        {clinicsLoading && (
+                                                            <span className="text-xs text-[var(--text-secondary)]">Loading registered medical centers…</span>
+                                                        )}
+                                                        <p className="text-xs text-[var(--text-secondary)]">
+                                                            If your hospital or clinic is registered on Sanjeevani, link it here. You can also register or update clinic affiliations later in your dashboard.
+                                                        </p>
                                                     </div>
                                                 </div>
-                                                {clinicsLoading && (
-                                                    <span className="text-xs text-[var(--text-secondary)]">Loading registered medical centers…</span>
-                                                )}
-                                                <p className="text-xs text-[var(--text-secondary)]">
-                                                    If your hospital or clinic is registered on Sanjeevani, link it here. You can also register or update clinic affiliations later in your dashboard.
-                                                </p>
                                             </div>
+                                        )}
+
+                                        {/* Step 3: Document Attachments */}
+                                        {doctorStep === 3 && (
+                                            <div className="flex flex-col gap-4">
+                                                <div className="mb-2">
+                                                    <p className="text-xs text-[var(--text-secondary)] font-semibold">
+                                                        Please upload high-quality scans of your documents (PDF, JPG, PNG). Max 10MB per file:
+                                                    </p>
+                                                </div>
+                                                <div className="flex flex-col gap-4">
+                                                    <div className="border border-[var(--border)] p-4 rounded-xl flex flex-col gap-2 bg-[var(--card-bg)]/30">
+                                                        <label className="text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider block">
+                                                            1. Medical Registration Certificate *
+                                                        </label>
+                                                        <input
+                                                            type="file"
+                                                            accept=".pdf,.jpg,.jpeg,.png"
+                                                            required
+                                                            onChange={(e) => setMedCertFile(e.target.files[0])}
+                                                            className="w-full text-xs"
+                                                        />
+                                                        {medCertFile && (
+                                                            <span className="text-xs text-[var(--pastel-mint-text)] font-bold block mt-1">
+                                                                ✓ Selected: {medCertFile.name} ({(medCertFile.size / 1024 / 1024).toFixed(2)} MB)
+                                                            </span>
+                                                        )}
+                                                    </div>
+
+                                                    <div className="border border-[var(--border)] p-4 rounded-xl flex flex-col gap-2 bg-[var(--card-bg)]/30">
+                                                        <label className="text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider block">
+                                                            2. MBBS or Primary Qualification Proof *
+                                                        </label>
+                                                        <input
+                                                            type="file"
+                                                            accept=".pdf,.jpg,.jpeg,.png"
+                                                            required
+                                                            onChange={(e) => setQualificationFile(e.target.files[0])}
+                                                            className="w-full text-xs"
+                                                        />
+                                                        {qualificationFile && (
+                                                            <span className="text-xs text-[var(--pastel-mint-text)] font-bold block mt-1">
+                                                                ✓ Selected: {qualificationFile.name} ({(qualificationFile.size / 1024 / 1024).toFixed(2)} MB)
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Action Buttons */}
+                                        <div className="flex items-center justify-between gap-4 mt-2">
+                                            {doctorStep > 1 && (
+                                                <Button
+                                                    type="button"
+                                                    variant="secondary"
+                                                    onClick={() => setDoctorStep((prev) => prev - 1)}
+                                                    disabled={loading}
+                                                    className="px-6"
+                                                >
+                                                    Back
+                                                </Button>
+                                            )}
+                                            <Button
+                                                type="submit"
+                                                variant="primary"
+                                                className="flex-grow justify-center"
+                                                disabled={loading}
+                                            >
+                                                {loading
+                                                    ? 'Registering...'
+                                                    : doctorStep === 3
+                                                        ? 'Register Profile & Send for Review'
+                                                        : 'Next Step →'}
+                                            </Button>
                                         </div>
-                                    </div>
+                                    </form>
                                 )}
 
-                                {/* Step 3: Document Attachments */}
-                                {doctorStep === 3 && (
-                                    <div className="flex flex-col gap-4">
-                                        <div className="mb-2">
-                                            <p className="text-xs text-[var(--text-secondary)] font-semibold">
-                                                Please upload high-quality scans of your documents (PDF, JPG, PNG). Max 10MB per file:
-                                            </p>
-                                        </div>
-                                        <div className="flex flex-col gap-4">
-                                            <div className="border border-[var(--border)] p-4 rounded-xl flex flex-col gap-2 bg-[var(--card-bg)]/30">
-                                                <label className="text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider block">
-                                                    1. Medical Registration Certificate *
-                                                </label>
-                                                <input
-                                                    type="file"
-                                                    accept=".pdf,.jpg,.jpeg,.png"
-                                                    required
-                                                    onChange={(e) => setMedCertFile(e.target.files[0])}
-                                                    className="w-full text-xs"
-                                                />
-                                                {medCertFile && (
-                                                    <span className="text-xs text-[var(--pastel-mint-text)] font-bold block mt-1">
-                                                        ✓ Selected: {medCertFile.name} ({(medCertFile.size / 1024 / 1024).toFixed(2)} MB)
-                                                    </span>
-                                                )}
-                                            </div>
-
-                                            <div className="border border-[var(--border)] p-4 rounded-xl flex flex-col gap-2 bg-[var(--card-bg)]/30">
-                                                <label className="text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider block">
-                                                    2. MBBS or Primary Qualification Proof *
-                                                </label>
-                                                <input
-                                                    type="file"
-                                                    accept=".pdf,.jpg,.jpeg,.png"
-                                                    required
-                                                    onChange={(e) => setQualificationFile(e.target.files[0])}
-                                                    className="w-full text-xs"
-                                                />
-                                                {qualificationFile && (
-                                                    <span className="text-xs text-[var(--pastel-mint-text)] font-bold block mt-1">
-                                                        ✓ Selected: {qualificationFile.name} ({(qualificationFile.size / 1024 / 1024).toFixed(2)} MB)
-                                                    </span>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
+                                {/* Clinic Registration Wizard */}
+                                {role === 'clinic' && (
+                                    <ClinicRegisterForm onSuccess={handleClinicSuccess} />
                                 )}
-
-                                {/* Action Buttons */}
-                                <div className="flex items-center justify-between gap-4 mt-2">
-                                    {doctorStep > 1 && (
-                                        <Button
-                                            type="button"
-                                            variant="secondary"
-                                            onClick={() => setDoctorStep((prev) => prev - 1)}
-                                            disabled={loading}
-                                            className="px-6"
-                                        >
-                                            Back
-                                        </Button>
-                                    )}
-                                    <Button
-                                        type="submit"
-                                        variant="primary"
-                                        className="flex-grow justify-center"
-                                        disabled={loading}
-                                    >
-                                        {loading
-                                            ? 'Registering...'
-                                            : doctorStep === 3
-                                                ? 'Register Profile & Send for Review'
-                                                : 'Next Step →'}
-                                    </Button>
-                                </div>
-                            </form>
+                            </div>
                         )}
-
-                        {/* Clinic Registration Wizard */}
-                        {role === 'clinic' && (
-                            <ClinicRegisterForm onSuccess={handleClinicSuccess} />
-                        )}
-                    </div>
-                )}
                     </div>
                 </div>
 

@@ -48,32 +48,32 @@ User.hasMany(ProfessionalDocument, { foreignKey: 'ownerId', as: 'documents', onD
 ProfessionalDocument.belongsTo(User, { foreignKey: 'ownerId', as: 'owner' });
 
 // ── Consultation associations ─────────────────────────────────────────────────
-PatientProfile.hasMany(Consultation, { foreignKey: 'patientId', as: 'consultations' });
-Consultation.belongsTo(PatientProfile, { foreignKey: 'patientId', as: 'patient' });
+PatientProfile.hasMany(Consultation, { foreignKey: 'patientId', sourceKey: 'userId', as: 'consultations' });
+Consultation.belongsTo(PatientProfile, { foreignKey: 'patientId', targetKey: 'userId', as: 'patient' });
 
-DoctorProfile.hasMany(Consultation, { foreignKey: 'doctorId', as: 'consultations' });
-Consultation.belongsTo(DoctorProfile, { foreignKey: 'doctorId', as: 'doctor' });
+DoctorProfile.hasMany(Consultation, { foreignKey: 'doctorId', sourceKey: 'userId', as: 'consultations' });
+Consultation.belongsTo(DoctorProfile, { foreignKey: 'doctorId', targetKey: 'userId', as: 'doctor' });
 
-ClinicProfile.hasMany(Consultation, { foreignKey: 'clinicId', as: 'consultations' });
-Consultation.belongsTo(ClinicProfile, { foreignKey: 'clinicId', as: 'clinic' });
+ClinicProfile.hasMany(Consultation, { foreignKey: 'clinicId', sourceKey: 'userId', as: 'consultations' });
+Consultation.belongsTo(ClinicProfile, { foreignKey: 'clinicId', targetKey: 'userId', as: 'clinic' });
 
 // ── DoctorReview associations ─────────────────────────────────────────────────
-DoctorProfile.hasMany(DoctorReview, { foreignKey: 'doctorId', as: 'reviews' });
-DoctorReview.belongsTo(DoctorProfile, { foreignKey: 'doctorId', as: 'doctor' });
+DoctorProfile.hasMany(DoctorReview, { foreignKey: 'doctorId', sourceKey: 'userId', as: 'reviews' });
+DoctorReview.belongsTo(DoctorProfile, { foreignKey: 'doctorId', targetKey: 'userId', as: 'doctor' });
 
-PatientProfile.hasMany(DoctorReview, { foreignKey: 'patientId', as: 'reviews' });
-DoctorReview.belongsTo(PatientProfile, { foreignKey: 'patientId', as: 'patient' });
+PatientProfile.hasMany(DoctorReview, { foreignKey: 'patientId', sourceKey: 'userId', as: 'reviews' });
+DoctorReview.belongsTo(PatientProfile, { foreignKey: 'patientId', targetKey: 'userId', as: 'patient' });
 
 Consultation.hasOne(DoctorReview, { foreignKey: 'consultationId', as: 'review' });
 DoctorReview.belongsTo(Consultation, { foreignKey: 'consultationId', as: 'consultation' });
 
 // ── SubsidyApplication associations ──────────────────────────────────────────
-PatientProfile.hasOne(SubsidyApplication, { foreignKey: 'patientId', as: 'subsidyApplication' });
-SubsidyApplication.belongsTo(PatientProfile, { foreignKey: 'patientId', as: 'patient' });
+PatientProfile.hasOne(SubsidyApplication, { foreignKey: 'patientId', sourceKey: 'userId', as: 'subsidyApplication' });
+SubsidyApplication.belongsTo(PatientProfile, { foreignKey: 'patientId', targetKey: 'userId', as: 'patient' });
 
 // ── MedicationReminder associations ───────────────────────────────────────
-PatientProfile.hasMany(MedicationReminder, { foreignKey: 'patientId', as: 'medicationReminders' });
-MedicationReminder.belongsTo(PatientProfile, { foreignKey: 'patientId', as: 'patient' });
+PatientProfile.hasMany(MedicationReminder, { foreignKey: 'patientId', sourceKey: 'userId', as: 'medicationReminders' });
+MedicationReminder.belongsTo(PatientProfile, { foreignKey: 'patientId', targetKey: 'userId', as: 'patient' });
 
 Consultation.hasMany(MedicationReminder, { foreignKey: 'consultationId', as: 'medicationReminders' });
 MedicationReminder.belongsTo(Consultation, { foreignKey: 'consultationId', as: 'consultation' });
@@ -82,24 +82,32 @@ MedicationReminder.hasMany(MedicationLog, { foreignKey: 'reminderId', as: 'logs'
 MedicationLog.belongsTo(MedicationReminder, { foreignKey: 'reminderId', as: 'reminder' });
 
 // ── DiseaseReport associations ────────────────────────────────────────────
-PatientProfile.hasMany(DiseaseReport, { foreignKey: 'patientId', as: 'diseaseReports' });
-DiseaseReport.belongsTo(PatientProfile, { foreignKey: 'patientId', as: 'patient' });
+PatientProfile.hasMany(DiseaseReport, { foreignKey: 'patientId', sourceKey: 'userId', as: 'diseaseReports' });
+DiseaseReport.belongsTo(PatientProfile, { foreignKey: 'patientId', targetKey: 'userId', as: 'patient' });
 
 // ── ConsultationDocument associations ────────────────────────────────────
 Consultation.hasMany(ConsultationDocument, { foreignKey: 'consultationId', as: 'documents' });
 ConsultationDocument.belongsTo(Consultation, { foreignKey: 'consultationId', as: 'consultation' });
-PatientProfile.hasMany(ConsultationDocument, { foreignKey: 'patientId', as: 'documents' });
-ConsultationDocument.belongsTo(PatientProfile, { foreignKey: 'patientId', as: 'patient' });
+PatientProfile.hasMany(ConsultationDocument, { foreignKey: 'patientId', sourceKey: 'userId', as: 'documents' });
+ConsultationDocument.belongsTo(PatientProfile, { foreignKey: 'patientId', targetKey: 'userId', as: 'patient' });
 
 // ── Medicine inventory associations ─────────────────────────────────────────
-ClinicProfile.hasMany(MedicineInventory, { foreignKey: 'clinicId', as: 'medicineInventory', onDelete: 'CASCADE' });
-MedicineInventory.belongsTo(ClinicProfile, { foreignKey: 'clinicId', as: 'clinic' });
+ClinicProfile.hasMany(MedicineInventory, { foreignKey: 'clinicId', sourceKey: 'userId', as: 'medicineInventory', onDelete: 'CASCADE' });
+MedicineInventory.belongsTo(ClinicProfile, { foreignKey: 'clinicId', targetKey: 'userId', as: 'clinic' });
 
 // ── Queue associations ───────────────────────────────────────────────────
-Queue.belongsTo(PatientProfile, { foreignKey: 'patientId', as: 'patient' });
-PatientProfile.hasMany(Queue, { foreignKey: 'patientId', as: 'queues' });
-Queue.belongsTo(DoctorProfile, { foreignKey: 'doctorId', as: 'doctor' });
-DoctorProfile.hasMany(Queue, { foreignKey: 'doctorId', as: 'queues' });
+Queue.belongsTo(PatientProfile, { foreignKey: 'patientId', targetKey: 'userId', as: 'patient' });
+PatientProfile.hasMany(Queue, { foreignKey: 'patientId', sourceKey: 'userId', as: 'queues' });
+Queue.belongsTo(DoctorProfile, { foreignKey: 'doctorId', targetKey: 'userId', as: 'doctor' });
+DoctorProfile.hasMany(Queue, { foreignKey: 'doctorId', sourceKey: 'userId', as: 'queues' });
+
+// ── Appointment associations ───────────────────────────────────────────
+Appointment.belongsTo(PatientProfile, { foreignKey: 'patientId', targetKey: 'userId', as: 'patient' });
+PatientProfile.hasMany(Appointment, { foreignKey: 'patientId', sourceKey: 'userId', as: 'appointments' });
+Appointment.belongsTo(DoctorProfile, { foreignKey: 'doctorId', targetKey: 'userId', as: 'doctor' });
+DoctorProfile.hasMany(Appointment, { foreignKey: 'doctorId', sourceKey: 'userId', as: 'appointments' });
+Appointment.belongsTo(ClinicProfile, { foreignKey: 'clinicId', targetKey: 'userId', as: 'clinic' });
+ClinicProfile.hasMany(Appointment, { foreignKey: 'clinicId', sourceKey: 'userId', as: 'appointments' });
 
 // ── Health Worker associations ───────────────────────────────────────────
 HealthWorkerAssignment.belongsTo(User, { foreignKey: 'patientId', as: 'patient' });

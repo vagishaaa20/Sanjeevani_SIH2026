@@ -95,8 +95,8 @@ async function registerPatient(req, res) {
     const response = {
       message: 'Patient registered. Verify your phone with the OTP to activate your account.',
       user: safeUser(user),
+      devOtp: otp, // Added back for production temporarily
     };
-    if (process.env.NODE_ENV !== 'production') response.devOtp = otp;
 
     return res.status(201).json(response);
   } catch (err) {
@@ -501,9 +501,12 @@ async function sendOtp(req, res) {
   const otp = generateOtp();
   pendingOtps.set(String(user.id), { otp, expiresAt: getOtpExpiry() });
 
-  // Production: send via SMS provider. Dev: return in response.
-  const response = { message: 'OTP sent to your registered phone number', userId: user.id };
-  if (process.env.NODE_ENV !== 'production') response.devOtp = otp;
+  // Returning devOtp in response temporarily until SMS is integrated
+  const response = {
+    message: 'OTP sent to your registered phone number',
+    userId: user.id,
+    devOtp: otp
+  };
 
   return res.json(response);
 }
