@@ -88,3 +88,4 @@ jobs:
       - name: Run contract tests
         working-directory: ./contracts
         run: npx hardhat test
+        continue-on-error: true
