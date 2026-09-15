@@ -54,7 +54,10 @@ jobs:
               .catch(err => { console.error(err); process.exit(1); });
           "
         env:
-          DATABASE_URL: postgres://test:test@localhost:5432/sanjeevani_test
+          DB_HOST: localhost
+          DB_USER: test
+          DB_PASSWORD: test
+          DB_NAME: sanjeevani_test
           NODE_ENV: test
           DB_SSL: false
 
@@ -62,7 +65,10 @@ jobs:
         working-directory: ./backend
         run: npm test
         env:
-          DATABASE_URL: postgres://test:test@localhost:5432/sanjeevani_test
+          DB_HOST: localhost
+          DB_USER: test
+          DB_PASSWORD: test
+          DB_NAME: sanjeevani_test
           NODE_ENV: test
           DB_SSL: false
           JWT_ACCESS_SECRET: ci-test-secret-not-for-production
