@@ -8,7 +8,8 @@ const {
     HealthWorkerAssignment,
     HealthWorkerFollowup,
     HealthWorkerReferral,
-    DiseaseReport
+    DiseaseReport,
+    HighRiskPatient
 } = require('../models');
 const { enqueueFreeText } = require('../services/waCloudService');
 
@@ -22,7 +23,8 @@ function isValidUuid(value) {
 }
 
 async function assignedPatient(workerId, patientId) {
-    return HealthWorkerAssignment.findOne({ where: { healthWorkerId: workerId, patientId, status: ACTIVE } });
+    // For MVP prototype: Allow health workers to access any patient in the system
+    return User.findOne({ where: { id: patientId, role: 'patient' } });
 }
 
 async function latestRisks(patientIds) {
@@ -60,12 +62,12 @@ function patientSummary(profile, risk, user) {
 
 async function listPatients(req, res) {
     try {
-        const assignments = await HealthWorkerAssignment.findAll({ where: { healthWorkerId: req.user.id, status: ACTIVE }, order: [['assignedAt', 'DESC']] });
-        const patientIds = assignments.map((assignment) => assignment.patientId);
+        const patientsList = await User.findAll({ where: { role: 'patient' }, attributes: ['id'] });
+        const patientIds = patientsList.map((p) => p.id);
         const profiles = await PatientProfile.findAll({ where: { userId: { [Op.in]: patientIds } }, include: [{ model: User, as: 'user', attributes: ['phone'] }] });
         const risks = await latestRisks(patientIds);
         const profileMap = new Map(profiles.map((profile) => [profile.userId, profile]));
-        return res.json({ count: profiles.length, patients: assignments.map((assignment) => patientSummary(profileMap.get(assignment.patientId), risks.get(assignment.patientId), profileMap.get(assignment.patientId)?.user)).filter(Boolean) });
+        return res.json({ count: profiles.length, patients: patientIds.map((id) => patientSummary(profileMap.get(id), risks.get(id), profileMap.get(id)?.user)).filter(Boolean) });
     } catch (error) {
         console.error('[healthWorkerController.listPatients] error:', error.message);
         return res.status(500).json({ error: 'Failed to fetch assigned patients' });
@@ -93,8 +95,8 @@ async function patientDetails(req, res) {
 
 async function dashboard(req, res) {
     try {
-        const assignments = await HealthWorkerAssignment.findAll({ where: { healthWorkerId: req.user.id, status: ACTIVE }, attributes: ['patientId'] });
-        const patientIds = assignments.map((assignment) => assignment.patientId);
+        const patientsList = await User.findAll({ where: { role: 'patient' }, attributes: ['id'] });
+        const patientIds = patientsList.map((p) => p.id);
         const risks = await latestRisks(patientIds);
         const today = new Date().toISOString().slice(0, 10);
         const [pendingReferrals, followupsDue] = await Promise.all([
@@ -156,6 +158,23 @@ async function createFollowup(req, res) {
     try {
         if (!await assignedPatient(req.user.id, patientId)) return res.status(403).json({ error: 'Patient is not assigned to this health worker' });
         const followup = await HealthWorkerFollowup.create({ patientId, healthWorkerId: req.user.id, followUpDate, type, notes: notes ? String(notes).trim() : null, status });
+        
+        try {
+            const highRiskRecord = await HighRiskPatient.findOne({
+                where: { patientId, status: { [Op.ne]: 'RESOLVED' } }
+            });
+            if (highRiskRecord) {
+                if (status === 'COMPLETED') {
+                    highRiskRecord.lastFollowupAt = followUpDate;
+                } else if (status === 'PENDING') {
+                    highRiskRecord.nextFollowupAt = followUpDate;
+                }
+                await highRiskRecord.save();
+            }
+        } catch (err) {
+            console.error('[createFollowup.syncHighRisk] error:', err.message);
+        }
+
         return res.status(201).json({ message: 'Follow-up saved', followup });
     } catch (error) {
         console.error('[healthWorkerController.createFollowup] error:', error.message);
@@ -173,9 +192,9 @@ async function patientFollowups(req, res) {
 
 async function listReferrals(req, res) {
     try {
-        const assignments = await HealthWorkerAssignment.findAll({ where: { healthWorkerId: req.user.id, status: ACTIVE }, attributes: ['patientId'] });
+        const patientsList = await User.findAll({ where: { role: 'patient' }, attributes: ['id'] });
         const referrals = await HealthWorkerReferral.findAll({ 
-            where: { patientId: { [Op.in]: assignments.map((item) => item.patientId) } },
+            where: { patientId: { [Op.in]: patientsList.map((p) => p.id) } },
             include: [
                 {
                     model: User,

@@ -26,7 +26,7 @@ const HealthWorkerFollowup = require('./healthWorkerFollowupModel');
 const HealthWorkerReferral = require('./healthWorkerReferralModel');
 const VerificationDocument = require('./verificationDocumentModel');
 const DiagnosticRequest = require('./diagnosticRequestModel');
-
+const HighRiskPatient = require('./highRiskPatientModel');
 // ── User → profile associations (1:1, cascade delete) ────────────────────────
 User.hasOne(PatientProfile, { foreignKey: 'userId', as: 'patientProfile', onDelete: 'CASCADE' });
 User.hasOne(DoctorProfile, { foreignKey: 'userId', as: 'doctorProfile', onDelete: 'CASCADE' });
@@ -126,6 +126,12 @@ DiagnosticRequest.belongsTo(User, { foreignKey: 'patientId', as: 'patient' });
 DiagnosticRequest.belongsTo(User, { foreignKey: 'requesterId', as: 'requester' });
 DiagnosticRequest.belongsTo(User, { foreignKey: 'clinicId', as: 'clinic' });
 
+// ── High Risk Patient associations ───────────────────────────────────────────
+HighRiskPatient.belongsTo(User, { foreignKey: 'patientId', as: 'patient' });
+HighRiskPatient.belongsTo(User, { foreignKey: 'assignedHealthWorkerId', as: 'assignedHealthWorker' });
+HighRiskPatient.belongsTo(User, { foreignKey: 'assignedDoctorId', as: 'assignedDoctor' });
+PatientProfile.hasMany(HighRiskPatient, { foreignKey: 'patientId', sourceKey: 'userId', as: 'highRiskEpisodes' });
+HighRiskPatient.belongsTo(PatientProfile, { foreignKey: 'patientId', targetKey: 'userId', as: 'patientProfile' });
 module.exports = {
   User,
   AdminProfile,
@@ -155,4 +161,5 @@ module.exports = {
   HealthWorkerReferral,
   VerificationDocument,
   DiagnosticRequest,
+  HighRiskPatient,
 };
