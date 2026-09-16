@@ -62,4 +62,8 @@ describe('triageService - mapDiseaseCategory', () => {
         // Documenting the current (incorrect) output so this is visible, not silent:
         expect(result).toBe('Neurological'); // SHOULD be 'Other' once trailing negation is handled
     });
+
+    afterAll(async () => {
+        await require('./cleanup')();
+    });
 });

@@ -27,6 +27,7 @@ const medicineRoutes = require('./medicineRoutes');
 const healthWorkerRoutes = require('./healthWorkerRoutes');
 const verifyRoutes = require('./verifyRoutes');
 const diagnosticRoutes = require('./diagnosticRoutes');
+const highRiskRoutes = require('./highRiskRoutes');
 
 
 router.use('/auth', authRoutes);
@@ -58,5 +59,6 @@ router.use('/medicines', medicineRoutes);
 router.use('/health-worker', healthWorkerRoutes);
 router.use('/verify', verifyRoutes);
 router.use('/diagnostics', diagnosticRoutes);
+router.use('/high-risk', highRiskRoutes);
 
 module.exports = router;

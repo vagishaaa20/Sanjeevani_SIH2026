@@ -3,6 +3,7 @@ const bhashiniService = require('./bhashiniService');
 const { buildTriagePrompt } = require('../prompts/triagePrompt');
 const { PatientProfile, DiseaseReport } = require('../models');
 const { runDetectionCycle } = require('./outbreakDetectionService');
+const { processHighRiskTriage } = require('./highRiskService');
 const ngeohash = require('ngeohash');
 
 const VALID_RECOMMENDATIONS = ['emergency', 'teleconsultation', 'doctor_visit'];
@@ -190,6 +191,9 @@ async function runTriage({ symptoms, duration, severity, patientId, targetLang =
 
                 // Asynchronously trigger detection
                 runDetectionCycle().catch(err => console.error('[outbreakDetection] Error:', err.message));
+                
+                // Process high-risk episode
+                processHighRiskTriage(patientId, sScore, parsed.reason);
             }
         }).catch(err => console.error('[diseaseReport] Error fetching patient:', err.message));
     }

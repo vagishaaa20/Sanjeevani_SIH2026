@@ -16,6 +16,7 @@ import {
     Building,
     Stethoscope,
     ClipboardList,
+    ShieldAlert,
     Pill,
     FileText,
     Flame,
@@ -66,6 +67,7 @@ export const Sidebar = () => {
         health_worker: [
             { path: '/health-worker/dashboard', label: 'Dashboard', icon: LayoutDashboard },
             { path: '/health-worker/patients', label: 'My Patients', icon: Users },
+            { path: '/health-worker/high-risk', label: 'High-Risk Patients', icon: ShieldAlert },
             { path: '/health-worker/followups', label: 'Follow-ups', icon: CheckCircle },
             { path: '/health-worker/referrals', label: 'Referrals', icon: HeartPulse },
             { path: '/health-worker/diagnostics', label: 'Diagnostics', icon: FileText },

@@ -40,4 +40,8 @@ describe('Outbreak Detection Service - calculateRiskLevel', () => {
         // If previous is 0 and current is 8, growth is considered 100%, so it hits severe
         expect(calculateRiskLevel(8, 0, 0, 0, defaultThresholds)).toBe('severe');
     });
+
+    afterAll(async () => {
+        await require('./cleanup')();
+    });
 });

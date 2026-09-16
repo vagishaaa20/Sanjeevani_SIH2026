@@ -38,6 +38,8 @@ import ClinicReferrals from './pages/clinic/ClinicReferrals';
 import MedicineInventory from './pages/clinic/MedicineInventory';
 import HealthWorkerDashboard from './pages/health-worker/HealthWorkerDashboard';
 import AssignedPatients from './pages/health-worker/AssignedPatients';
+import HighRiskPatients from './pages/health-worker/HighRiskPatients';
+import HighRiskPatientDetails from './pages/health-worker/HighRiskPatientDetails';
 import HealthWorkerPatientDetails from './pages/health-worker/HealthWorkerPatientDetails';
 import HealthWorkerReferrals from './pages/health-worker/HealthWorkerReferrals';
 import HealthWorkerFollowups from './pages/health-worker/HealthWorkerFollowups';
@@ -243,6 +245,8 @@ export const App = () => {
 
                                         <Route path="/health-worker/dashboard" element={<ProtectedRoute allowedRoles={['health_worker']}><AppLayout><HealthWorkerDashboard /></AppLayout></ProtectedRoute>} />
                                         <Route path="/health-worker/patients" element={<ProtectedRoute allowedRoles={['health_worker']}><AppLayout><AssignedPatients /></AppLayout></ProtectedRoute>} />
+                                        <Route path="/health-worker/high-risk" element={<ProtectedRoute allowedRoles={['health_worker']}><AppLayout><HighRiskPatients /></AppLayout></ProtectedRoute>} />
+                                        <Route path="/health-worker/high-risk/:patientId" element={<ProtectedRoute allowedRoles={['health_worker']}><AppLayout><HighRiskPatientDetails /></AppLayout></ProtectedRoute>} />
                                         <Route path="/health-worker/patients/:patientId" element={<ProtectedRoute allowedRoles={['health_worker']}><AppLayout><HealthWorkerPatientDetails /></AppLayout></ProtectedRoute>} />
                                         <Route path="/health-worker/referrals" element={<ProtectedRoute allowedRoles={['health_worker']}><AppLayout><HealthWorkerReferrals /></AppLayout></ProtectedRoute>} />
                                         <Route path="/health-worker/followups" element={<ProtectedRoute allowedRoles={['health_worker']}><AppLayout><HealthWorkerFollowups /></AppLayout></ProtectedRoute>} />

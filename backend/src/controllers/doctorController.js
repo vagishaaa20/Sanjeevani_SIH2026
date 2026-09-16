@@ -1,4 +1,5 @@
 const { Op } = require('sequelize');
+const sequelize = require('../config/db');
 const { DoctorProfile } = require('../models');
 const { VERIFICATION_STATUS } = require('../constants/roles');
 const { findNearbyDoctors } = require('../services/locationService');
@@ -241,28 +242,19 @@ async function updateOwnProfile(req, res, next) {
 const getRecentPatients = async (req, res, next) => {
     try {
         const { Consultation, PatientProfile, User } = require('../models');
-        const consultations = await Consultation.findAll({
-            where: { doctorId: req.user.id },
-            include: [
-                {
-                    model: User,
-                    as: 'patient',
-                    attributes: ['id', 'email', 'phone'],
-                    include: [{ model: PatientProfile, as: 'patientProfile', attributes: ['fullName'] }]
-                }
-            ],
-            order: [['createdAt', 'DESC']],
+        // For MVP testing: Return all patients in the system instead of only recent ones
+        const allPatients = await User.findAll({
+            where: { role: 'patient' },
+            include: [{ model: PatientProfile, as: 'patientProfile', attributes: ['fullName'] }]
         });
 
         const patientsMap = new Map();
-        for (const c of consultations) {
-            if (c.patient && !patientsMap.has(c.patientId)) {
-                patientsMap.set(c.patientId, {
-                    id: c.patient.id,
-                    phone: c.patient.phone,
-                    fullName: c.patient.patientProfile?.fullName || 'Unknown Patient'
-                });
-            }
+        for (const p of allPatients) {
+            patientsMap.set(p.id, {
+                id: p.id,
+                phone: p.phone,
+                fullName: p.patientProfile?.fullName || 'Unknown Patient'
+            });
         }
 
         return res.json({ patients: Array.from(patientsMap.values()) });

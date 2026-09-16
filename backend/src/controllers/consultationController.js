@@ -7,7 +7,6 @@ const ngeohash = require('ngeohash');
 const { runDetectionCycle } = require('../services/outbreakDetectionService');
 const { generatePrescriptionPdf } = require('../services/prescriptionPdfService');
 const { computeCanonicalHash, anchorOnChain, verifyOnChain } = require('../services/blockchainService');
-const pdfParse = require('pdf-parse');
 
 /**
  * GET /api/consultations/me
@@ -650,6 +649,7 @@ async function extractPdfUUID(req, res) {
     }
 
     try {
+        const pdfParse = require('pdf-parse');
         const data = await pdfParse(req.file.buffer);
         const text = data.text;
 

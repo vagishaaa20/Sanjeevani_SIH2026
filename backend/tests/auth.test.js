@@ -1,9 +1,7 @@
 const request = require('supertest');
 const app = require('../src/app');
-
 afterAll(async () => {
-  await require('../src/config/redis').quit();
-  await require('../src/config/db').close();
+    await require('./cleanup')();
 });
 
 describe('API health', () => {
