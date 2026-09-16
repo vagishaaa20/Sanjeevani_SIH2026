@@ -47,8 +47,8 @@ afterAll(async () => {
   await DoctorProfile.destroy({ where: { userId: createdIds.doctorId } });
   await PatientProfile.destroy({ where: { userId: createdIds.patientId } });
   await User.destroy({ where: { id: [...clinicIds, createdIds.doctorId, createdIds.patientId] } });
-  await require('../src/config/redis').quit();
-  await require('../src/config/db').close();
+  
+  await require('./cleanup')();
 });
 
 describe('Medicine inventory access control', () => {

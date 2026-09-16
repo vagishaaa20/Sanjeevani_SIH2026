@@ -57,9 +57,8 @@ describe('High-Risk Patient Management Tests', () => {
     });
 
     afterAll(async () => {
-        await sequelize.close();
+        await require('./cleanup')();
     });
-
     describe('Triage Service Integration (processHighRiskTriage)', () => {
         it('should NOT create high-risk episode for severityScore < 2', async () => {
             await processHighRiskTriage(patient.id, 1, 'Mild fever');

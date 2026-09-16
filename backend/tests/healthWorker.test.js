@@ -42,10 +42,8 @@ afterAll(async () => {
     await HealthWorkerProfile.destroy({ where: { userId: [ids.worker, ids.otherWorker] } });
     await PatientProfile.destroy({ where: { userId: [ids.patient, ids.otherPatient] } });
     await User.destroy({ where: { id: Object.values(ids) } });
-    const { inboundQueue, outboundQueue, medicationReminderQueue } = require('../src/config/queues');
-    await Promise.all([inboundQueue.close(), outboundQueue.close(), medicationReminderQueue.close()]);
-    await require('../src/config/redis').quit();
-    await require('../src/config/db').close();
+    
+    await require('./cleanup')();
 });
 
 describe('Health Worker access control', () => {
