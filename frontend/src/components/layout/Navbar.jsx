@@ -24,7 +24,7 @@ const INDIAN_LANGUAGES = [
 
 export const Navbar = () => {
     const { user, logout } = useAuth();
-    const { currentLang, setCurrentLang } = useLanguage();
+    const { currentLang, setCurrentLang, t } = useLanguage();
     const { theme, toggleTheme } = useTheme();
     const navigate = useNavigate();
 
@@ -127,7 +127,7 @@ export const Navbar = () => {
                     <div className="w-10 h-10 rounded-2xl border flex items-center justify-center shadow-2xs flex-shrink-0 p-1" style={{ background: 'var(--logo-gradient)', borderColor: 'var(--border)' }}>
                         <SanjeevaniLogo variant="emblem" size={32} />
                     </div>
-                    <span className="text-xl font-black tracking-tight" style={{ color: 'var(--text-primary)' }}>Sanjeevani</span>
+                    <span className="text-xl font-black tracking-tight" style={{ color: 'var(--text-primary)' }}>{t("SANJEEVANI")}</span>
                 </Link>
 
                 <div className="hidden md:flex flex-col text-left">
@@ -135,10 +135,10 @@ export const Navbar = () => {
                         className="text-xl font-black font-heading flex items-center gap-1.5"
                         style={{ color: 'var(--text-primary)' }}
                     >
-                        <span><TranslatedText text="Good day," /> {userName}!</span>
+                        <span>{t("Good day,")} {userName}!</span>
                     </h2>
                     <p className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>
-                        <TranslatedText text="Empathetic clinical care at your fingertips" />
+                        {t("Empathetic clinical care at your fingertips")}
                     </p>
                 </div>
             </div>
@@ -174,7 +174,7 @@ export const Navbar = () => {
                                 className="px-3 py-1 text-[10px] font-black uppercase tracking-wider border-b mb-1"
                                 style={{ color: 'var(--text-secondary)', borderColor: 'var(--border-subtle)' }}
                             >
-                                Select Language
+                                {t("Select Language")}
                             </div>
                             <div className="max-h-60 overflow-y-auto">
                                 {INDIAN_LANGUAGES.map((lang) => (
@@ -258,7 +258,7 @@ export const Navbar = () => {
                                 <div className="flex items-center justify-between border-b pb-2.5" style={{ borderColor: 'var(--border-subtle)' }}>
                                     <div className="flex items-center gap-1.5">
                                         <h3 className="font-black text-sm font-heading" style={{ color: 'var(--text-primary)' }}>
-                                            Notifications
+                                            {t("Notifications")}
                                         </h3>
                                         {unreadCount > 0 && (
                                             <span
@@ -277,7 +277,7 @@ export const Navbar = () => {
                                             style={{ color: 'var(--accent)' }}
                                         >
                                             <CheckCheck className="w-3.5 h-3.5" />
-                                            <span>Mark all read</span>
+                                            <span>{t("Mark all read")}</span>
                                         </button>
                                     )}
                                 </div>
@@ -314,10 +314,10 @@ export const Navbar = () => {
                                                         </div>
                                                         <div className="flex flex-col">
                                                             <span className="text-xs font-black leading-tight" style={{ color: 'var(--text-primary)' }}>
-                                                                {n.title}
+                                                                {t(n.title)}
                                                             </span>
                                                             <p className="text-[11px] font-medium mt-0.5 leading-snug" style={{ color: 'var(--text-secondary)' }}>
-                                                                {n.message}
+                                                                {t(n.message)}
                                                             </p>
                                                             <span className="text-[10px] mt-1 flex items-center gap-1" style={{ color: 'var(--text-muted)' }}>
                                                                 <Clock className="w-3 h-3" /> {n.time}
@@ -397,7 +397,7 @@ export const Navbar = () => {
                                         onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-primary)'; }}
                                     >
                                         <User className="w-4 h-4" style={{ color: 'var(--accent)' }} />
-                                        <span>View & Edit Profile / ABHA</span>
+                                        <span>{t("View & Edit Profile / ABHA")}</span>
                                     </button>
 
                                     {user.role === 'patient' && (
@@ -413,7 +413,7 @@ export const Navbar = () => {
                                                 onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-primary)'; }}
                                             >
                                                 <Calendar className="w-4 h-4" style={{ color: 'var(--accent)' }} />
-                                                <span>My Consultations & History</span>
+                                                <span>{t("My Consultations & History")}</span>
                                             </button>
                                             <button
                                                 onClick={() => {
@@ -426,7 +426,7 @@ export const Navbar = () => {
                                                 onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-primary)'; }}
                                             >
                                                 <ShieldCheck className="w-4 h-4" style={{ color: 'var(--accent)' }} />
-                                                <span>Find Doctors & Reviews</span>
+                                                <span>{t("Find Doctors & Reviews")}</span>
                                             </button>
                                         </>
                                     )}
@@ -444,7 +444,7 @@ export const Navbar = () => {
                                         onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
                                     >
                                         <LogOut className="w-4 h-4" />
-                                        <span>Sign Out</span>
+                                        <span>{t("Sign Out")}</span>
                                     </button>
                                 </div>
                             </div>
@@ -457,14 +457,14 @@ export const Navbar = () => {
                             className="text-xs font-bold px-3 py-1.5 transition"
                             style={{ color: 'var(--text-primary)' }}
                         >
-                            Sign In
+                            {t("Sign In")}
                         </Link>
                         <Link
                             to="/register"
                             className="px-4 py-2 text-xs font-bold rounded-full text-white shadow-xs transition"
                             style={{ background: 'var(--accent)' }}
                         >
-                            Register
+                            {t("Register")}
                         </Link>
                     </div>
                 )}

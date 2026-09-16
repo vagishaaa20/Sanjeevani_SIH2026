@@ -1,13 +1,15 @@
 import React from 'react';
-import { ArrowRight, Heart } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import BiomolecularOrb3D from './BiomolecularOrb3D';
 import MagneticButton from './MagneticButton';
 import useAuth from '../../hooks/useAuth';
+import { useLanguage } from '../../hooks/LanguageContext';
 import SanjeevaniLogo from '../common/SanjeevaniLogo';
 
 export const ReturnDnaSection = ({ onEnterPlatform }) => {
     const { user } = useAuth();
+    const { t } = useLanguage();
 
     return (
         <section className="relative w-full py-20 md:py-28 px-6 md:px-12 max-w-6xl mx-auto z-20 flex flex-col items-center text-center">
@@ -18,14 +20,14 @@ export const ReturnDnaSection = ({ onEnterPlatform }) => {
 
             {/* Concise Calm Statement */}
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight leading-[1.1] max-w-2xl mb-4" style={{ color: 'var(--text-primary)' }}>
-                Your health deserves a{' '}
+                {t("Your health deserves a")}{' '}
                 <span className="font-serif italic font-normal" style={{ color: 'var(--accent-hover)' }}>
-                    calmer experience.
+                    {t("calmer experience.")}
                 </span>
             </h2>
 
             <p className="text-sm sm:text-base font-medium leading-relaxed max-w-md mb-8" style={{ color: 'var(--text-secondary)' }}>
-                Structured AI clinical triage, secure health records, and seamless care networks in one unified platform.
+                {t("Structured AI clinical triage, secure health records, and seamless care networks in one unified platform.")}
             </p>
 
             {/* Clear Action Buttons */}
@@ -35,7 +37,7 @@ export const ReturnDnaSection = ({ onEnterPlatform }) => {
                     className="px-8 py-3.5 rounded-full text-white text-sm font-black shadow-md hover:shadow-xl transition-all flex items-center gap-2.5 cursor-pointer"
                     style={{ background: 'var(--accent)' }}
                 >
-                    <span>{user ? 'Enter Dashboard' : 'Get Started with Sanjeevani'}</span>
+                    <span>{user ? t("Enter Dashboard") : t("Get Started with Sanjeevani")}</span>
                     <ArrowRight className="w-4 h-4" />
                 </MagneticButton>
 
@@ -45,7 +47,7 @@ export const ReturnDnaSection = ({ onEnterPlatform }) => {
                         className="px-6 py-3.5 rounded-full border text-xs font-bold transition shadow-xs hover:opacity-80"
                         style={{ background: 'var(--card-bg)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
                     >
-                        Sign In to Account
+                        {t("Sign In to Account")}
                     </Link>
                 )}
             </div>
@@ -56,14 +58,14 @@ export const ReturnDnaSection = ({ onEnterPlatform }) => {
                     <div className="w-8 h-8 rounded-xl bg-white border border-[#f5c6d6] flex items-center justify-center p-0.5 shadow-2xs">
                         <SanjeevaniLogo variant="emblem" size={24} />
                     </div>
-                    <span className="font-heading font-black text-sm text-[#1c1218]">SANJEEVANI</span>
+                    <span className="font-heading font-black text-sm text-[#1c1218]">{t("SANJEEVANI")}</span>
                 </div>
 
                 <p>© 2026 Sanjeevani Health Network.</p>
 
                 <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full" style={{ background: 'var(--pastel-mint-text)' }} />
-                    <span>Clinical Network Active</span>
+                    <span>{t("Clinical Network Active")}</span>
                 </div>
             </div>
         </section>

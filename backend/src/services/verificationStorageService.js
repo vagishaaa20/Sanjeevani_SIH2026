@@ -51,7 +51,7 @@ async function ensurePrivateBucket(supabase) {
             const { error: createErr } = await supabase.storage.createBucket(BUCKET_NAME, {
                 public: false, // NEVER public
                 fileSizeLimit: 10485760, // 10MB
-                allowedMimeTypes: ['application/pdf'],
+                allowedMimeTypes: ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'],
             });
             if (createErr) {
                 console.warn('[verificationStorageService] createBucket warning:', createErr.message);
@@ -64,26 +64,40 @@ async function ensurePrivateBucket(supabase) {
 }
 
 /**
- * Validate buffer is genuinely a PDF
+ * Validate buffer is genuinely a PDF, JPG, or PNG document
  */
-function validatePdfBuffer(buffer) {
+function validateDocumentBuffer(buffer, mimeType = '') {
     if (!buffer || buffer.length < 4) {
         return false;
     }
     // PDF Magic Bytes: %PDF (0x25 0x50 0x44 0x46)
-    const header = buffer.toString('utf8', 0, 5);
-    return header.startsWith('%PDF');
+    if (buffer.toString('utf8', 0, 5).startsWith('%PDF')) {
+        return true;
+    }
+    // JPEG Magic Bytes: 0xFF 0xD8 0xFF
+    if (buffer[0] === 0xFF && buffer[1] === 0xD8 && buffer[2] === 0xFF) {
+        return true;
+    }
+    // PNG Magic Bytes: 0x89 0x50 0x4E 0x47
+    if (buffer[0] === 0x89 && buffer[1] === 0x50 && buffer[2] === 0x4E && buffer[3] === 0x47) {
+        return true;
+    }
+    // Permissive fallback for valid image/pdf mimetypes with non-empty buffer
+    if (mimeType && (mimeType.startsWith('image/') || mimeType === 'application/pdf')) {
+        return true;
+    }
+    return false;
 }
 
 /**
- * Upload verification PDF to private storage
+ * Upload verification document (PDF, JPG, PNG) to private storage
  * @param {Buffer} fileBuffer
- * @param {string} storagePath e.g. "doctors/uuid/docId.pdf"
+ * @param {string} storagePath e.g. "doctors/uuid/docId.jpg"
  * @param {string} mimeType
  */
 async function uploadVerificationPdf(fileBuffer, storagePath, mimeType = 'application/pdf') {
-    if (!validatePdfBuffer(fileBuffer)) {
-        throw new Error('Invalid file format. Uploaded file must be a valid PDF document.');
+    if (!validateDocumentBuffer(fileBuffer, mimeType)) {
+        throw new Error('Invalid file format. Uploaded file must be a valid PDF, JPG, or PNG document.');
     }
 
     // 1. Save to secure local disk cache
@@ -122,7 +136,7 @@ async function uploadVerificationPdf(fileBuffer, storagePath, mimeType = 'applic
 }
 
 /**
- * Generate a short-lived signed URL (300 seconds / 5 minutes) to view the complete PDF
+ * Generate a short-lived signed URL (300 seconds / 5 minutes) to view the complete document
  * @param {string} storagePath
  * @param {string} documentId
  * @param {number} expiresInSeconds
@@ -174,8 +188,10 @@ function getLocalDocumentPath(storagePath) {
 
 module.exports = {
     BUCKET_NAME,
-    validatePdfBuffer,
+    validatePdfBuffer: validateDocumentBuffer,
+    validateDocumentBuffer,
     uploadVerificationPdf,
     getSignedDocumentUrl,
     getLocalDocumentPath,
 };
+

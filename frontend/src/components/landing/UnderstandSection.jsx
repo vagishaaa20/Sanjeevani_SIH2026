@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Activity, ShieldCheck, ArrowRight, Check } from 'lucide-react';
+import { useLanguage } from '../../hooks/LanguageContext';
 
 const TRIAGE_CHIPS = [
     {
@@ -29,6 +30,7 @@ const TRIAGE_CHIPS = [
 ];
 
 export const UnderstandSection = ({ onEnterPlatform }) => {
+    const { t } = useLanguage();
     const [activeIdx, setActiveIdx] = useState(0);
     const active = TRIAGE_CHIPS[activeIdx];
 
@@ -38,16 +40,16 @@ export const UnderstandSection = ({ onEnterPlatform }) => {
             <div className="flex flex-col items-start gap-3 mb-10 max-w-xl">
                 <div className="flex items-center gap-2 text-[11px] font-black tracking-[0.2em] uppercase font-mono" style={{ color: 'var(--accent)' }}>
                     <span className="w-1.5 h-1.5 rounded-full" style={{ background: 'var(--accent)' }} />
-                    02 — Intelligent Intake
+                    {t("02 — Intelligent Intake")}
                 </div>
                 <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight leading-[1.12]" style={{ color: 'var(--text-primary)' }}>
-                    Clinical triage, <br />
+                    {t("Clinical triage,")} <br />
                     <span className="font-serif italic font-normal" style={{ color: 'var(--accent-hover)' }}>
-                        structured in seconds.
+                        {t("structured in seconds.")}
                     </span>
                 </h2>
                 <p className="text-sm md:text-base font-medium leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-                    Select a concern below to see how Sanjeevani translates symptoms into structured clinical context.
+                    {t("Select a concern below to see how Sanjeevani translates symptoms into structured clinical context.")}
                 </p>
             </div>
 
@@ -66,9 +68,9 @@ export const UnderstandSection = ({ onEnterPlatform }) => {
                                 border: isActive ? '1px solid transparent' : '1px solid var(--border)'
                             }}
                         >
-                            {chip.label}
+                            {t(chip.label)}
                         </button>
-                    )
+                    );
                 })}
             </div>
 
@@ -78,7 +80,7 @@ export const UnderstandSection = ({ onEnterPlatform }) => {
                     {/* Patient Input Box */}
                     <div className="md:col-span-6 flex flex-col gap-3">
                         <span className="text-[11px] font-mono font-bold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
-                            Patient Description
+                            {t("Patient Description")}
                         </span>
                         <div className="rounded-2xl p-4 text-sm font-medium leading-relaxed" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', color: 'var(--text-primary)' }}>
                             "{active.patientQuery}"
@@ -89,7 +91,7 @@ export const UnderstandSection = ({ onEnterPlatform }) => {
                     <div className="md:col-span-6 flex flex-col gap-3">
                         <div className="flex items-center justify-between">
                             <span className="text-[11px] font-mono font-bold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
-                                Structured Output
+                                {t("Structured Output")}
                             </span>
                             <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full border" style={{ color: 'var(--pastel-mint-text)', background: 'var(--pastel-mint-bg)', borderColor: 'var(--pastel-mint-text)' }}>
                                 {active.level}
@@ -113,13 +115,13 @@ export const UnderstandSection = ({ onEnterPlatform }) => {
                 </div>
 
                 <div className="mt-6 pt-5 border-t flex items-center justify-between" style={{ borderColor: 'var(--border-subtle)' }}>
-                    <span className="text-xs" style={{ color: 'var(--text-muted)' }}>Available across English, हिन्दी &amp; বাংলা</span>
+                    <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{t("Available across English, हिन्दी & বাংলা")}</span>
                     <button
                         onClick={onEnterPlatform}
                         className="text-xs font-bold hover:opacity-80 flex items-center gap-1.5 transition cursor-pointer"
                         style={{ color: 'var(--accent)' }}
                     >
-                        <span>Experience Full Triage</span>
+                        <span>{t("Experience Full Triage")}</span>
                         <ArrowRight className="w-3.5 h-3.5" />
                     </button>
                 </div>

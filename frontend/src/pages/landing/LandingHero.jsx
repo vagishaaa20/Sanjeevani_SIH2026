@@ -1,11 +1,16 @@
 import React, { useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { ArrowRight, ChevronDown, Heart, Globe, Sun, Moon } from 'lucide-react';
+import { ArrowRight, ChevronDown, Globe, Sun, Moon } from 'lucide-react';
 import DnaHelix3D from '../../components/landing/DnaHelix3D';
 import ShaderAtmosphere from '../../components/landing/ShaderAtmosphere';
 import MagneticButton from '../../components/landing/MagneticButton';
+import StatsBarSection from '../../components/landing/StatsBarSection';
 import UnderstandSection from '../../components/landing/UnderstandSection';
+import RoleHighlightsSection from '../../components/landing/RoleHighlightsSection';
 import HealthRecordsSection from '../../components/landing/HealthRecordsSection';
+import SecurityTrustSection from '../../components/landing/SecurityTrustSection';
+import TestimonialsSection from '../../components/landing/TestimonialsSection';
+import FaqSection from '../../components/landing/FaqSection';
 import ReturnDnaSection from '../../components/landing/ReturnDnaSection';
 import useAuth from '../../hooks/useAuth';
 import { useLanguage } from '../../hooks/LanguageContext';
@@ -14,7 +19,7 @@ import SanjeevaniLogo from '../../components/common/SanjeevaniLogo';
 
 export const LandingHero = () => {
     const { user, logout } = useAuth();
-    const { currentLang, setCurrentLang } = useLanguage();
+    const { currentLang, setCurrentLang, t } = useLanguage();
     const { theme, toggleTheme } = useTheme();
     const isDark = theme === 'dark';
     const navigate = useNavigate();
@@ -63,8 +68,8 @@ export const LandingHero = () => {
                             <SanjeevaniLogo variant="emblem" size={42} />
                         </div>
                         <div className="flex flex-col text-left">
-                            <span className="font-heading tracking-tight font-black text-2xl leading-none">SANJEEVANI</span>
-                            <span className="text-[10px] font-extrabold tracking-widest uppercase mt-1" style={{ color: 'var(--accent)' }}>Intelligent Clinical Platform</span>
+                            <span className="font-heading tracking-tight font-black text-2xl leading-none">{t("SANJEEVANI")}</span>
+                            <span className="text-[10px] font-extrabold tracking-widest uppercase mt-1" style={{ color: 'var(--accent)' }}>{t("Intelligent Clinical Platform")}</span>
                         </div>
                     </Link>
 
@@ -112,14 +117,14 @@ export const LandingHero = () => {
                                     className="text-xs font-bold transition cursor-pointer"
                                     style={{ color: 'var(--text-primary)' }}
                                 >
-                                    Sign Out
+                                    {t("Sign Out")}
                                 </button>
                                 <button
                                     onClick={handleEnter}
                                     className="px-5 py-2 rounded-full text-white text-xs font-black transition shadow-xs cursor-pointer"
                                     style={{ background: 'var(--accent)' }}
                                 >
-                                    Dashboard →
+                                    {t("Dashboard →")}
                                 </button>
                             </div>
                         ) : (
@@ -129,14 +134,14 @@ export const LandingHero = () => {
                                     className="text-xs font-bold transition"
                                     style={{ color: 'var(--text-primary)' }}
                                 >
-                                    Sign In
+                                    {t("Sign In")}
                                 </Link>
                                 <Link
                                     to="/register"
                                     className="px-5 py-2 rounded-full text-white text-xs font-black transition shadow-xs"
                                     style={{ background: 'var(--accent)' }}
                                 >
-                                    Register
+                                    {t("Register")}
                                 </Link>
                             </div>
                         )}
@@ -151,25 +156,25 @@ export const LandingHero = () => {
                     {/* Minimal Eyebrow */}
                     <div className="flex items-center gap-2 text-[11px] font-black tracking-[0.2em] uppercase font-mono" style={{ color: 'var(--accent)' }}>
                         <span className="w-1.5 h-1.5 rounded-full" style={{ background: 'var(--accent)' }} />
-                        01 — Sanjeevani
+                        {t("01 — Sanjeevani Healthcare")}
                     </div>
 
                     {/* Editorial Headline */}
                     <div className="flex flex-col">
                         <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-[70px] font-black leading-[1.04] tracking-tight" style={{ color: 'var(--text-primary)' }}>
                             <span className="font-serif italic font-normal tracking-normal mr-2" style={{ color: 'var(--accent)' }}>
-                                Healthcare,
+                                {t("Healthcare,")}
                             </span>
                             <br />
                             <span className="font-heading font-black">
-                                but more human.
+                                {t("but more human.")}
                             </span>
                         </h1>
                     </div>
 
                     {/* Short Supporting Sentence */}
                     <p className="text-sm md:text-base lg:text-lg font-medium leading-relaxed max-w-md" style={{ color: 'var(--text-secondary)' }}>
-                        AI-assisted clinical triage connecting patients, doctors, and frontline care workers through intelligent human-centered care.
+                        {t("AI-assisted clinical triage connecting patients, doctors, and frontline care workers through intelligent human-centered care.")}
                     </p>
 
                     {/* Clean Action Buttons */}
@@ -179,7 +184,7 @@ export const LandingHero = () => {
                             className="group px-8 py-4 rounded-full text-white text-sm md:text-base font-black shadow-md hover:shadow-xl transition-all flex items-center gap-3 cursor-pointer"
                             style={{ background: 'var(--accent)' }}
                         >
-                            <span>Enter Sanjeevani</span>
+                            <span>{t("Enter Sanjeevani")}</span>
                             <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
                         </MagneticButton>
 
@@ -188,7 +193,7 @@ export const LandingHero = () => {
                             className="px-6 py-4 rounded-full text-xs md:text-sm font-bold transition flex items-center gap-2 shadow-xs cursor-pointer"
                             style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
                         >
-                            <span>Explore</span>
+                            <span>{t("Explore Features")}</span>
                             <ChevronDown className="w-3.5 h-3.5" style={{ color: 'var(--text-secondary)' }} />
                         </button>
                     </div>
@@ -204,15 +209,30 @@ export const LandingHero = () => {
                 </div>
             </main>
 
+            {/* STATS BAR SECTION */}
+            <StatsBarSection />
+
             {/* 02 — UNDERSTAND (Intelligent Intake) */}
             <div ref={understandSectionRef}>
                 <UnderstandSection onEnterPlatform={handleEnter} />
             </div>
 
-            {/* 03 — DIGITAL HEALTH VAULT */}
+            {/* 03 — MULTI-ROLE ECOSYSTEM */}
+            <RoleHighlightsSection onEnterPlatform={handleEnter} />
+
+            {/* 04 — DIGITAL HEALTH VAULT */}
             <HealthRecordsSection />
 
-            {/* 04 — CONTINUITY & 3D BIOMOLECULAR ORB */}
+            {/* 05 — TRUST & COMPLIANCE (ABDM & Security Grid) */}
+            <SecurityTrustSection />
+
+            {/* 06 — VERIFIED CLINICAL TESTIMONIALS */}
+            <TestimonialsSection />
+
+            {/* 07 — FREQUENTLY ASKED QUESTIONS */}
+            <FaqSection />
+
+            {/* 08 — CONTINUITY & 3D BIOMOLECULAR ORB */}
             <ReturnDnaSection onEnterPlatform={handleEnter} />
         </div>
     );

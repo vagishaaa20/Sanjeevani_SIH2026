@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Pill, Activity, ShieldCheck, FileCheck } from 'lucide-react';
+import { Pill, Activity, FileCheck } from 'lucide-react';
+import { useLanguage } from '../../hooks/LanguageContext';
 
 const VAULT_ITEMS = [
     {
@@ -29,6 +30,7 @@ const VAULT_ITEMS = [
 ];
 
 export const HealthRecordsSection = () => {
+    const { t } = useLanguage();
     const [activeIdx, setActiveIdx] = useState(0);
 
     return (
@@ -37,16 +39,16 @@ export const HealthRecordsSection = () => {
             <div className="flex flex-col items-start gap-3 mb-10 max-w-xl">
                 <div className="flex items-center gap-2 text-[11px] font-black tracking-[0.2em] uppercase font-mono" style={{ color: 'var(--accent)' }}>
                     <span className="w-1.5 h-1.5 rounded-full" style={{ background: 'var(--accent)' }} />
-                    03 — Digital Health Vault
+                    {t("04 — Digital Health Vault")}
                 </div>
                 <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight leading-[1.12]" style={{ color: 'var(--text-primary)' }}>
-                    Unified records, <br />
+                    {t("Unified records,")} <br />
                     <span className="font-serif italic font-normal" style={{ color: 'var(--accent-hover)' }}>
-                        always accessible.
+                        {t("always accessible.")}
                     </span>
                 </h2>
                 <p className="text-sm md:text-base font-medium leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-                    All your triage histories, electronic prescriptions, and diagnostic records organized in one secure dashboard.
+                    {t("All your triage histories, electronic prescriptions, and diagnostic records organized in one secure dashboard.")}
                 </p>
             </div>
 
@@ -83,16 +85,16 @@ export const HealthRecordsSection = () => {
                                         borderColor: 'var(--pastel-mint-text)'
                                     }}
                                 >
-                                    {item.badge}
+                                    {t(item.badge)}
                                 </span>
                             </div>
 
                             <div className="mt-6">
                                 <h3 className="font-bold text-base mb-1.5" style={{ color: 'var(--text-primary)' }}>
-                                    {item.title}
+                                    {t(item.title)}
                                 </h3>
                                 <p className="text-xs leading-relaxed font-medium" style={{ color: 'var(--text-secondary)' }}>
-                                    {item.desc}
+                                    {t(item.desc)}
                                 </p>
                             </div>
                         </button>

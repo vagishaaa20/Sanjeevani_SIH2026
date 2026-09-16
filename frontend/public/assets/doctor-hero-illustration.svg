@@ -1,0 +1,125 @@
+<svg width="480" height="320" viewBox="0 0 480 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg-grad" x1="0" y1="0" x2="480" y2="320" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF5F8"/>
+      <stop offset="1" stop-color="#FCE4EE"/>
+    </linearGradient>
+    <linearGradient id="doctor-coat" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#F3F4F6"/>
+    </linearGradient>
+    <linearGradient id="doctor-scrub" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#0D9488"/>
+      <stop offset="1" stop-color="#0F766E"/>
+    </linearGradient>
+    <linearGradient id="pink-accent" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#E13B68"/>
+      <stop offset="1" stop-color="#F43F5E"/>
+    </linearGradient>
+    <linearGradient id="patient-cardigan" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#FB7185"/>
+      <stop offset="1" stop-color="#E13B68"/>
+    </linearGradient>
+    <filter id="soft-shadow" x="0" y="0" width="500" height="340" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#E13B68" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+
+  <!-- Outer Glow & Background Blob -->
+  <circle cx="240" cy="160" r="140" fill="#FFE3EC" opacity="0.6"/>
+  <circle cx="340" cy="120" r="80" fill="#CCFBF1" opacity="0.5"/>
+  <circle cx="140" cy="220" r="90" fill="#FCE4EE" opacity="0.7"/>
+
+  <!-- Medical Cross Decor floating -->
+  <g opacity="0.8" transform="translate(60, 50)">
+    <rect x="8" y="0" width="8" height="24" rx="4" fill="#E13B68"/>
+    <rect x="0" y="8" width="24" height="8" rx="4" fill="#E13B68"/>
+  </g>
+  <g opacity="0.6" transform="translate(390, 70) scale(0.75)">
+    <rect x="8" y="0" width="8" height="24" rx="4" fill="#0D9488"/>
+    <rect x="0" y="8" width="24" height="8" rx="4" fill="#0D9488"/>
+  </g>
+
+  <!-- Heartbeat line backdrop -->
+  <path d="M 40 180 Q 90 180 110 180 L 120 150 L 130 210 L 142 130 L 154 190 L 165 180 L 220 180" stroke="#F472B6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.3"/>
+
+  <!-- Main Card Container / Backdrop Shield -->
+  <rect x="70" y="40" width="340" height="240" rx="32" fill="url(#bg-grad)" stroke="#F8D4E2" stroke-width="2" filter="url(#soft-shadow)"/>
+
+  <!-- Pulse Heart Symbol Centre Top -->
+  <g transform="translate(224, 20)">
+    <circle cx="16" cy="16" r="22" fill="#FFFFFF" stroke="#F8D4E2" stroke-width="2"/>
+    <path d="M16 23.5 C16 23.5 7 17.5 7 11.5 C7 8.5 9.5 6 12.5 6 C14.3 6 15.8 7 16.5 8.2 C17.2 7 18.7 6 20.5 6 C23.5 6 26 8.5 26 11.5 C26 17.5 16 23.5 16 23.5 Z" fill="url(#pink-accent)"/>
+  </g>
+
+  <!-- Left: Lady Doctor Figure -->
+  <g transform="translate(110, 75)">
+    <!-- Hair -->
+    <path d="M40 38 C32 15 68 15 60 38 C65 24 75 35 70 50 C65 65 35 65 30 50 C25 35 35 24 40 38 Z" fill="#374151"/>
+    <!-- Face -->
+    <ellipse cx="50" cy="42" rx="16" ry="18" fill="#FDBA74"/>
+    <!-- Smile & Eyes -->
+    <circle cx="44" cy="40" r="2" fill="#1F2937"/>
+    <circle cx="56" cy="40" r="2" fill="#1F2937"/>
+    <path d="M46 48 Q50 52 54 48" stroke="#9A3412" stroke-width="2" stroke-linecap="round" fill="none"/>
+    <!-- Glasses -->
+    <circle cx="44" cy="40" r="5" stroke="#E13B68" stroke-width="1.5" fill="none"/>
+    <circle cx="56" cy="40" r="5" stroke="#E13B68" stroke-width="1.5" fill="none"/>
+    <line x1="49" y1="40" x2="51" y2="40" stroke="#E13B68" stroke-width="1.5"/>
+
+    <!-- Neck & Body -->
+    <rect x="44" y="58" width="12" height="12" rx="3" fill="#FDBA74"/>
+    <!-- Scrubs -->
+    <path d="M30 70 L70 70 L75 160 L25 160 Z" fill="url(#doctor-scrub)"/>
+    <!-- Doctor Coat -->
+    <path d="M22 70 Q32 68 42 75 L38 160 L18 160 Z" fill="url(#doctor-coat)"/>
+    <path d="M78 70 Q68 68 58 75 L62 160 L82 160 Z" fill="url(#doctor-coat)"/>
+    
+    <!-- Stethoscope -->
+    <path d="M42 75 Q36 95 46 110 Q50 115 54 110 Q64 95 58 75" stroke="#9CA3AF" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <circle cx="50" cy="113" r="5" fill="#E13B68" stroke="#FFFFFF" stroke-width="1.5"/>
+
+    <!-- Clipboard in Hand -->
+    <rect x="62" y="100" width="22" height="30" rx="3" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1.5"/>
+    <rect x="67" y="98" width="12" height="4" rx="1" fill="#9CA3AF"/>
+    <line x1="66" y1="108" x2="78" y2="108" stroke="#E13B68" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="66" y1="114" x2="78" y2="114" stroke="#D1D5DB" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="66" y1="120" x2="74" y2="120" stroke="#D1D5DB" stroke-width="1.5" stroke-linecap="round"/>
+  </g>
+
+  <!-- Right: Elderly Patient Figure -->
+  <g transform="translate(260, 85)">
+    <!-- Hair (Soft Grey) -->
+    <path d="M40 34 C30 18 70 18 60 34 C65 24 75 32 70 45 C65 58 35 58 30 45 Z" fill="#9CA3AF"/>
+    <!-- Face -->
+    <ellipse cx="50" cy="42" rx="15" ry="17" fill="#FFEDD5"/>
+    <!-- Eyes & Gentle Smile -->
+    <circle cx="44" cy="40" r="1.8" fill="#374151"/>
+    <circle cx="56" cy="40" r="1.8" fill="#374151"/>
+    <path d="M45 47 Q50 51 55 47" stroke="#C2410C" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+    <!-- Blush -->
+    <circle cx="40" cy="44" r="3" fill="#FCA5A5" opacity="0.6"/>
+    <circle cx="60" cy="44" r="3" fill="#FCA5A5" opacity="0.6"/>
+
+    <!-- Neck & Body -->
+    <rect x="44" y="57" width="12" height="10" rx="3" fill="#FFEDD5"/>
+    <!-- Cardigan / Dress -->
+    <path d="M25 67 C35 65 65 65 75 67 L80 150 L20 150 Z" fill="url(#patient-cardigan)"/>
+    <path d="M42 67 L50 90 L58 67" stroke="#FFFFFF" stroke-width="2" fill="none"/>
+
+    <!-- Comforting Hand Gesture -->
+    <path d="M22 95 Q10 98 5 90" stroke="#FFEDD5" stroke-width="6" stroke-linecap="round"/>
+  </g>
+
+  <!-- Floating Caring Shield / Badge -->
+  <g transform="translate(340, 195)">
+    <rect x="0" y="0" width="90" height="34" rx="17" fill="#FFFFFF" stroke="#F8D4E2" stroke-width="1.5" filter="url(#soft-shadow)"/>
+    <circle cx="17" cy="17" r="10" fill="#CCFBF1"/>
+    <path d="M17 11 L19 15 L23 16 L20 19 L21 23 L17 21 L13 23 L14 19 L11 16 L15 15 Z" fill="#0D9488"/>
+    <text x="34" y="21" font-family="sans-serif" font-size="10" font-weight="bold" fill="#0F766E">Care Active</text>
+  </g>
+
+  <!-- Floating Sparkles -->
+  <path d="M 85 120 L 88 128 L 96 131 L 88 134 L 85 142 L 82 134 L 74 131 L 82 128 Z" fill="#E13B68" opacity="0.7"/>
+  <path d="M 390 140 L 392 145 L 397 147 L 392 149 L 390 154 L 388 149 L 383 147 L 388 145 Z" fill="#0D9488" opacity="0.7"/>
+</svg>

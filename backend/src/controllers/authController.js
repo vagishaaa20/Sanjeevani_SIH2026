@@ -207,10 +207,12 @@ async function registerDoctor(req, res) {
       { transaction: t }
     );
 
+    const medExt = path.extname(medCert.originalname) || '.pdf';
+    const qualExt = path.extname(qualificationCert.originalname) || '.pdf';
     const medDocId = uuidv4();
     const qualDocId = uuidv4();
-    const medStoragePath = `doctors/${user.id}/${medDocId}.pdf`;
-    const qualStoragePath = `doctors/${user.id}/${qualDocId}.pdf`;
+    const medStoragePath = `doctors/${user.id}/${medDocId}${medExt}`;
+    const qualStoragePath = `doctors/${user.id}/${qualDocId}${qualExt}`;
 
     // Upload to private verification storage
     if (fs.existsSync(medCert.path)) {
@@ -289,7 +291,7 @@ async function registerDoctor(req, res) {
     if (err.name === 'SequelizeUniqueConstraintError')
       return res.status(409).json({ error: 'A user with this email, phone, or medical registration number already exists' });
     return res.status(500).json({
-      error: process.env.NODE_ENV === 'development' ? err.message : 'Registration failed. Please try again.',
+      error: err.message || 'Registration failed. Please try again.',
     });
   }
 }

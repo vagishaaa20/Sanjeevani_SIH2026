@@ -1,18 +1,26 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useLanguage } from './LanguageContext'; // We'll create this to track current global language
+import { useLanguage } from './LanguageContext';
+import { getTranslatedText } from '../utils/translations';
 
 /**
- * Dynamically translates English UI text into the user's selected language using Bhashini via our backend router.
- * Fallbacks cleanly to the provided English text immediately on hydration or error.
+ * Dynamically translates English UI text into the user's selected language using 
+ * local dictionary first, and Bhashini via backend router as fallback for dynamic content.
  */
 function useTranslatedText(defaultEnglishText) {
     const { currentLang } = useLanguage();
-    const [translatedText, setTranslatedText] = useState(defaultEnglishText);
+    const [translatedText, setTranslatedText] = useState(() => getTranslatedText(defaultEnglishText, currentLang));
 
     useEffect(() => {
         if (!defaultEnglishText || currentLang === 'en' || !currentLang) {
             setTranslatedText(defaultEnglishText);
+            return;
+        }
+
+        // Check local translation dictionary first
+        const localTrans = getTranslatedText(defaultEnglishText, currentLang);
+        if (localTrans !== defaultEnglishText) {
+            setTranslatedText(localTrans);
             return;
         }
 
@@ -26,7 +34,7 @@ function useTranslatedText(defaultEnglishText) {
 
         let isMounted = true;
 
-        // Fetch securely from our custom translation backend
+        // Fetch from custom translation backend for unmapped dynamic strings
         const fetchTranslation = async () => {
             try {
                 const response = await axios.post(`${import.meta.env.VITE_API_URL}/translate`, {
@@ -37,12 +45,10 @@ function useTranslatedText(defaultEnglishText) {
 
                 if (response.data?.translatedText && isMounted) {
                     setTranslatedText(response.data.translatedText);
-                    // Commit to localStorage to avoid ever translating this exact string for this exact language again on this machine
                     localStorage.setItem(cacheKey, response.data.translatedText);
                 }
             } catch (err) {
-                console.warn(`[useTranslation] Failed to translate: "${defaultEnglishText}" to ${currentLang}.`, err.message);
-                if (isMounted) setTranslatedText(defaultEnglishText); // Fallback organically
+                if (isMounted) setTranslatedText(localTrans); // Fallback to local string
             }
         };
 
