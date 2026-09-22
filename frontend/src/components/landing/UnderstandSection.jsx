@@ -35,20 +35,23 @@ export const UnderstandSection = ({ onEnterPlatform }) => {
     return (
         <section className="relative w-full py-16 md:py-24 px-6 md:px-12 max-w-6xl mx-auto z-20">
             {/* Header with minimal, confident copy */}
-            <div className="flex flex-col items-start gap-3 mb-10 max-w-xl">
+            <div className="flex flex-col items-start gap-3 mb-10 max-w-2xl">
                 <div className="flex items-center gap-2 text-[11px] font-black tracking-[0.2em] uppercase font-mono" style={{ color: 'var(--accent)' }}>
                     <span className="w-1.5 h-1.5 rounded-full" style={{ background: 'var(--accent)' }} />
-                    02 — Intelligent Intake
+                    Intelligent Intake
                 </div>
                 <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight leading-[1.12]" style={{ color: 'var(--text-primary)' }}>
-                    Clinical triage, <br />
+                    Don't make patients <br />
                     <span className="font-serif italic font-normal" style={{ color: 'var(--accent-hover)' }}>
-                        structured in seconds.
+                        speak healthcare.
                     </span>
                 </h2>
                 <p className="text-sm md:text-base font-medium leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-                    Select a concern below to see how Sanjeevani translates symptoms into structured clinical context.
+                    Let them describe what they're experiencing. Our AI assists in structuring the data for clinicians instantly.
                 </p>
+                <div className="mt-2 text-xs font-bold px-3 py-1 rounded-full bg-rose-500/10 text-rose-500">
+                    AI-assisted. Clinician-led.
+                </div>
             </div>
 
             {/* Interactive Symptom Chips */}
