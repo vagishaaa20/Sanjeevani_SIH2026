@@ -7,6 +7,16 @@ import MagneticButton from '../../components/landing/MagneticButton';
 import UnderstandSection from '../../components/landing/UnderstandSection';
 import HealthRecordsSection from '../../components/landing/HealthRecordsSection';
 import ReturnDnaSection from '../../components/landing/ReturnDnaSection';
+import EcosystemSection from '../../components/landing/EcosystemSection';
+import WorkflowSection from '../../components/landing/WorkflowSection';
+import ProblemStatement from '../../components/landing/ProblemStatement';
+import ConnectedJourney from '../../components/landing/ConnectedJourney';
+import NetworkVisualization from '../../components/landing/NetworkVisualization';
+import HighRiskSection from '../../components/landing/HighRiskSection';
+import OfflineCareSection from '../../components/landing/OfflineCareSection';
+import MultilingualSection from '../../components/landing/MultilingualSection';
+import CoordinationSection from '../../components/landing/CoordinationSection';
+import TechnologyStack from '../../components/landing/TechnologyStack';
 import useAuth from '../../hooks/useAuth';
 import { useLanguage } from '../../hooks/LanguageContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -145,15 +155,9 @@ export const LandingHero = () => {
             </header>
 
             {/* 01 — HERO COMPOSITION */}
-            <main className="relative z-20 min-h-[calc(100vh-80px)] w-full max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center py-8 md:py-16">
+            <main className="relative z-20 w-full max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start pt-0 pb-0">
                 {/* Left Column: Refined Editorial Typography & CTAs (6 cols) */}
-                <div className="lg:col-span-6 xl:col-span-6 flex flex-col items-start text-left gap-6 md:gap-7 pt-4 lg:pt-0">
-                    {/* Minimal Eyebrow */}
-                    <div className="flex items-center gap-2 text-[11px] font-black tracking-[0.2em] uppercase font-mono" style={{ color: 'var(--accent)' }}>
-                        <span className="w-1.5 h-1.5 rounded-full" style={{ background: 'var(--accent)' }} />
-                        01 — Sanjeevani
-                    </div>
-
+                <div className="lg:col-span-6 xl:col-span-6 flex flex-col items-start text-left gap-6 md:gap-7 pt-16 md:pt-24 lg:pt-32 relative z-20">
                     {/* Editorial Headline */}
                     <div className="flex flex-col">
                         <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-[70px] font-black leading-[1.04] tracking-tight" style={{ color: 'var(--text-primary)' }}>
@@ -195,7 +199,13 @@ export const LandingHero = () => {
                 </div>
 
                 {/* Right Column: Live 3D DNA Helix (6 cols) */}
-                <div className="lg:col-span-6 xl:col-span-6 w-full h-full flex items-center justify-center relative min-h-[580px] md:min-h-[700px] lg:min-h-[820px]">
+                <div 
+                    className="lg:col-span-6 xl:col-span-6 w-full h-full flex items-center justify-center relative min-h-[580px] md:min-h-[700px] lg:min-h-[820px] lg:-ml-8 -mt-8 md:mt-0 lg:-mb-32 xl:-mb-48 z-0"
+                    style={{ 
+                        WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 10%, black 50%, transparent 75%)',
+                        maskImage: 'linear-gradient(to bottom, transparent 0%, black 10%, black 50%, transparent 75%)' 
+                    }}
+                >
                     {/* Soft Atmospheric Glow */}
                     <div className="absolute w-80 h-80 md:w-96 md:h-96 rounded-full blur-3xl pointer-events-none -z-10" style={{ background: 'var(--accent-light)', opacity: 0.4 }} />
 
@@ -204,15 +214,45 @@ export const LandingHero = () => {
                 </div>
             </main>
 
-            {/* 02 — UNDERSTAND (Intelligent Intake) */}
+            {/* 03 — THE PROBLEM */}
+            <ProblemStatement />
+
+            {/* 04 — ONE CONNECTED JOURNEY */}
+            <ConnectedJourney />
+
+            {/* 05 — SANJEEVANI NETWORK */}
+            <NetworkVisualization />
+
+            {/* 06 — HOW IT WORKS */}
+            <WorkflowSection />
+
+            {/* 07 — INTELLIGENT TRIAGE */}
             <div ref={understandSectionRef}>
                 <UnderstandSection onEnterPlatform={handleEnter} />
             </div>
 
-            {/* 03 — DIGITAL HEALTH VAULT */}
+            {/* 08 — HIGH-RISK PATIENT MANAGEMENT */}
+            <HighRiskSection />
+
+            {/* 09 — DIGITAL HEALTH VAULT */}
             <HealthRecordsSection />
 
-            {/* 04 — CONTINUITY & 3D BIOMOLECULAR ORB */}
+            {/* 10 — LOW-CONNECTIVITY CARE */}
+            <OfflineCareSection />
+
+            {/* 11 — MULTILINGUAL HEALTHCARE */}
+            <MultilingualSection />
+
+            {/* 12 — DIAGNOSTICS + MEDICINES */}
+            <CoordinationSection />
+
+            {/* 13 — TECHNOLOGY + AI */}
+            <TechnologyStack />
+
+            {/* 14 — ECOSYSTEM REVEAL */}
+            <EcosystemSection />
+
+            {/* 15 — CONTINUITY & FINAL CTA */}
             <ReturnDnaSection onEnterPlatform={handleEnter} />
         </div>
     );

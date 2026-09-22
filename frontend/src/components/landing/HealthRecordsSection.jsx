@@ -1,103 +1,77 @@
-import React, { useState } from 'react';
-import { Pill, Activity, ShieldCheck, FileCheck } from 'lucide-react';
+import React from 'react';
+import useScrollReveal from '../../hooks/useScrollReveal';
+import { Pill, Activity, ShieldCheck, FileCheck, Calendar, ArrowDown } from 'lucide-react';
 
-const VAULT_ITEMS = [
-    {
-        id: 'rx',
-        label: 'Digital Prescription',
-        icon: Pill,
-        badge: 'Encrypted & Signed',
-        title: 'Instant Electronic Prescriptions',
-        desc: 'Standardized medication plans with dosage intervals and refill schedules synced instantly to your patient profile.'
-    },
-    {
-        id: 'lab',
-        label: 'Diagnostic Panels',
-        icon: Activity,
-        badge: 'Automatic Ranges',
-        title: 'Structured Biomarkers',
-        desc: 'Lab reports automatically parsed with healthy reference intervals for clear patient understanding.'
-    },
-    {
-        id: 'vault',
-        label: 'Care History',
-        icon: FileCheck,
-        badge: 'ABDM Native',
-        title: 'Unified Health Records',
-        desc: 'Complete continuity across consultations, referrals, and diagnostic tests securely accessible in one place.'
-    }
+const TIMELINE_EVENTS = [
+    { date: '2026', type: 'Consultation', desc: 'Initial triage & physician review.', icon: Calendar },
+    { date: '2026', type: 'Diagnostic Report', desc: 'CBC & Lipid panel results attached.', icon: Activity },
+    { date: '2026', type: 'Prescription', desc: 'Standardized medication plan.', icon: Pill },
+    { date: '2026', type: 'Referral', desc: 'Specialist coordination.', icon: ShieldCheck },
 ];
 
 export const HealthRecordsSection = () => {
-    const [activeIdx, setActiveIdx] = useState(0);
+    const { ref, isVisible } = useScrollReveal(0.2);
 
     return (
-        <section className="relative w-full py-16 md:py-24 px-6 md:px-12 max-w-6xl mx-auto z-20">
-            {/* Minimal Header */}
-            <div className="flex flex-col items-start gap-3 mb-10 max-w-xl">
-                <div className="flex items-center gap-2 text-[11px] font-black tracking-[0.2em] uppercase font-mono" style={{ color: 'var(--accent)' }}>
-                    <span className="w-1.5 h-1.5 rounded-full" style={{ background: 'var(--accent)' }} />
-                    03 — Digital Health Vault
-                </div>
+        <section className="relative w-full py-24 md:py-32 px-6 max-w-5xl mx-auto z-20" ref={ref}>
+            <div className="flex flex-col items-center mb-16 text-center">
                 <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight leading-[1.12]" style={{ color: 'var(--text-primary)' }}>
-                    Unified records, <br />
+                    Your health history shouldn't <br />
                     <span className="font-serif italic font-normal" style={{ color: 'var(--accent-hover)' }}>
-                        always accessible.
+                        reset at every door.
                     </span>
                 </h2>
-                <p className="text-sm md:text-base font-medium leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-                    All your triage histories, electronic prescriptions, and diagnostic records organized in one secure dashboard.
+                <p className="mt-4 text-sm md:text-base font-medium leading-relaxed max-w-xl" style={{ color: 'var(--text-secondary)' }}>
+                    Every interaction across the Sanjeevani ecosystem builds a single, continuous, and highly secure longitudinal health record.
                 </p>
             </div>
 
-            {/* Interactive Vault Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {VAULT_ITEMS.map((item, idx) => {
-                    const isSelected = activeIdx === idx;
-                    const Icon = item.icon;
-                    return (
-                        <button
-                            key={item.id}
-                            onClick={() => setActiveIdx(idx)}
-                            className="p-6 rounded-3xl text-left transition-all duration-200 border cursor-pointer flex flex-col justify-between min-h-[220px]"
-                            style={{
-                                background: isSelected ? 'var(--bg-surface)' : 'var(--card-bg)',
-                                borderColor: isSelected ? 'var(--accent)' : 'var(--border)'
-                            }}
-                        >
-                            <div className="flex items-center justify-between w-full">
-                                <div
-                                    className="w-11 h-11 rounded-2xl flex items-center justify-center transition-colors"
-                                    style={{
-                                        background: isSelected ? 'var(--accent-light)' : 'var(--bg-primary)',
-                                        color: isSelected ? 'var(--accent)' : 'var(--text-muted)'
-                                    }}
-                                >
-                                    <Icon className="w-5 h-5" />
-                                </div>
-                                <span
-                                    className="text-[11px] font-bold px-2.5 py-0.5 rounded-full border"
-                                    style={{
-                                        color: 'var(--pastel-mint-text)',
-                                        background: 'var(--pastel-mint-bg)',
-                                        borderColor: 'var(--pastel-mint-text)'
-                                    }}
-                                >
-                                    {item.badge}
-                                </span>
-                            </div>
+            {/* Timeline */}
+            <div className="relative flex flex-col items-center max-w-2xl mx-auto">
+                {/* Central Line */}
+                <div className={`absolute top-0 bottom-0 w-0.5 bg-gradient-to-b from-teal-500/20 via-teal-500/40 to-teal-500/20 transition-all duration-[2s] ${isVisible ? 'scale-y-100' : 'scale-y-0'} origin-top`} />
 
-                            <div className="mt-6">
-                                <h3 className="font-bold text-base mb-1.5" style={{ color: 'var(--text-primary)' }}>
-                                    {item.title}
-                                </h3>
-                                <p className="text-xs leading-relaxed font-medium" style={{ color: 'var(--text-secondary)' }}>
-                                    {item.desc}
-                                </p>
+                {TIMELINE_EVENTS.map((event, idx) => (
+                    <div 
+                        key={idx} 
+                        className={`relative w-full flex items-center justify-between mb-12 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+                        style={{ transitionDelay: `${idx * 300}ms` }}
+                    >
+                        {/* Left Side (Empty for staggering, or used on desktop) */}
+                        <div className="hidden md:flex flex-1 justify-end pr-8 text-right">
+                            {idx % 2 === 0 && (
+                                <div>
+                                    <span className="text-xs font-black tracking-wider text-teal-500">{event.date}</span>
+                                    <h4 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>{event.type}</h4>
+                                    <p className="text-sm font-medium mt-1" style={{ color: 'var(--text-secondary)' }}>{event.desc}</p>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Center Node */}
+                        <div className="relative z-10 w-12 h-12 rounded-full border-2 bg-[var(--bg-surface)] flex items-center justify-center shrink-0 shadow-md"
+                             style={{ borderColor: 'var(--border)' }}>
+                            <event.icon className="w-5 h-5 text-teal-500" />
+                            {/* Pulse */}
+                            <div className="absolute inset-0 rounded-full animate-ping opacity-20 bg-teal-500" style={{ animationDuration: '3s', animationDelay: `${idx * 0.5}s` }} />
+                        </div>
+
+                        {/* Right Side */}
+                        <div className="flex-1 pl-6 md:pl-8">
+                            <div className={`md:${idx % 2 === 0 ? 'hidden' : 'block'}`}>
+                                <span className="text-xs font-black tracking-wider text-teal-500">{event.date}</span>
+                                <h4 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>{event.type}</h4>
+                                <p className="text-sm font-medium mt-1" style={{ color: 'var(--text-secondary)' }}>{event.desc}</p>
                             </div>
-                        </button>
-                    );
-                })}
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            <div className={`mt-16 text-center transition-all duration-1000 delay-1000 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
+                <h3 className="text-2xl font-black tracking-tight text-teal-600">
+                    One patient. <br className="md:hidden" /> One continuous story.
+                </h3>
             </div>
         </section>
     );
