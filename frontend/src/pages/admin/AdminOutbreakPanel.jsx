@@ -126,7 +126,7 @@ const AdminOutbreakPanel = () => {
                 />
             )}
 
-            <div className="bg-white rounded-2xl border-2 border-ink-black p-6 shadow-sm overflow-x-auto">
+            <div className="bg-cream-card rounded-2xl border-2 border-ink-black p-6 shadow-sm overflow-x-auto">
                 {loading ? (
                     <div className="py-8 text-center font-bold text-ink-charcoal">Loading active alerts...</div>
                 ) : sortedAlerts.length === 0 ? (

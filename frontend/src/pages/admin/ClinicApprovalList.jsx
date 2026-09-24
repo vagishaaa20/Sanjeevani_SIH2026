@@ -43,7 +43,7 @@ export const ClinicApprovalList = () => {
 
     return (
         <div className="w-full flex flex-col gap-6 text-left">
-            <div className="bg-white border-2 border-ink-black rounded-2xl p-6 shadow-sm">
+            <div className="bg-cream-card border-2 border-ink-black rounded-2xl p-6 shadow-sm">
                 <h2 className="text-2xl font-black text-ink-black font-heading">Clinic Audit Approvals</h2>
                 <p className="text-xs font-semibold text-ink-charcoal mt-1">Review pending registry registrations and toggle verification flags</p>
             </div>
@@ -65,7 +65,7 @@ export const ClinicApprovalList = () => {
                     <div className="w-8 h-8 border-4 border-t-pastel-pink-action border-r-transparent border-b-cerulean border-l-transparent rounded-full animate-spin"></div>
                 </div>
             ) : clinics.length === 0 ? (
-                <div className="bg-white border-2 border-ink-black rounded-2xl p-8 text-center">
+                <div className="bg-cream-card border-2 border-ink-black rounded-2xl p-8 text-center">
                     <p className="font-semibold text-ink-muted">No pending clinic registration applications found.</p>
                 </div>
             ) : (

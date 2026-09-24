@@ -18,6 +18,9 @@ const DEV_DOCTOR_PASSWORD = 'doctor1234';
 const DEV_WORKER_EMAIL = 'worker@sanjeevani.gov.in';
 const DEV_WORKER_PASSWORD = 'worker1234';
 
+const DEV_CLINIC_EMAIL = 'clinic@sanjeevani.dev';
+const DEV_CLINIC_PASSWORD = 'clinic1234';
+
 const DEV_PATIENT_PHONE = '9876543210';
 
 export const Login = () => {
@@ -389,6 +392,22 @@ export const Login = () => {
                                 <Button type="submit" variant="primary" className="mt-2 w-full" disabled={loading}>
                                     {loading ? 'Signing In…' : 'Access Clinic Portal'}
                                 </Button>
+
+                                <div className="p-4 mt-2 border border-dashed rounded-2xl flex flex-col gap-3" style={{ background: 'var(--accent-light)', borderColor: 'var(--notif-unread-border)' }}>
+                                    <div className="flex items-center gap-1.5" style={{ color: 'var(--accent)' }}>
+                                        <Sparkles className="w-4 h-4" />
+                                        <span className="text-xs font-black uppercase tracking-wider">Dev Sandbox</span>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => handleQuickLogin(DEV_CLINIC_EMAIL, DEV_CLINIC_PASSWORD)}
+                                        disabled={loading}
+                                        className="w-full py-2.5 text-xs font-black text-white rounded-full cursor-pointer transition shadow-xs disabled:opacity-50"
+                                        style={{ background: 'var(--accent)' }}
+                                    >
+                                        ⚡ Quick Login as Clinic
+                                    </button>
+                                </div>
                             </form>
                         )}
 

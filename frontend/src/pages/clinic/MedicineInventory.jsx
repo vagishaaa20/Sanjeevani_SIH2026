@@ -122,14 +122,14 @@ const MedicineInventory = () => {
 
     return (
         <div className="w-full flex flex-col gap-6 text-left">
-            <div className="bg-white border-2 border-ink-black rounded-3xl p-8 flex flex-col md:flex-row md:justify-between md:items-center gap-6 shadow-sm">
+            <div className="bg-cream-card border-2 border-ink-black rounded-3xl p-8 flex flex-col md:flex-row md:justify-between md:items-center gap-6 shadow-sm">
                 <div>
                     <h2 className="text-3xl font-black text-ink-black">Medicine Inventory</h2>
                     <p className="text-sm font-semibold text-ink-charcoal">Manage clinic medicines and stock levels</p>
                 </div>
             </div>
 
-            <div className="bg-white border-2 border-ink-black rounded-2xl p-6 shadow-sm">
+            <div className="bg-cream-card border-2 border-ink-black rounded-2xl p-6 shadow-sm">
                 <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-6 gap-3 items-end">
                     <div className="md:col-span-2">
                         <label className="block text-xs font-bold text-ink-muted uppercase tracking-wider mb-1">Medicine Name</label>
@@ -220,15 +220,15 @@ const MedicineInventory = () => {
             )}
 
             {loading ? (
-                <div className="bg-white border-2 border-ink-black rounded-2xl p-8 text-sm text-ink-charcoal text-center">
+                <div className="bg-cream-card border-2 border-ink-black rounded-2xl p-8 text-sm text-ink-charcoal text-center">
                     Loading medicines…
                 </div>
             ) : items.length === 0 ? (
-                <div className="bg-white border-2 border-ink-black rounded-2xl p-8 text-sm text-ink-charcoal text-center">
+                <div className="bg-cream-card border-2 border-ink-black rounded-2xl p-8 text-sm text-ink-charcoal text-center">
                     No medicines stocked yet. Add your first inventory item.
                 </div>
             ) : (
-                <div className="bg-white border-2 border-ink-black rounded-2xl overflow-hidden">
+                <div className="bg-cream-card border-2 border-ink-black rounded-2xl overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="min-w-full text-left text-sm">
                             <thead className="bg-cream-surface">

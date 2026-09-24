@@ -15,6 +15,10 @@ const doctorService = {
         const response = await api.patch(`/doctors/referrals/${referralId}`, data);
         return response.data;
     },
+    getRecentPatients: async () => {
+        const response = await api.get('/doctors/patients/recent');
+        return response.data;
+    },
 };
 
 export default doctorService;

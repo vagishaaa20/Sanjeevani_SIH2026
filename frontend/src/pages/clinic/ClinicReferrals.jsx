@@ -65,10 +65,10 @@ const ClinicReferrals = () => {
         <div className="w-full flex flex-col gap-6 text-left relative">
             <div className="flex justify-between items-center">
                 <div>
-                    <h2 className="text-3xl font-black text-slate-800">Incoming Referrals</h2>
-                    <p className="text-sm font-semibold text-slate-500">Manage patients referred to your facility.</p>
+                    <h2 className="text-3xl font-black text-ink-black">Incoming Referrals</h2>
+                    <p className="text-sm font-semibold text-ink-charcoal">Manage patients referred to your facility.</p>
                 </div>
-                <button onClick={loadData} className="px-3 py-2 bg-white border-2 border-black rounded-lg hover:bg-slate-50 shadow-sm flex items-center gap-2 font-semibold">
+                <button onClick={loadData} className="px-3 py-2 bg-cream-card border-2 border-ink-black rounded-lg hover:bg-cream-surface shadow-sm flex items-center gap-2 font-semibold">
                     <RefreshCcw size={16} className={loading ? 'animate-spin' : ''} />
                 </button>
             </div>
@@ -76,17 +76,17 @@ const ClinicReferrals = () => {
             {error && <div className="p-3 rounded-xl border-2 border-red-300 bg-red-50 text-red-700 font-bold">{error}</div>}
             {actionError && <div className="p-3 rounded-xl border-2 border-orange-300 bg-orange-50 text-orange-700 font-bold">{actionError}</div>}
 
-            <div className="bg-white border-2 border-slate-200 rounded-2xl overflow-x-auto shadow-sm">
+            <div className="bg-cream-card border-2 border-ink-black rounded-2xl overflow-x-auto shadow-sm">
                 <table className="min-w-full text-sm">
-                    <thead className="bg-slate-100 border-b-2 border-slate-200">
+                    <thead className="bg-cream-surface border-b-2 border-ink-black">
                         <tr>
-                            <th className="px-4 py-3 text-left font-bold text-slate-700">Date</th>
-                            <th className="px-4 py-3 text-left font-bold text-slate-700">Patient</th>
-                            <th className="px-4 py-3 text-left font-bold text-slate-700">Referred By</th>
-                            <th className="px-4 py-3 text-left font-bold text-slate-700">Priority</th>
-                            <th className="px-4 py-3 text-left font-bold text-slate-700">Reason</th>
-                            <th className="px-4 py-3 text-left font-bold text-slate-700">Status</th>
-                            <th className="px-4 py-3 text-left font-bold text-slate-700">Actions</th>
+                            <th className="px-4 py-3 text-left font-bold text-ink-black">Date</th>
+                            <th className="px-4 py-3 text-left font-bold text-ink-black">Patient</th>
+                            <th className="px-4 py-3 text-left font-bold text-ink-black">Referred By</th>
+                            <th className="px-4 py-3 text-left font-bold text-ink-black">Priority</th>
+                            <th className="px-4 py-3 text-left font-bold text-ink-black">Reason</th>
+                            <th className="px-4 py-3 text-left font-bold text-ink-black">Status</th>
+                            <th className="px-4 py-3 text-left font-bold text-ink-black">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -141,14 +141,14 @@ const ClinicReferrals = () => {
                     </tbody>
                 </table>
                 {!referrals.length && !loading && (
-                    <div className="p-12 text-center text-slate-500 font-semibold">No incoming referrals.</div>
+                    <div className="p-12 text-center text-ink-muted font-semibold">No incoming referrals.</div>
                 )}
             </div>
 
             {/* Outcome Modal */}
             {showOutcomeModal && selectedReferral && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-                    <div className="bg-white rounded-2xl border-2 border-black p-6 w-full max-w-md shadow-xl flex flex-col gap-4">
+                    <div className="bg-cream-card rounded-2xl border-2 border-ink-black p-6 w-full max-w-md shadow-xl flex flex-col gap-4">
                         <div className="flex justify-between items-center border-b pb-3">
                             <h3 className="text-xl font-black">Record Outcome</h3>
                         </div>

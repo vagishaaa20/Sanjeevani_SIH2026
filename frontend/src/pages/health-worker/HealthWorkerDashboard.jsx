@@ -67,7 +67,7 @@ export const HealthWorkerDashboard = () => {
             {/* 3-Column Layout: Upcoming Follow-ups, Recent Patients, Quick Actions */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* 1. Upcoming Follow-ups */}
-                <div className="bg-white border border-[#f5e4ec] rounded-3xl p-6 shadow-xs flex flex-col justify-between">
+                <div className="bg-cream-card border border-[#f5e4ec] rounded-3xl p-6 shadow-xs flex flex-col justify-between">
                     <div className="flex flex-col gap-4">
                         <div className="flex justify-between items-center">
                             <h3 className="text-base font-black text-[#2d2329] font-heading">Upcoming Follow-ups</h3>
@@ -128,7 +128,7 @@ export const HealthWorkerDashboard = () => {
                 </div>
 
                 {/* 2. Recent Patients */}
-                <div className="bg-white border border-[#f5e4ec] rounded-3xl p-6 shadow-xs flex flex-col justify-between">
+                <div className="bg-cream-card border border-[#f5e4ec] rounded-3xl p-6 shadow-xs flex flex-col justify-between">
                     <div className="flex flex-col gap-4">
                         <div className="flex justify-between items-center">
                             <h3 className="text-base font-black text-[#2d2329] font-heading">Recent Patients</h3>
@@ -140,7 +140,7 @@ export const HealthWorkerDashboard = () => {
                         <div className="flex flex-col gap-3">
                             <Link
                                 to="/health-worker/patients"
-                                className="flex items-center justify-between p-3 rounded-2xl bg-white border border-[#f5e4ec] hover:bg-[#fdf0f4] transition"
+                                className="flex items-center justify-between p-3 rounded-2xl bg-cream-card border border-[#f5e4ec] hover:bg-[#fdf0f4] transition"
                             >
                                 <div className="flex items-center gap-3">
                                     <div className="w-9 h-9 rounded-full bg-[#fff0e6] flex items-center justify-center font-bold text-xs text-[#e07a38]">
@@ -156,7 +156,7 @@ export const HealthWorkerDashboard = () => {
 
                             <Link
                                 to="/health-worker/patients"
-                                className="flex items-center justify-between p-3 rounded-2xl bg-white border border-[#f5e4ec] hover:bg-[#fdf0f4] transition"
+                                className="flex items-center justify-between p-3 rounded-2xl bg-cream-card border border-[#f5e4ec] hover:bg-[#fdf0f4] transition"
                             >
                                 <div className="flex items-center gap-3">
                                     <div className="w-9 h-9 rounded-full bg-[#e6f9f0] flex items-center justify-center font-bold text-xs text-[#10b981]">
@@ -172,7 +172,7 @@ export const HealthWorkerDashboard = () => {
 
                             <Link
                                 to="/health-worker/patients"
-                                className="flex items-center justify-between p-3 rounded-2xl bg-white border border-[#f5e4ec] hover:bg-[#fdf0f4] transition"
+                                className="flex items-center justify-between p-3 rounded-2xl bg-cream-card border border-[#f5e4ec] hover:bg-[#fdf0f4] transition"
                             >
                                 <div className="flex items-center gap-3">
                                     <div className="w-9 h-9 rounded-full bg-[#ffe6ee] flex items-center justify-center font-bold text-xs text-[#e13b68]">
@@ -198,7 +198,7 @@ export const HealthWorkerDashboard = () => {
                 </div>
 
                 {/* 3. Quick Actions */}
-                <div className="bg-white border border-[#f5e4ec] rounded-3xl p-6 shadow-xs flex flex-col gap-4">
+                <div className="bg-cream-card border border-[#f5e4ec] rounded-3xl p-6 shadow-xs flex flex-col gap-4">
                     <h3 className="text-base font-black text-[#2d2329] font-heading">Quick Actions</h3>
 
                     {/* Quick Illustration Graphic */}
@@ -216,7 +216,7 @@ export const HealthWorkerDashboard = () => {
                     <div className="grid grid-cols-2 gap-3">
                         <Link
                             to="/health-worker/patients"
-                            className="p-3.5 rounded-2xl bg-white border border-[#f5e4ec] hover:bg-[#fdf0f4] hover:border-[#f8c8d8] transition flex items-center gap-2 text-xs font-bold text-[#2d2329]"
+                            className="p-3.5 rounded-2xl bg-cream-card border border-[#f5e4ec] hover:bg-[#fdf0f4] hover:border-[#f8c8d8] transition flex items-center gap-2 text-xs font-bold text-[#2d2329]"
                         >
                             <Phone className="w-4 h-4 text-[#1e7ab8]" />
                             <span>Call Patient</span>
@@ -224,7 +224,7 @@ export const HealthWorkerDashboard = () => {
 
                         <Link
                             to="/health-worker/patients"
-                            className="p-3.5 rounded-2xl bg-white border border-[#f5e4ec] hover:bg-[#fdf0f4] hover:border-[#f8c8d8] transition flex items-center gap-2 text-xs font-bold text-[#2d2329]"
+                            className="p-3.5 rounded-2xl bg-cream-card border border-[#f5e4ec] hover:bg-[#fdf0f4] hover:border-[#f8c8d8] transition flex items-center gap-2 text-xs font-bold text-[#2d2329]"
                         >
                             <MessageSquare className="w-4 h-4 text-[#25D366]" />
                             <span>Send Message</span>
@@ -232,7 +232,7 @@ export const HealthWorkerDashboard = () => {
 
                         <Link
                             to="/health-worker/referrals"
-                            className="p-3.5 rounded-2xl bg-white border border-[#f5e4ec] hover:bg-[#fdf0f4] hover:border-[#f8c8d8] transition flex items-center gap-2 text-xs font-bold text-[#2d2329]"
+                            className="p-3.5 rounded-2xl bg-cream-card border border-[#f5e4ec] hover:bg-[#fdf0f4] hover:border-[#f8c8d8] transition flex items-center gap-2 text-xs font-bold text-[#2d2329]"
                         >
                             <HeartPulse className="w-4 h-4 text-[#7c3aed]" />
                             <span>Create Referral</span>
@@ -240,7 +240,7 @@ export const HealthWorkerDashboard = () => {
 
                         <Link
                             to="/health-worker/followups"
-                            className="p-3.5 rounded-2xl bg-white border border-[#f5e4ec] hover:bg-[#fdf0f4] hover:border-[#f8c8d8] transition flex items-center gap-2 text-xs font-bold text-[#2d2329]"
+                            className="p-3.5 rounded-2xl bg-cream-card border border-[#f5e4ec] hover:bg-[#fdf0f4] hover:border-[#f8c8d8] transition flex items-center gap-2 text-xs font-bold text-[#2d2329]"
                         >
                             <PlusCircle className="w-4 h-4 text-[#e13b68]" />
                             <span>Add Follow-up</span>

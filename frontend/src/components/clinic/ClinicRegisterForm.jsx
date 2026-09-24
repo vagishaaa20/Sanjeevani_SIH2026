@@ -303,7 +303,7 @@ export const ClinicRegisterForm = ({ onSuccess }) => {
                                     ? 'border-emerald-400 bg-emerald-50 text-emerald-800 hover:bg-emerald-100'
                                     : geoStatus === 'loading'
                                         ? 'border-blue-300 bg-blue-50 text-blue-600 cursor-not-allowed'
-                                        : 'border-ink-black bg-white text-ink-black hover:bg-pastel-sky-soft hover:-translate-y-0.5 hover:shadow-sm'
+                                        : 'border-ink-black bg-cream-card text-ink-black hover:bg-pastel-sky-soft hover:-translate-y-0.5 hover:shadow-sm'
                                 }`}
                         >
                             <span className="text-lg">{geoStatus === 'success' ? '✓' : '📍'}</span>
@@ -331,7 +331,7 @@ export const ClinicRegisterForm = ({ onSuccess }) => {
                                     value={formData.latitude}
                                     onChange={handleChange}
                                     placeholder="e.g. 22.8046"
-                                    className="w-full px-4 py-2.5 rounded-xl border border-ink-black bg-white focus:ring-2 focus:ring-rose-mauve text-sm"
+                                    className="w-full px-4 py-2.5 rounded-xl border border-ink-black bg-cream-card focus:ring-2 focus:ring-rose-mauve text-sm"
                                 />
                             </div>
                             <div className="flex flex-col gap-1">
@@ -345,7 +345,7 @@ export const ClinicRegisterForm = ({ onSuccess }) => {
                                     value={formData.longitude}
                                     onChange={handleChange}
                                     placeholder="e.g. 86.2029"
-                                    className="w-full px-4 py-2.5 rounded-xl border border-ink-black bg-white focus:ring-2 focus:ring-rose-mauve text-sm"
+                                    className="w-full px-4 py-2.5 rounded-xl border border-ink-black bg-cream-card focus:ring-2 focus:ring-rose-mauve text-sm"
                                 />
                             </div>
                         </div>

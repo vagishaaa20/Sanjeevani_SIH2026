@@ -26,7 +26,7 @@ export default function DiagnosticRequests() {
 
     return (
         <div className="max-w-4xl mx-auto w-full flex flex-col gap-6 text-left">
-            <div className="bg-white border-2 border-ink-black rounded-3xl p-8 flex flex-col gap-2 shadow-sm">
+            <div className="bg-cream-card border-2 border-ink-black rounded-3xl p-8 flex flex-col gap-2 shadow-sm">
                 <h2 className="text-3xl font-black text-ink-black">My Diagnostic Tests</h2>
                 <p className="text-sm font-semibold text-ink-charcoal">
                     View the status of your prescribed diagnostic tests and download results.
@@ -38,7 +38,7 @@ export default function DiagnosticRequests() {
                 {error && <p className="font-bold text-red-600">{error}</p>}
                 
                 {!loading && !error && requests.length === 0 && (
-                    <div className="bg-white border-2 border-ink-black rounded-2xl p-10 text-center flex flex-col items-center justify-center">
+                    <div className="bg-cream-card border-2 border-ink-black rounded-2xl p-10 text-center flex flex-col items-center justify-center">
                         <span className="text-4xl mb-4">🧪</span>
                         <h3 className="font-black text-xl text-ink-black mb-2">No Diagnostic Tests</h3>
                         <p className="text-sm text-ink-charcoal mb-6">
@@ -48,7 +48,7 @@ export default function DiagnosticRequests() {
                 )}
                 
                 {!loading && !error && requests.map(req => (
-                    <div key={req.id} className="bg-white border-2 border-ink-black rounded-2xl p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-sm">
+                    <div key={req.id} className="bg-cream-card border-2 border-ink-black rounded-2xl p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-sm">
                         <div className="flex flex-col gap-1">
                             <h3 className="font-black text-lg text-ink-black tracking-wide">
                                 {req.testName}

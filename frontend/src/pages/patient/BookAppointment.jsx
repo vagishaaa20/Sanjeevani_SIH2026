@@ -290,7 +290,7 @@ const BookAppointment = () => {
                                 </span>
                             </div>
 
-                            <div className="p-3.5 rounded-xl bg-white/80 border border-emerald-200 text-xs flex flex-col gap-1.5">
+                            <div className="p-3.5 rounded-xl bg-cream-card/80 border border-emerald-200 text-xs flex flex-col gap-1.5">
                                 <div>
                                     <span className="font-bold text-gray-500">Physician: </span>
                                     <span className="font-black text-gray-900">Dr. {selectedDoctor?.fullName}</span>
@@ -332,7 +332,7 @@ const BookAppointment = () => {
                                     closeModal();
                                     navigate('/patient/my-consultations');
                                 }}
-                                className="px-5 py-3 rounded-xl font-bold text-xs border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 transition"
+                                className="px-5 py-3 rounded-xl font-bold text-xs border border-gray-300 bg-cream-card hover:bg-gray-50 text-gray-700 transition"
                             >
                                 View My Consultations
                             </button>

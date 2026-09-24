@@ -162,7 +162,7 @@ export const HealthWorkerProfile = () => {
     return (
         <div className="w-full flex flex-col gap-6 text-left max-w-5xl mx-auto pb-16 animate-fade-in-up">
             {/* Header */}
-            <div className="bg-white border border-[#f5e4ec] rounded-3xl p-6 md:p-8 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="bg-cream-card border border-[#f5e4ec] rounded-3xl p-6 md:p-8 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3.5">
                     <div className="w-12 h-12 rounded-2xl bg-[#ffe6ee] border border-[#f8c8d8] flex items-center justify-center text-[#e13b68]">
                         <User className="w-6 h-6" />
@@ -201,7 +201,7 @@ export const HealthWorkerProfile = () => {
             )}
 
             {/* Profile Form */}
-            <div className="bg-white border border-[#f5e4ec] rounded-3xl p-6 sm:p-8 shadow-xs flex flex-col gap-6">
+            <div className="bg-cream-card border border-[#f5e4ec] rounded-3xl p-6 sm:p-8 shadow-xs flex flex-col gap-6">
                 <div className="border-b border-[#f5e4ec] pb-3">
                     <h3 className="text-base font-black text-[#1c1218] font-heading">Worker Details</h3>
                 </div>
@@ -272,7 +272,7 @@ export const HealthWorkerProfile = () => {
             </div>
 
             {/* Document Upload & Verification Section */}
-            <div className="bg-white border border-[#f5e4ec] rounded-3xl p-6 sm:p-8 shadow-xs flex flex-col gap-6">
+            <div className="bg-cream-card border border-[#f5e4ec] rounded-3xl p-6 sm:p-8 shadow-xs flex flex-col gap-6">
                 <div className="border-b border-[#f5e4ec] pb-3 flex items-center justify-between">
                     <div>
                         <h3 className="text-base font-black text-[#1c1218] font-heading">
@@ -385,7 +385,7 @@ export const HealthWorkerProfile = () => {
                                         <button
                                             type="button"
                                             onClick={() => handleViewDoc(doc)}
-                                            className="px-3 py-1.5 rounded-full bg-white border border-[#f5e4ec] hover:border-[#f8c8d8] text-xs font-bold text-[#e13b68] flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                                            className="px-3 py-1.5 rounded-full bg-cream-card border border-[#f5e4ec] hover:border-[#f8c8d8] text-xs font-bold text-[#e13b68] flex items-center gap-1.5 cursor-pointer shadow-2xs"
                                         >
                                             <Eye className="w-3.5 h-3.5" />
                                             <span>View PDF</span>
@@ -412,7 +412,7 @@ export const HealthWorkerProfile = () => {
             {/* Health Worker PDF Preview Modal */}
             {previewDoc && (
                 <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in">
-                    <div className="bg-white border border-[#f5e4ec] rounded-3xl w-full max-w-4xl h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+                    <div className="bg-cream-card border border-[#f5e4ec] rounded-3xl w-full max-w-4xl h-[85vh] flex flex-col shadow-2xl overflow-hidden">
                         <div className="px-6 py-4 border-b border-[#f5e4ec] flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <FileText className="w-5 h-5 text-[#e13b68]" />
@@ -435,7 +435,7 @@ export const HealthWorkerProfile = () => {
                                 <iframe
                                     src={`${previewSignedUrl}#toolbar=1`}
                                     title="Health Worker Document"
-                                    className="w-full h-full border-none bg-white"
+                                    className="w-full h-full border-none bg-cream-card"
                                 />
                             ) : (
                                 <p className="text-xs text-rose-600 font-bold">Failed to load preview.</p>

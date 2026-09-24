@@ -18,7 +18,7 @@ export const DepartmentManager = () => {
 
     return (
         <div className="w-full flex flex-col gap-6 text-left">
-            <div className="flex justify-between items-center bg-white border-2 border-ink-black rounded-2xl p-6 shadow-sm">
+            <div className="flex justify-between items-center bg-cream-card border-2 border-ink-black rounded-2xl p-6 shadow-sm">
                 <div>
                     <h2 className="text-2xl font-black text-ink-black">OPD & Lab Departments</h2>
                     <p className="text-xs font-semibold text-ink-charcoal mt-1">Configure active services for {profile.clinicName}</p>

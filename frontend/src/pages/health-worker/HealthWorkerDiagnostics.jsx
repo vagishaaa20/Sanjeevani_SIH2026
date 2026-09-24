@@ -36,7 +36,7 @@ export default function HealthWorkerDiagnostics() {
 
     return (
         <div className="max-w-5xl mx-auto w-full flex flex-col gap-6 text-left">
-            <div className="bg-white border-2 border-ink-black rounded-3xl p-8 flex flex-col gap-4 shadow-sm">
+            <div className="bg-cream-card border-2 border-ink-black rounded-3xl p-8 flex flex-col gap-4 shadow-sm">
                 <div className="flex justify-between items-center">
                     <div>
                         <h2 className="text-3xl font-black text-ink-black">Diagnostic Coordination</h2>
@@ -72,7 +72,7 @@ export default function HealthWorkerDiagnostics() {
                 {error && <p className="font-bold text-red-600 px-2">{error}</p>}
                 
                 {!loading && !error && requests.length === 0 && (
-                    <div className="bg-white border-2 border-ink-black rounded-2xl p-10 text-center flex flex-col items-center justify-center">
+                    <div className="bg-cream-card border-2 border-ink-black rounded-2xl p-10 text-center flex flex-col items-center justify-center">
                         <h3 className="font-black text-xl text-ink-black mb-2">No Requests</h3>
                         <p className="text-sm text-ink-charcoal mb-6">
                             You have not coordinated any diagnostic requests yet.
@@ -81,7 +81,7 @@ export default function HealthWorkerDiagnostics() {
                 )}
                 
                 {!loading && !error && requests.map(req => (
-                    <div key={req.id} className="bg-white border border-[#f5e4ec] rounded-2xl p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-xs">
+                    <div key={req.id} className="bg-cream-card border border-[#f5e4ec] rounded-2xl p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-xs">
                         <div className="flex flex-col gap-1">
                             <h3 className="font-black text-lg text-ink-black tracking-wide">
                                 {req.testName} <span className="text-sm text-ink-muted">({req.priority})</span>

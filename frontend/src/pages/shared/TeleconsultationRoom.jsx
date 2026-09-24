@@ -185,7 +185,7 @@ export default function TeleconsultationRoom() {
                             Signal: {quality.toUpperCase()}
                         </span>
                         {remoteUsers === 0 && (
-                            <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-white/90 text-stone-900 uppercase">
+                            <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-cream-card/90 text-stone-900 uppercase">
                                 Waiting for {isDoctor ? 'Patient' : 'Doctor'}...
                             </span>
                         )}
@@ -277,7 +277,7 @@ export default function TeleconsultationRoom() {
                                     switchToAudioMode();
                                     setShowQualityBanner(false);
                                 }}
-                                className="bg-white text-red-700 font-bold px-3 py-1 rounded text-xs transition cursor-pointer"
+                                className="bg-cream-card text-red-700 font-bold px-3 py-1 rounded text-xs transition cursor-pointer"
                             >
                                 Switch to Audio
                             </button>
@@ -304,7 +304,7 @@ export default function TeleconsultationRoom() {
                         <div className="flex gap-3 mt-2">
                             <button
                                 onClick={switchToVideoMode}
-                                className="bg-white text-stone-900 font-bold px-5 py-2.5 rounded-xl shadow-lg transition hover:bg-stone-100 text-xs flex items-center gap-1.5 cursor-pointer"
+                                className="bg-cream-card text-stone-900 font-bold px-5 py-2.5 rounded-xl shadow-lg transition hover:bg-stone-100 text-xs flex items-center gap-1.5 cursor-pointer"
                             >
                                 <Video className="w-4 h-4 text-emerald-600" />
                                 <span>Switch Back to Video</span>
@@ -369,7 +369,7 @@ export default function TeleconsultationRoom() {
                 )}
 
                 {/* Socket.io Chat Box */}
-                <div className="flex-1 flex flex-col bg-white border-2 border-ink-black rounded-2xl overflow-hidden shadow-sm">
+                <div className="flex-1 flex flex-col bg-cream-card border-2 border-ink-black rounded-2xl overflow-hidden shadow-sm">
                     <div className="bg-ink-black text-white p-3 border-b-2 border-ink-black">
                         <h3 className="font-bold text-sm uppercase tracking-wider">Messages</h3>
                     </div>
@@ -383,7 +383,7 @@ export default function TeleconsultationRoom() {
                                 <span className="text-[10px] font-bold text-ink-muted uppercase">{m.senderName}</span>
                                 <div className={`px-3 py-1.5 rounded-lg font-medium border-2 mt-0.5 ${m.senderName === (user.profile?.fullName || 'User')
                                     ? 'bg-emerald-100 border-emerald-300 text-emerald-900 rounded-tr-none'
-                                    : 'bg-white border-ink-black text-ink-black rounded-tl-none'
+                                    : 'bg-cream-card border-ink-black text-ink-black rounded-tl-none'
                                     }`}>
                                     {m.message}
                                 </div>
@@ -392,7 +392,7 @@ export default function TeleconsultationRoom() {
                         ))}
                     </div>
 
-                    <form onSubmit={sendChat} className="p-2 border-t-2 border-ink-black bg-white flex gap-2">
+                    <form onSubmit={sendChat} className="p-2 border-t-2 border-ink-black bg-cream-card flex gap-2">
                         <input
                             type="text"
                             className="flex-1 w-full p-2 bg-stone-100 rounded border border-stone-300 outline-none focus:border-emerald-500 font-medium text-sm"
@@ -410,7 +410,7 @@ export default function TeleconsultationRoom() {
             {/* Doctor Completion Modal */}
             {isDoctor && showCompletionModal && (
                 <div className="fixed inset-0 bg-ink-black/80 z-50 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto flex flex-col shadow-2xl border-2 border-ink-black animate-slide-up relative">
+                    <div className="bg-cream-card rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto flex flex-col shadow-2xl border-2 border-ink-black animate-slide-up relative">
                         <div className="p-6 border-b-2 border-ink-black bg-stone-50 rounded-t-3xl flex justify-between items-center sticky top-0 z-10">
                             <div>
                                 <h2 className="text-xl font-black text-ink-black uppercase tracking-wider">Complete Consultation</h2>
@@ -438,7 +438,7 @@ export default function TeleconsultationRoom() {
                                     required
                                     value={finalDiagnosis}
                                     onChange={(e) => setFinalDiagnosis(e.target.value)}
-                                    className="w-full bg-white border-2 border-ink-black rounded-xl p-3 focus:outline-none focus:ring-4 focus:ring-emerald-200 transition font-medium"
+                                    className="w-full bg-cream-card border-2 border-ink-black rounded-xl p-3 focus:outline-none focus:ring-4 focus:ring-emerald-200 transition font-medium"
                                     placeholder="e.g. Upper Respiratory Tract Infection"
                                 />
                             </div>
@@ -449,7 +449,7 @@ export default function TeleconsultationRoom() {
                                     value={prescriptionText}
                                     onChange={(e) => setPrescriptionText(e.target.value)}
                                     rows={4}
-                                    className="w-full bg-white border-2 border-ink-black rounded-xl p-3 focus:outline-none focus:ring-4 focus:ring-emerald-200 transition font-medium resize-none"
+                                    className="w-full bg-cream-card border-2 border-ink-black rounded-xl p-3 focus:outline-none focus:ring-4 focus:ring-emerald-200 transition font-medium resize-none"
                                     placeholder="e.g. Paracetamol 500mg SOS"
                                 />
                                 <p className="text-[10px] uppercase font-bold text-ink-muted mt-1">This will be processed by the Medication Reminders engine for the patient.</p>
@@ -500,7 +500,7 @@ export default function TeleconsultationRoom() {
             {/* Reschedule Consultation Modal - Doctor Only */}
             {isDoctor && showRescheduleModal && (
                 <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-3xl w-full max-w-lg overflow-hidden flex flex-col shadow-2xl border-2 border-stone-800 animate-slide-up relative text-left">
+                    <div className="bg-cream-card rounded-3xl w-full max-w-lg overflow-hidden flex flex-col shadow-2xl border-2 border-stone-800 animate-slide-up relative text-left">
                         <div className="p-5 border-b border-stone-200 bg-stone-50 flex justify-between items-center">
                             <div>
                                 <h2 className="text-lg font-black text-stone-900 tracking-tight flex items-center gap-2">
@@ -570,7 +570,7 @@ export default function TeleconsultationRoom() {
                                 <select
                                     value={rescheduleReason}
                                     onChange={(e) => setRescheduleReason(e.target.value)}
-                                    className="w-full px-3 py-2 rounded-xl text-xs border border-stone-300 focus:outline-none focus:ring-2 focus:ring-amber-300 font-medium bg-white"
+                                    className="w-full px-3 py-2 rounded-xl text-xs border border-stone-300 focus:outline-none focus:ring-2 focus:ring-amber-300 font-medium bg-cream-card"
                                 >
                                     <option value="Network connectivity issue">Network connectivity / poor signal</option>
                                     <option value="Patient unreachable / did not connect">Patient unreachable / did not answer</option>

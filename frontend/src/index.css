@@ -5,6 +5,43 @@
 
 @import "tailwindcss";
 
+@theme {
+  --color-rose-primary: var(--rose-primary);
+  --color-rose-primary-hover: var(--rose-primary-hover);
+  --color-rose-light: var(--rose-light);
+  --color-rose-soft-bg: var(--rose-soft-bg);
+  --color-rose-active-pill: var(--rose-active-pill);
+  --color-rose-card-border: var(--rose-card-border);
+
+  --color-pastel-pink-bg: var(--pastel-pink-bg);
+  --color-pastel-pink-text: var(--pastel-pink-text);
+  --color-pastel-mint-bg: var(--pastel-mint-bg);
+  --color-pastel-mint-text: var(--pastel-mint-text);
+  --color-pastel-peach-bg: var(--pastel-peach-bg);
+  --color-pastel-peach-text: var(--pastel-peach-text);
+  --color-pastel-lavender-bg: var(--pastel-lavender-bg);
+  --color-pastel-lavender-text: var(--pastel-lavender-text);
+  --color-pastel-sky-bg: var(--pastel-sky-bg);
+  --color-pastel-sky-text: var(--pastel-sky-text);
+
+  --color-cream-bg: var(--cream-bg);
+  --color-cream-card: var(--cream-card);
+  --color-cream-surface: var(--cream-surface);
+
+  --color-ink-black: var(--ink-black);
+  --color-ink-charcoal: var(--ink-charcoal);
+  --color-ink-muted: var(--ink-muted);
+
+  --font-sans: var(--sans);
+  --font-heading: var(--heading);
+
+  --color-pastel-pink-action: var(--accent);
+  --color-pastel-pink-action-hover: var(--accent-hover);
+  --color-pastel-pink-soft: var(--rose-soft-bg);
+  
+  --color-cerulean: #0ea5e9;
+}
+
 /* ─────────────────────────────────────────
    CSS Custom Properties — Soft Blush Healthcare Palette
 ──────────────────────────────────────────*/

@@ -49,7 +49,7 @@ export const HealthWorkerApprovalList = () => {
 
     return (
         <div className="w-full flex flex-col gap-6 text-left max-w-7xl mx-auto pb-12 animate-fade-in-up">
-            <div className="bg-white border border-[#f5e4ec] rounded-3xl p-6 md:p-8 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="bg-cream-card border border-[#f5e4ec] rounded-3xl p-6 md:p-8 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3.5">
                     <div className="w-12 h-12 rounded-2xl bg-[#ffe6ee] border border-[#f8c8d8] flex items-center justify-center text-[#e13b68]">
                         <Users className="w-6 h-6" />
@@ -78,15 +78,15 @@ export const HealthWorkerApprovalList = () => {
             )}
 
             {loading ? (
-                <div className="flex justify-center p-12 bg-white rounded-3xl border border-[#f5e4ec]">
+                <div className="flex justify-center p-12 bg-cream-card rounded-3xl border border-[#f5e4ec]">
                     <div className="w-8 h-8 border-4 border-t-[#e13b68] border-r-transparent border-b-[#e13b68] border-l-transparent rounded-full animate-spin"></div>
                 </div>
             ) : healthWorkers.length === 0 ? (
-                <div className="bg-white border border-[#f5e4ec] rounded-3xl p-12 text-center shadow-xs">
+                <div className="bg-cream-card border border-[#f5e4ec] rounded-3xl p-12 text-center shadow-xs">
                     <p className="font-bold text-xs text-[#7d6974]">No pending health worker applications found.</p>
                 </div>
             ) : (
-                <div className="bg-white border border-[#f5e4ec] rounded-3xl overflow-hidden shadow-xs">
+                <div className="bg-cream-card border border-[#f5e4ec] rounded-3xl overflow-hidden shadow-xs">
                     <Table headers={['Name', 'Worker Type', 'Location', 'Contact', 'Verification Documents', 'Actions']}>
                         {healthWorkers.map((hw) => {
                             const docs = hw.user?.verificationDocuments || [];

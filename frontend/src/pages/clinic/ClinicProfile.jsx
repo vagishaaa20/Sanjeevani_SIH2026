@@ -18,7 +18,7 @@ export const ClinicProfile = () => {
 
     return (
         <div className="w-full flex flex-col gap-6 text-left">
-            <div className="bg-white border-2 border-ink-black rounded-3xl p-8 flex flex-col md:flex-row md:justify-between md:items-center gap-6 shadow-sm">
+            <div className="bg-cream-card border-2 border-ink-black rounded-3xl p-8 flex flex-col md:flex-row md:justify-between md:items-center gap-6 shadow-sm">
                 <div className="flex flex-col gap-2">
                     <div className="flex flex-wrap items-center gap-3">
                         <h2 className="text-3xl font-black text-ink-black">{profile.clinicName || 'Clinic Name'}</h2>
@@ -37,7 +37,7 @@ export const ClinicProfile = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-white border-2 border-ink-black rounded-2xl p-6 flex flex-col gap-4">
+                <div className="bg-cream-card border-2 border-ink-black rounded-2xl p-6 flex flex-col gap-4">
                     <h3 className="text-lg font-bold text-ink-black">Facility Location</h3>
                     <div className="flex flex-col gap-3">
                         <div>
@@ -61,7 +61,7 @@ export const ClinicProfile = () => {
                     </div>
                 </div>
 
-                <div className="bg-white border-2 border-ink-black rounded-2xl p-6 flex flex-col gap-4">
+                <div className="bg-cream-card border-2 border-ink-black rounded-2xl p-6 flex flex-col gap-4">
                     <h3 className="text-lg font-bold text-ink-black">Active Departments</h3>
                     <div className="flex flex-wrap gap-2">
                         {profile.departments && profile.departments.length > 0 ? (

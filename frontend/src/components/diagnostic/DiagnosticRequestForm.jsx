@@ -45,7 +45,7 @@ const DiagnosticRequestForm = ({ onSuccess, prefilledPatientId = '', availablePa
     };
 
     return (
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4 bg-white p-6 rounded-2xl border border-[#f5e4ec] shadow-xs">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4 bg-cream-card p-6 rounded-2xl border border-[#f5e4ec] shadow-xs">
             <h3 className="text-lg font-black text-ink-black border-b border-[#f5e4ec] pb-2">New Diagnostic Request</h3>
             
             {availablePatients ? (
@@ -57,7 +57,7 @@ const DiagnosticRequestForm = ({ onSuccess, prefilledPatientId = '', availablePa
                         onChange={handleChange}
                         required
                         disabled={!!prefilledPatientId}
-                        className="w-full px-4 py-2.5 rounded-xl border border-ink-black bg-white focus:ring-2 focus:ring-rose-mauve text-sm"
+                        className="w-full px-4 py-2.5 rounded-xl border border-ink-black bg-cream-card focus:ring-2 focus:ring-rose-mauve text-sm text-ink-black"
                     >
                         <option value="">-- Select a Patient --</option>
                         {availablePatients.map((p) => {
@@ -91,7 +91,7 @@ const DiagnosticRequestForm = ({ onSuccess, prefilledPatientId = '', availablePa
                     value={formData.clinicId}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-2.5 rounded-xl border border-ink-black bg-white focus:ring-2 focus:ring-rose-mauve text-sm"
+                    className="w-full px-4 py-2.5 rounded-xl border border-ink-black bg-cream-card focus:ring-2 focus:ring-rose-mauve text-sm text-ink-black"
                 >
                     <option value="">-- Select a Clinic --</option>
                     {clinics.map((c) => (
@@ -117,7 +117,7 @@ const DiagnosticRequestForm = ({ onSuccess, prefilledPatientId = '', availablePa
                     name="priority" 
                     value={formData.priority}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-ink-black bg-white focus:ring-2 focus:ring-rose-mauve text-sm"
+                    className="w-full px-4 py-2.5 rounded-xl border border-ink-black bg-cream-card focus:ring-2 focus:ring-rose-mauve text-sm text-ink-black"
                 >
                     <option value="NORMAL">Normal</option>
                     <option value="HIGH">High</option>
@@ -132,7 +132,7 @@ const DiagnosticRequestForm = ({ onSuccess, prefilledPatientId = '', availablePa
                     value={formData.notes}
                     onChange={handleChange}
                     rows={3}
-                    className="w-full px-4 py-2.5 rounded-xl border border-ink-black bg-white focus:ring-2 focus:ring-rose-mauve text-sm"
+                    className="w-full px-4 py-2.5 rounded-xl border border-ink-black bg-cream-card focus:ring-2 focus:ring-rose-mauve text-sm text-ink-black"
                     placeholder="Any specific instructions..."
                 ></textarea>
             </div>

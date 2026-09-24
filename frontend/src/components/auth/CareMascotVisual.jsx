@@ -11,7 +11,7 @@ export const CareMascotVisual = () => {
             <div className="absolute w-[500px] h-[520px] bg-[#ffe4ec]/45 rounded-full blur-3xl pointer-events-none -z-10" />
 
             {/* Main Mascot Card Container */}
-            <div className="relative max-w-[500px] w-full rounded-3xl overflow-hidden border border-[#f5e4ec] bg-white/70 shadow-lg backdrop-blur-md">
+            <div className="relative max-w-[500px] w-full rounded-3xl overflow-hidden border border-[#f5e4ec] bg-cream-card/70 shadow-lg backdrop-blur-md">
                 <img
                     src="/care_mascot.jpg"
                     alt="Sanjeevani Compassionate Care"

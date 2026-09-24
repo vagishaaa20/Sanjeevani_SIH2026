@@ -53,7 +53,7 @@ export const ReturnDnaSection = ({ onEnterPlatform }) => {
             {/* Minimal Brand Footer */}
             <div className="mt-20 pt-8 border-t border-[#f5e4ec] w-full flex flex-col sm:flex-row items-center justify-between text-xs text-[#7d6974] gap-4 font-semibold">
                 <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-xl bg-white border border-[#f5c6d6] flex items-center justify-center p-0.5 shadow-2xs">
+                    <div className="w-8 h-8 rounded-xl bg-cream-card border border-[#f5c6d6] flex items-center justify-center p-0.5 shadow-2xs">
                         <SanjeevaniLogo variant="emblem" size={24} />
                     </div>
                     <span className="font-heading font-black text-sm text-[#1c1218]">SANJEEVANI</span>

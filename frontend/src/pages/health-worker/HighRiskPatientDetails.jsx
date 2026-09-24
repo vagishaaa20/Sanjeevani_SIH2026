@@ -102,7 +102,7 @@ const HighRiskPatientDetails = () => {
             </div>
 
             {/* Summary Card */}
-            <div className="bg-white border border-[#f5e4ec] rounded-3xl p-6 shadow-xs">
+            <div className="bg-cream-card border border-[#f5e4ec] rounded-3xl p-6 shadow-xs">
                 <div className="flex flex-col md:flex-row justify-between gap-6">
                     <div className="flex items-start gap-4">
                         <div className="w-16 h-16 rounded-full bg-[#fdf5f7] flex items-center justify-center text-[#e13b68]">
@@ -148,7 +148,7 @@ const HighRiskPatientDetails = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 
                 {/* Timeline */}
-                <div className="bg-white border border-[#f5e4ec] rounded-3xl p-6 shadow-xs flex flex-col gap-4">
+                <div className="bg-cream-card border border-[#f5e4ec] rounded-3xl p-6 shadow-xs flex flex-col gap-4">
                     <h3 className="text-base font-black text-[#2d2329] font-heading flex items-center gap-2">
                         <Activity className="w-5 h-5 text-[#e13b68]" /> Care Timeline
                     </h3>
@@ -194,7 +194,7 @@ const HighRiskPatientDetails = () => {
 
                 {/* Integration Summaries */}
                 <div className="flex flex-col gap-6">
-                    <div className="bg-white border border-[#f5e4ec] rounded-3xl p-6 shadow-xs flex flex-col gap-4">
+                    <div className="bg-cream-card border border-[#f5e4ec] rounded-3xl p-6 shadow-xs flex flex-col gap-4">
                         <h3 className="text-base font-black text-[#2d2329] font-heading flex items-center gap-2">
                             <HeartPulse className="w-5 h-5 text-[#7c3aed]" /> Referrals
                         </h3>
@@ -213,7 +213,7 @@ const HighRiskPatientDetails = () => {
                         )}
                     </div>
 
-                    <div className="bg-white border border-[#f5e4ec] rounded-3xl p-6 shadow-xs flex flex-col gap-4">
+                    <div className="bg-cream-card border border-[#f5e4ec] rounded-3xl p-6 shadow-xs flex flex-col gap-4">
                         <h3 className="text-base font-black text-[#2d2329] font-heading flex items-center gap-2">
                             <CheckCircle className="w-5 h-5 text-[#1e7ab8]" /> Diagnostics
                         </h3>
@@ -236,7 +236,7 @@ const HighRiskPatientDetails = () => {
             {/* Escalation Modal */}
             {showEscalationModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 animate-fade-in">
-                    <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl flex flex-col gap-4">
+                    <div className="bg-cream-card rounded-3xl p-6 max-w-md w-full shadow-2xl flex flex-col gap-4">
                         <h3 className="text-lg font-black text-[#2d2329] flex items-center gap-2">
                             <AlertTriangle className="w-5 h-5 text-orange-500" /> Escalate to Doctor
                         </h3>
