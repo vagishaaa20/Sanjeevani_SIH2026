@@ -35,7 +35,7 @@ export const DepartmentConfig = ({ currentDepartments, onUpdateSuccess }) => {
     };
 
     return (
-        <div className="bg-white border-2 border-ink-black rounded-2xl p-6 flex flex-col gap-4 text-left shadow-sm">
+        <div className="bg-cream-card border-2 border-ink-black rounded-2xl p-6 flex flex-col gap-4 text-left shadow-sm">
             <div>
                 <h3 className="text-lg font-bold text-ink-black">OPD Room & Services Configuration</h3>
                 <p className="text-xs text-ink-muted mt-0.5">Toggle operational departments that are currently active in your medical registry</p>

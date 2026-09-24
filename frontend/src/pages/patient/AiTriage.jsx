@@ -696,7 +696,7 @@ export const AiTriage = () => {
                         </div>
 
                         {/* Temporary Diagnosis & Specialty Banner */}
-                        <div className="flex flex-wrap items-center gap-3 p-4 rounded-2xl bg-white border border-[#f5e4ec] shadow-2xs">
+                        <div className="flex flex-wrap items-center gap-3 p-4 rounded-2xl bg-cream-card border border-[#f5e4ec] shadow-2xs">
                             <div className="flex flex-col gap-0.5">
                                 <span className="text-[10px] font-bold uppercase tracking-wider text-[#7d6974]">
                                     Preliminary AI Assessment
@@ -747,7 +747,7 @@ export const AiTriage = () => {
 
                                 {/* Active Emergency Dispatch Widget if triggered */}
                                 {emergencyDispatch ? (
-                                    <div className="p-5 rounded-2xl bg-white border-2 border-rose-500 shadow-md flex flex-col gap-3 animate-fade-in">
+                                    <div className="p-5 rounded-2xl bg-cream-card border-2 border-rose-500 shadow-md flex flex-col gap-3 animate-fade-in">
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-2">
                                                 <span className="w-3 h-3 rounded-full bg-rose-500 animate-ping" />
@@ -801,7 +801,7 @@ export const AiTriage = () => {
                                         </button>
                                         <a
                                             href="tel:108"
-                                            className="px-6 py-3.5 rounded-full font-black text-sm text-center border-2 border-rose-600 text-rose-700 bg-white hover:bg-rose-50 transition"
+                                            className="px-6 py-3.5 rounded-full font-black text-sm text-center border-2 border-rose-600 text-rose-700 bg-cream-card hover:bg-rose-50 transition"
                                         >
                                             Call 108 Directly
                                         </a>
@@ -870,7 +870,7 @@ export const AiTriage = () => {
                                     <button
                                         type="button"
                                         onClick={() => navigate('/patient/book-appointment')}
-                                        className="px-6 py-3.5 rounded-full font-bold text-xs border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 transition"
+                                        className="px-6 py-3.5 rounded-full font-bold text-xs border border-gray-300 bg-cream-card hover:bg-gray-50 text-gray-700 transition"
                                     >
                                         Pick Specific Doctor
                                     </button>

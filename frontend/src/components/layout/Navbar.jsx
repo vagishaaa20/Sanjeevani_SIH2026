@@ -366,7 +366,7 @@ export const Navbar = () => {
                         </button>
 
                         {profileMenuOpen && (
-                            <div className="absolute right-0 mt-2 w-64 bg-white border border-[#f5e4ec] rounded-3xl shadow-xl p-4 z-50 animate-fade-in-up text-left flex flex-col gap-3">
+                            <div className="absolute right-0 mt-2 w-64 bg-cream-card border border-[#f5e4ec] rounded-3xl shadow-xl p-4 z-50 animate-fade-in-up text-left flex flex-col gap-3">
                                 <div className="flex items-center gap-3 pb-3 border-b border-[#fdf0f4]">
                                     <MinimalistAvatar
                                         name={userName}

@@ -67,7 +67,7 @@ export default function ClinicDiagnostics() {
 
     return (
         <div className="max-w-5xl mx-auto w-full flex flex-col gap-6 text-left">
-            <div className="bg-white border-2 border-ink-black rounded-3xl p-8 flex flex-col gap-2 shadow-sm">
+            <div className="bg-cream-card border-2 border-ink-black rounded-3xl p-8 flex flex-col gap-2 shadow-sm">
                 <h2 className="text-3xl font-black text-ink-black">Diagnostic Coordination</h2>
                 <p className="text-sm font-semibold text-ink-charcoal">
                     Manage incoming diagnostic requests, update their status, and upload results.
@@ -79,7 +79,7 @@ export default function ClinicDiagnostics() {
                 {error && <p className="font-bold text-red-600 px-2">{error}</p>}
                 
                 {!loading && !error && requests.length === 0 && (
-                    <div className="bg-white border-2 border-ink-black rounded-2xl p-10 text-center flex flex-col items-center justify-center">
+                    <div className="bg-cream-card border-2 border-ink-black rounded-2xl p-10 text-center flex flex-col items-center justify-center">
                         <h3 className="font-black text-xl text-ink-black mb-2">No Requests</h3>
                         <p className="text-sm text-ink-charcoal mb-6">
                             There are no incoming diagnostic requests for your facility.
@@ -88,7 +88,7 @@ export default function ClinicDiagnostics() {
                 )}
                 
                 {!loading && !error && requests.map(req => (
-                    <div key={req.id} className="bg-white border border-[#f5e4ec] rounded-2xl p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shadow-xs">
+                    <div key={req.id} className="bg-cream-card border border-[#f5e4ec] rounded-2xl p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shadow-xs">
                         <div className="flex flex-col gap-1 flex-1">
                             <h3 className="font-black text-lg text-ink-black tracking-wide">
                                 {req.testName} <span className="text-sm text-ink-muted">({req.priority})</span>

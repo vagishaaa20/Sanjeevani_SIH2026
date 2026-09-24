@@ -47,7 +47,7 @@ const HighRiskPatients = () => {
                 </div>
             )}
 
-            <div className="bg-white border border-[#f5e4ec] rounded-3xl overflow-hidden shadow-xs">
+            <div className="bg-cream-card border border-[#f5e4ec] rounded-3xl overflow-hidden shadow-xs">
                 {patients.length === 0 ? (
                     <div className="p-12 text-center flex flex-col items-center justify-center gap-3">
                         <div className="w-16 h-16 rounded-full bg-[#fdf5f7] flex items-center justify-center text-[#e13b68]">
@@ -106,7 +106,7 @@ const HighRiskPatients = () => {
                                             <td className="p-4 text-right">
                                                 <Link 
                                                     to={`/health-worker/high-risk/${p.patientId}`}
-                                                    className="inline-flex items-center justify-center p-2 rounded-xl bg-white border border-[#f5e4ec] hover:bg-[#fdf0f4] hover:border-[#f8c8d8] text-[#e13b68] transition"
+                                                    className="inline-flex items-center justify-center p-2 rounded-xl bg-cream-card border border-[#f5e4ec] hover:bg-[#fdf0f4] hover:border-[#f8c8d8] text-[#e13b68] transition"
                                                     title="View Details"
                                                 >
                                                     <ArrowRight className="w-4 h-4" />

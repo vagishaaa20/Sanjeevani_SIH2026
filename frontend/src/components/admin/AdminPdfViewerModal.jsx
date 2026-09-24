@@ -129,7 +129,7 @@ export const AdminPdfViewerModal = ({
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 animate-fade-in">
             <div className="bg-[#fffcfd] border border-[#f5e4ec] rounded-3xl w-full max-w-6xl h-[92vh] flex flex-col shadow-2xl overflow-hidden">
                 {/* Modal Header */}
-                <div className="bg-white border-b border-[#f5e4ec] px-6 py-4 flex items-center justify-between shrink-0">
+                <div className="bg-cream-card border-b border-[#f5e4ec] px-6 py-4 flex items-center justify-between shrink-0">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-2xl bg-[#ffe6ee] border border-[#f8c8d8] flex items-center justify-center text-[#e13b68]">
                             <FileText className="w-5 h-5" />
@@ -187,7 +187,7 @@ export const AdminPdfViewerModal = ({
                                 <span>Generating temporary secure signed URL...</span>
                             </div>
                         ) : error ? (
-                            <div className="p-8 text-center max-w-md bg-white rounded-2xl border border-rose-200 shadow-md">
+                            <div className="p-8 text-center max-w-md bg-cream-card rounded-2xl border border-rose-200 shadow-md">
                                 <AlertCircle className="w-10 h-10 text-rose-600 mx-auto mb-2" />
                                 <h4 className="font-black text-sm text-rose-950">Could Not Load Document</h4>
                                 <p className="text-xs text-rose-800 mt-1">{error}</p>
@@ -196,7 +196,7 @@ export const AdminPdfViewerModal = ({
                             <iframe
                                 src={`${signedUrl}#toolbar=1&navpanes=1&scrollbar=1`}
                                 title="Original Verification PDF Document"
-                                className="w-full h-full border-none bg-white"
+                                className="w-full h-full border-none bg-cream-card"
                             />
                         ) : null}
                     </div>
@@ -293,13 +293,13 @@ export const AdminPdfViewerModal = ({
                                         }
                                         rows={3}
                                         required
-                                        className="w-full p-2.5 rounded-xl border border-[#f0d5df] text-xs focus:outline-none focus:ring-2 focus:ring-[#e13b68]/20 bg-white"
+                                        className="w-full p-2.5 rounded-xl border border-[#f0d5df] text-xs focus:outline-none focus:ring-2 focus:ring-[#e13b68]/20 bg-cream-card"
                                     />
                                     <div className="flex items-center gap-2 justify-end pt-1">
                                         <button
                                             type="button"
                                             onClick={() => setActionType(null)}
-                                            className="px-3 py-1.5 rounded-full text-xs font-bold text-[#7d6974] hover:bg-white transition"
+                                            className="px-3 py-1.5 rounded-full text-xs font-bold text-[#7d6974] hover:bg-cream-card transition"
                                         >
                                             Cancel
                                         </button>

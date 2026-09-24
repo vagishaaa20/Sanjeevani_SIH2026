@@ -343,7 +343,7 @@ export default function PatientRequests() {
                                                 return (
                                                     <div
                                                         key={docId || idx}
-                                                        className="p-4 rounded-2xl bg-white border border-[#f5e4ec] hover:border-[#e13b68] shadow-2xs hover:shadow-xs flex flex-col justify-between gap-3 transition"
+                                                        className="p-4 rounded-2xl bg-cream-card border border-[#f5e4ec] hover:border-[#e13b68] shadow-2xs hover:shadow-xs flex flex-col justify-between gap-3 transition"
                                                     >
                                                         <div className="flex items-start gap-3">
                                                             <div className="w-10 h-10 rounded-xl bg-[#ffe6ee] text-[#e13b68] flex items-center justify-center font-black text-sm shrink-0">

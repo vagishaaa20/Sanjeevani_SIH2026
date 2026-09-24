@@ -205,7 +205,7 @@ const DoctorApprovalList = () => {
     return (
         <div className="w-full flex flex-col gap-6 text-left">
             {/* Header */}
-            <div className="bg-white border-2 border-ink-black rounded-2xl p-6 shadow-sm flex items-start justify-between">
+            <div className="bg-cream-card border-2 border-ink-black rounded-2xl p-6 shadow-sm flex items-start justify-between">
                 <div>
                     <h2 className="text-2xl font-black text-ink-black font-heading">Doctor Registration Review</h2>
                     <p className="text-xs font-semibold text-ink-charcoal mt-1">
@@ -236,7 +236,7 @@ const DoctorApprovalList = () => {
                     <div className="w-8 h-8 border-4 border-t-pastel-pink-action border-r-transparent border-b-cerulean border-l-transparent rounded-full animate-spin" />
                 </div>
             ) : doctors.length === 0 ? (
-                <div className="bg-white border-2 border-ink-black rounded-2xl p-10 text-center">
+                <div className="bg-cream-card border-2 border-ink-black rounded-2xl p-10 text-center">
                     <p className="text-4xl mb-3">🩺</p>
                     <p className="font-bold text-ink-black">No pending doctor applications</p>
                     <p className="text-xs text-ink-muted mt-1 font-medium">All registrations are up to date</p>
@@ -249,7 +249,7 @@ const DoctorApprovalList = () => {
                         const docsExpanded = !!expandedDocs[doc.userId];
 
                         return (
-                            <div key={doc.userId} className="bg-white border-2 border-ink-black rounded-2xl p-5 shadow-sm flex flex-col gap-4">
+                            <div key={doc.userId} className="bg-cream-card border-2 border-ink-black rounded-2xl p-5 shadow-sm flex flex-col gap-4">
                                 {/* Header row */}
                                 <div className="flex items-start justify-between gap-4 flex-wrap">
                                     <div className="flex flex-col gap-1">

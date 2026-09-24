@@ -88,7 +88,7 @@ const HealthWorkerReferrals = () => {
                     <p className="text-sm font-semibold text-slate-500">Track and manage referrals for your assigned patients.</p>
                 </div>
                 <div className="flex gap-2">
-                    <button onClick={loadData} className="px-3 py-2 bg-white border-2 border-black rounded-lg hover:bg-slate-50 shadow-sm flex items-center gap-2 font-semibold">
+                    <button onClick={loadData} className="px-3 py-2 bg-cream-card border-2 border-black rounded-lg hover:bg-slate-50 shadow-sm flex items-center gap-2 font-semibold">
                         <RefreshCcw size={16} className={loading ? 'animate-spin' : ''} />
                     </button>
                     <button onClick={() => setShowCreate(true)} className="px-4 py-2 bg-emerald-500 text-white border-2 border-black rounded-lg hover:bg-emerald-600 shadow-sm flex items-center gap-2 font-bold">
@@ -99,7 +99,7 @@ const HealthWorkerReferrals = () => {
 
             {error && <div className="p-3 rounded-xl border-2 border-red-300 bg-red-50 text-red-700 font-bold">{error}</div>}
 
-            <div className="bg-white border-2 border-slate-200 rounded-2xl overflow-x-auto shadow-sm">
+            <div className="bg-cream-card border-2 border-slate-200 rounded-2xl overflow-x-auto shadow-sm">
                 <table className="min-w-full text-sm">
                     <thead className="bg-slate-100 border-b-2 border-slate-200">
                         <tr>
@@ -163,7 +163,7 @@ const HealthWorkerReferrals = () => {
             {/* Create Modal */}
             {showCreate && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-                    <div className="bg-white rounded-2xl border-2 border-black p-6 w-full max-w-md shadow-xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
+                    <div className="bg-cream-card rounded-2xl border-2 border-black p-6 w-full max-w-md shadow-xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
                         <div className="flex justify-between items-center border-b pb-3">
                             <h3 className="text-xl font-black">Create Referral</h3>
                             <button onClick={() => setShowCreate(false)} className="p-1 hover:bg-slate-100 rounded-full"><X size={20} /></button>
